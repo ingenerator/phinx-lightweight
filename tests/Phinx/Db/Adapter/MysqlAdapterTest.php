@@ -20,7 +20,7 @@ class MysqlAdapterTest extends TestCase
      */
     private $adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!defined('MYSQL_DB_CONFIG')) {
             $this->markTestSkipped('Mysql tests disabled.');
@@ -36,7 +36,7 @@ class MysqlAdapterTest extends TestCase
         $this->adapter->disconnect();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->adapter);
     }

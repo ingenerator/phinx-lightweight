@@ -67,7 +67,7 @@ class MysqlAdapterUnitTest extends TestCase
 
     private $result;
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!defined('MYSQL_DB_CONFIG')) {
             $this->markTestSkipped('Mysql tests disabled. See MYSQL_DB_CONFIG constant.');
