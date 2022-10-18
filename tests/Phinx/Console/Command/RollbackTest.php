@@ -239,12 +239,12 @@ class RollbackTest extends TestCase
 
     /**
      * @dataProvider getTargetFromDateThrowsExceptionDataProvider
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Invalid date. Format is YYYY[MM[DD[HH[II[SS]]]]].
      */
     public function testGetTargetFromDateThrowsException($invalidDate)
     {
         $rollbackCommand = new Rollback();
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid date. Format is YYYY[MM[DD[HH[II[SS]]]]].');
         $rollbackCommand->getTargetFromDate($invalidDate);
     }
 

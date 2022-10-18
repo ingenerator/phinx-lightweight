@@ -141,10 +141,6 @@ class PdoAdapterTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Invalid version_order configuration option
-     */
     public function testGetVersionLogInvalidVersionOrderKO()
     {
         $adapter = $this->getMockForAbstractClass(
@@ -152,6 +148,8 @@ class PdoAdapterTest extends TestCase
             [['version_order' => 'invalid']]
         );
 
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid version_order configuration option');
         $adapter->getVersionLog();
     }
 

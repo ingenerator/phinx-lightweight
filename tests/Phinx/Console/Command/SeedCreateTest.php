@@ -57,14 +57,13 @@ class SeedCreateTest extends TestCase
         $this->output = new StreamOutput(fopen('php://memory', 'a', false));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The file "MyDuplicateSeeder.php" already exists
-     */
     public function testExecute()
     {
         $application = new PhinxApplication('testing');
         $application->add(new SeedCreate());
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The file "MyDuplicateSeeder.php" already exists');
 
         /** @var SeedCreate $command */
         $command = $application->find('seed:create');
@@ -83,10 +82,6 @@ class SeedCreateTest extends TestCase
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateSeeder'], ['decorated' => false]);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The seed class name "badseedname" is invalid. Please use CamelCase format
-     */
     public function testExecuteWithInvalidClassName()
     {
         $application = new PhinxApplication('testing');
@@ -105,6 +100,8 @@ class SeedCreateTest extends TestCase
         $command->setManager($managerStub);
 
         $commandTester = new CommandTester($command);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The seed class name "badseedname" is invalid. Please use CamelCase format');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'badseedname'], ['decorated' => false]);
     }
 }

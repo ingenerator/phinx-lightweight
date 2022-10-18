@@ -7,13 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class IndexTest extends TestCase
 {
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage "0" is not a valid index option.
-     */
+
     public function testSetOptionThrowsExceptionIfOptionIsNotString()
     {
         $column = new Index();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('"0" is not a valid index option.');
         $column->setOptions(['type']);
     }
 }

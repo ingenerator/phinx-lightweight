@@ -43,10 +43,6 @@ class InitTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException              \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /The file "(.*)" already exists/
-     */
     public function testThrowsExceptionWhenConfigFilePresent()
     {
         touch(sys_get_temp_dir() . '/phinx.yml');
@@ -56,6 +52,8 @@ class InitTest extends TestCase
         $command = $application->find('init');
 
         $commandTester = new CommandTester($command);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/The file "(.*)" already exists/');
         $commandTester->execute([
             'command' => $command->getName(),
             'path' => sys_get_temp_dir()

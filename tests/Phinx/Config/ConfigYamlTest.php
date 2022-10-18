@@ -15,12 +15,12 @@ class ConfigYamlTest extends TestCase
     /**
      * @covers \Phinx\Config\Config::fromYaml
      * @covers \Phinx\Config\Config::getDefaultEnvironment
-     * @expectedException \RuntimeException
      */
     public function testGetDefaultEnvironmentWithAnEmptyYamlFile()
     {
         // test using a Yaml file with no key or entries
         $path = __DIR__ . '/_files';
+        $this->expectException(\RuntimeException::class);
         $config = Config::fromYaml($path . '/empty.yml');
         $config->getDefaultEnvironment();
     }
@@ -28,8 +28,6 @@ class ConfigYamlTest extends TestCase
     /**
      * @covers \Phinx\Config\Config::fromYaml
      * @covers \Phinx\Config\Config::getDefaultEnvironment
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The environment configuration for 'staging' is missing
      */
     public function testGetDefaultEnvironmentWithAMissingEnvironmentEntry()
     {
@@ -37,6 +35,8 @@ class ConfigYamlTest extends TestCase
         // corresponding entry
         $path = __DIR__ . '/_files';
         $config = Config::fromYaml($path . '/missing_environment_entry.yml');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("The environment configuration for 'staging' is missing");
         $config->getDefaultEnvironment();
     }
 

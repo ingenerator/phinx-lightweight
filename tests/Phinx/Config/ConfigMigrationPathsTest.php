@@ -12,12 +12,11 @@ use Phinx\Config\Config;
  */
 class ConfigMigrationPathsTest extends AbstractConfigTest
 {
-    /**
-     * @expectedException \UnexpectedValueException
-     */
+
     public function testGetMigrationPathsThrowsExceptionForNoPath()
     {
         $config = new Config([]);
+        $this->expectException(\UnexpectedValueException::class);
         $config->getMigrationPaths();
     }
 

@@ -12,12 +12,11 @@ use Phinx\Config\Config;
  */
 class ConfigSeedPathsTest extends AbstractConfigTest
 {
-    /**
-     * @expectedException \UnexpectedValueException
-     */
+
     public function testGetSeedPathsThrowsExceptionForNoPath()
     {
         $config = new Config([]);
+        $this->expectException(\UnexpectedValueException::class);
         $config->getSeedPaths();
     }
 

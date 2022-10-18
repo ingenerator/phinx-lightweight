@@ -114,11 +114,11 @@ class ConfigTest extends AbstractConfigTest
 
     /**
      * @covers \Phinx\Config\Config::offsetGet
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Identifier "foo" is not defined.
      */
     public function testUndefinedArrayAccess()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Identifier "foo" is not defined.');
         $config = new Config([]);
         $config['foo'];
     }
@@ -205,12 +205,12 @@ class ConfigTest extends AbstractConfigTest
 
     /**
      * @covers \Phinx\Config\Config::getSeedPaths
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Seeds path missing from config file
      */
     public function testGetSeedPathThrowsException()
     {
         $config = new \Phinx\Config\Config([]);
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Seeds path missing from config file');
         $this->assertEquals('db/seeds', $config->getSeedPaths());
     }
 

@@ -26,11 +26,11 @@ class ConfigPhpTest extends TestCase
     /**
      * @covers \Phinx\Config\Config::fromPhp
      * @covers \Phinx\Config\Config::getDefaultEnvironment
-     * @expectedException \RuntimeException
      */
     public function testFromPHPMethodWithoutArray()
     {
         $path = __DIR__ . '/_files';
+        $this->expectException(\RuntimeException::class);
         $config = Config::fromPhp($path . '/config_without_array.php');
         $this->assertEquals('dev', $config->getDefaultEnvironment());
     }
@@ -38,11 +38,11 @@ class ConfigPhpTest extends TestCase
     /**
      * @covers \Phinx\Config\Config::fromPhp
      * @covers \Phinx\Config\Config::getDefaultEnvironment
-     * @expectedException \RuntimeException
      */
     public function testFromJSONMethodWithoutJSON()
     {
         $path = __DIR__ . '/_files';
+        $this->expectException(\RuntimeException::class);
         $config = Config::fromPhp($path . '/empty.json');
         $this->assertEquals('dev', $config->getDefaultEnvironment());
     }

@@ -7,13 +7,11 @@ use PHPUnit\Framework\TestCase;
 
 class ColumnTest extends TestCase
 {
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage "0" is not a valid column option.
-     */
     public function testSetOptionThrowsExceptionIfOptionIsNotString()
     {
         $column = new Column();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('"0" is not a valid column option.');
         $column->setOptions(['identity']);
     }
 }

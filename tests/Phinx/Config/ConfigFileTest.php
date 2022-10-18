@@ -50,10 +50,10 @@ class ConfigFileTest extends TestCase
      *
      * @param $input
      * @param $dir
-     * @expectedException \InvalidArgumentException
      */
     public function testNotWorkingGetConfigFile($input, $dir)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->runLocateFile($input, $dir);
     }
 

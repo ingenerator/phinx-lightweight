@@ -1048,10 +1048,6 @@ class ManagerTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Invalid version_order configuration option
-     */
     public function testPrintStatusInvalidVersionOrderKO()
     {
         // stub environment
@@ -1066,6 +1062,8 @@ class ManagerTest extends TestCase
         $this->manager = new Manager($config, $this->input, $this->output);
 
         $this->manager->setEnvironments(['mockenv' => $envStub]);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid version_order configuration option');
         $this->manager->printStatus('mockenv');
     }
 
@@ -5360,10 +5358,6 @@ class ManagerTest extends TestCase
         $this->assertStringContainsString('Baz\UserSeeder', $output);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The seed class "NonExistentSeeder" does not exist
-     */
     public function testExecuteANonExistentSeedWorksAsExpected()
     {
         // stub environment
@@ -5371,16 +5365,14 @@ class ManagerTest extends TestCase
             ->setConstructorArgs(['mockenv', []])
             ->getMock();
         $this->manager->setEnvironments(['mockenv' => $envStub]);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The seed class "NonExistentSeeder" does not exist');
         $this->manager->seed('mockenv', 'NonExistentSeeder');
         rewind($this->manager->getOutput()->getStream());
         $output = stream_get_contents($this->manager->getOutput()->getStream());
         $this->assertStringContainsString('UserSeeder', $output);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The seed class "Foo\Bar\NonExistentSeeder" does not exist
-     */
     public function testExecuteANonExistentSeedWorksAsExpectedWithNamespace()
     {
         // stub environment
@@ -5389,16 +5381,14 @@ class ManagerTest extends TestCase
             ->getMock();
         $this->manager->setConfig($this->getConfigWithNamespace());
         $this->manager->setEnvironments(['mockenv' => $envStub]);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The seed class "Foo\Bar\NonExistentSeeder" does not exist');
         $this->manager->seed('mockenv', 'Foo\Bar\NonExistentSeeder');
         rewind($this->manager->getOutput()->getStream());
         $output = stream_get_contents($this->manager->getOutput()->getStream());
         $this->assertStringContainsString('Foo\Bar\UserSeeder', $output);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The seed class "Baz\NonExistentSeeder" does not exist
-     */
     public function testExecuteANonExistentSeedWorksAsExpectedWithMixedNamespace()
     {
         // stub environment
@@ -5407,6 +5397,8 @@ class ManagerTest extends TestCase
             ->getMock();
         $this->manager->setConfig($this->getConfigWithMixedNamespace());
         $this->manager->setEnvironments(['mockenv' => $envStub]);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The seed class "Baz\NonExistentSeeder" does not exist');
         $this->manager->seed('mockenv', 'Baz\NonExistentSeeder');
         rewind($this->manager->getOutput()->getStream());
         $output = stream_get_contents($this->manager->getOutput()->getStream());
@@ -5453,12 +5445,10 @@ class ManagerTest extends TestCase
         }
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The environment "invalidenv" does not exist
-     */
     public function testGettingAnInvalidEnvironment()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The environment "invalidenv" does not exist');
         $this->manager->getEnvironment('invalidenv');
     }
 
@@ -5710,18 +5700,13 @@ class ManagerTest extends TestCase
 
     public function setExpectedException($exceptionName, $exceptionMessage = '', $exceptionCode = null)
     {
-        if (method_exists($this, 'expectException')) {
-            //PHPUnit 5+
-            $this->expectException($exception);
-            if ($exceptionMessage !== '') {
-                $this->expectExceptionMessage($exceptionMessage);
-            }
-            if ($exceptionCode !== null) {
-                $this->expectExceptionCode($exceptionCode);
-            }
-        } else {
-            //PHPUnit 4
-            parent::setExpectedException($exceptionName, $exceptionMessage, $exceptionCode);
+        //PHPUnit 5+
+        $this->expectException($exceptionName);
+        if ($exceptionMessage !== '') {
+            $this->expectExceptionMessage($exceptionMessage);
+        }
+        if ($exceptionCode !== null) {
+            $this->expectExceptionCode($exceptionCode);
         }
     }
 }

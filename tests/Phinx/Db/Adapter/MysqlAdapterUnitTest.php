@@ -810,10 +810,6 @@ class MysqlAdapterUnitTest extends TestCase
         $this->adapter->renameColumn('table_name', 'column_old', 'column_new');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The specified column doesn't exist: column_old
-     */
     public function testRenameColumnNotExists()
     {
         $column1 = [
@@ -844,6 +840,8 @@ class MysqlAdapterUnitTest extends TestCase
 
         $this->assertQuerySql("DESCRIBE `table_name`", $this->result);
 
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("The specified column doesn't exist: column_old");
         $this->adapter->renameColumn('table_name', 'column_old', 'column_new');
     }
 
@@ -1099,12 +1097,10 @@ class MysqlAdapterUnitTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage The type: "fake" is not supported.
-     */
     public function testGetSqlTypeNotExists()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The type: "fake" is not supported.');
         $this->adapter->getSqlType('fake');
     }
 
@@ -1284,21 +1280,17 @@ class MysqlAdapterUnitTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage The type: "fake" is not supported.
-     */
     public function testPhinxTypeNotValidType()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The type: "fake" is not supported.');
         $this->adapter->getPhinxType('fake');
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Column type ?int? is not supported
-     */
     public function testPhinxTypeNotValidTypeRegex()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Column type ?int? is not supported');
         $this->adapter->getPhinxType('?int?');
     }
 

@@ -108,13 +108,11 @@ class ProxyAdapterTest extends TestCase
         $this->assertContains('ref_table_id', $commands[0]['arguments'][1]);
     }
 
-    /**
-     * @expectedException \Phinx\Migration\IrreversibleMigrationException
-     * @expectedExceptionMessage Cannot reverse a "createDatabase" command
-     */
     public function testGetInvertedCommandsThrowsExceptionForIrreversibleCommand()
     {
         $this->adapter->recordCommand('createDatabase', ['testdb']);
+        $this->expectException(\Phinx\Migration\IrreversibleMigrationException::class);
+        $this->expectExceptionMessage('Cannot reverse a "createDatabase" command');
         $this->adapter->getInvertedCommands();
     }
 }
