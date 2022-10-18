@@ -24,5 +24,6 @@
  * IN THE SOFTWARE.
  */
 
-$app = require __DIR__ . '/../app/phinx.php';
+$autoloader = require __DIR__.'/../vendor/autoload.php';
+$app        = new Phinx\Console\PhinxApplication();
 $app->run();
