@@ -497,7 +497,7 @@ class MysqlAdapterUnitTest extends TestCase
 
         $columns = $this->adapter->getColumns("table_name");
 
-        $this->assertInternalType('array', $columns);
+        $this->assertIsArray($columns);
         $this->assertCount(2, $columns);
 
         $this->assertEquals('column1', $columns[0]->getName());
@@ -1431,7 +1431,7 @@ class MysqlAdapterUnitTest extends TestCase
         [$index1, $index2, $index3, $index4] = $this->prepareCaseIndexes();
         $indexes = $this->adapter->getIndexes("table_name");
 
-        $this->assertInternalType('array', $indexes);
+        $this->assertIsArray($indexes);
         $this->assertCount(3, $indexes);
         $this->assertEquals(['columns' => [$index1['Column_name']]], $indexes[$index1['Key_name']]);
         $this->assertEquals(['columns' => [$index2['Column_name']]], $indexes[$index2['Key_name']]);
@@ -1587,7 +1587,7 @@ class MysqlAdapterUnitTest extends TestCase
         [$fk, $fk1, $fk2] = $this->prepareCaseForeignKeys();
         $foreignkeys = $this->adapter->getForeignKeys("table_name");
 
-        $this->assertInternalType('array', $foreignkeys);
+        $this->assertIsArray($foreignkeys);
         $this->assertCount(2, $foreignkeys);
         $this->assertEquals('table_name', $foreignkeys['fk1']['table']);
         $this->assertEquals(['other_table_id'], $foreignkeys['fk1']['columns']);
