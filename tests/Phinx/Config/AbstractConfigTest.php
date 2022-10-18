@@ -48,9 +48,7 @@ abstract class AbstractConfigTest extends TestCase
                 'default_migration_table' => 'phinxlog',
                 'default_database' => 'testing',
                 'testing' => [
-                    'adapter' => 'sqllite',
-                    'wrapper' => 'testwrapper',
-                    'path' => '%%PHINX_CONFIG_PATH%%/testdb/test.db'
+                    'adapter' => 'mysql',
                 ],
                 'production' => [
                     'adapter' => 'mysql'

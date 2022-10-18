@@ -74,12 +74,6 @@ interface AdapterInterface
     const PHINX_TYPE_ENUM = 'enum';
     const PHINX_TYPE_SET = 'set';
 
-    // only for postgresql so far
-    const PHINX_TYPE_CIDR = 'cidr';
-    const PHINX_TYPE_INET = 'inet';
-    const PHINX_TYPE_MACADDR = 'macaddr';
-    const PHINX_TYPE_INTERVAL = 'interval';
-
     /**
      * Get all migrated version numbers.
      *

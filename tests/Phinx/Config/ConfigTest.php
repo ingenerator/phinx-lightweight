@@ -82,7 +82,7 @@ class ConfigTest extends AbstractConfigTest
     {
         $config = new Config($this->getConfigArray());
         $db = $config->getEnvironment('testing');
-        $this->assertEquals('sqllite', $db['adapter']);
+        $this->assertEquals('mysql', $db['adapter']);
     }
 
     /**

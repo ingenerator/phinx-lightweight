@@ -4,9 +4,6 @@ namespace Test\Phinx\Db;
 
 use Phinx\Db\Adapter\AdapterInterface;
 use Phinx\Db\Adapter\MysqlAdapter;
-use Phinx\Db\Adapter\PostgresAdapter;
-use Phinx\Db\Adapter\SQLiteAdapter;
-use Phinx\Db\Adapter\SqlServerAdapter;
 use PHPUnit\Framework\TestCase;
 
 class TableTest extends TestCase
@@ -16,10 +13,7 @@ class TableTest extends TestCase
         $result = [];
         $adapters = array_filter(
             [
-                TESTS_PHINX_DB_ADAPTER_SQLSRV_ENABLED ? new SqlServerAdapter([]) : false,
                 TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED ? new MysqlAdapter([]) : false,
-                TESTS_PHINX_DB_ADAPTER_POSTGRES_ENABLED ? new PostgresAdapter([]) : false,
-                TESTS_PHINX_DB_ADAPTER_SQLITE_ENABLED ? new SQLiteAdapter([]) : false,
             ]
         );
         foreach ($adapters as $adapter) {
