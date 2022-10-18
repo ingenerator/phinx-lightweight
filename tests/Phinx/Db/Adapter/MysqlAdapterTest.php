@@ -690,9 +690,9 @@ class MysqlAdapterTest extends TestCase
         $described = $this->adapter->describeTable('t');
 
         $this->assertContains($described['TABLE_TYPE'], ['VIEW', 'BASE TABLE']);
-        $this->assertEquals($described['TABLE_NAME'], 't');
-        $this->assertEquals($described['TABLE_SCHEMA'], MYSQL_DB_CONFIG['name']);
-        $this->assertEquals($described['TABLE_ROWS'], 0);
+        $this->assertEquals('t', $described['TABLE_NAME']);
+        $this->assertEquals(MYSQL_DB_CONFIG['name'], $described['TABLE_SCHEMA']);
+        $this->assertEquals(0, $described['TABLE_ROWS']);
     }
 
     public function testGetColumnsReservedTableName()
@@ -1207,6 +1207,6 @@ class MysqlAdapterTest extends TestCase
 CREATE TABLE `table1` (`id` INT(11) NOT NULL AUTO_INCREMENT, `column1` VARCHAR(255) NOT NULL, `column2` INT(11) NOT NULL, `column3` VARCHAR(255) NOT NULL DEFAULT 'test', PRIMARY KEY (`id`)) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci;
 OUTPUT;
         $actualOutput = $consoleOutput->fetch();
-        $this->assertContains($expectedOutput, $actualOutput, 'Passing the --dry-run option does not dump create table query to the output');
+        $this->assertStringContainsString($expectedOutput, $actualOutput, 'Passing the --dry-run option does not dump create table query to the output');
     }
 }

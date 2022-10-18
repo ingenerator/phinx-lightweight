@@ -62,7 +62,7 @@ class ProxyAdapterTest extends TestCase
         $commands = $this->adapter->getInvertedCommands();
         $this->assertEquals('dropColumn', $commands[0]['name']);
         $this->assertEquals('atable', $commands[0]['arguments'][0]);
-        $this->assertContains('acolumn', $commands[0]['arguments'][1]);
+        $this->assertStringContainsString('acolumn', $commands[0]['arguments'][1]);
     }
 
     public function testProxyAdapterCanInvertRenameColumn()
