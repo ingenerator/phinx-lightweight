@@ -47,9 +47,7 @@ class AbstractMigrationTest extends TestCase
         $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
 
         // stub output
-        $outputStub = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')
-            ->setConstructorArgs([[]])
-            ->getMock();
+        $outputStub = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
 
         // test methods
         $this->assertNull($migrationStub->getOutput());
@@ -60,9 +58,7 @@ class AbstractMigrationTest extends TestCase
     public function testGetInputMethodWithInjectedInput()
     {
         // stub input
-        $inputStub = $this->getMockBuilder('\Symfony\Component\Console\Input\InputInterface')
-            ->setConstructorArgs([[]])
-            ->getMock();
+        $inputStub = $this->getMockBuilder('\Symfony\Component\Console\Input\InputInterface')->getMock();
 
         // stub migration
         $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0, $inputStub, null]);
@@ -75,9 +71,7 @@ class AbstractMigrationTest extends TestCase
     public function testGetOutputMethodWithInjectedOutput()
     {
         // stub output
-        $outputStub = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')
-            ->setConstructorArgs([[]])
-            ->getMock();
+        $outputStub = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
 
         // stub migration
         $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0, null, $outputStub]);
