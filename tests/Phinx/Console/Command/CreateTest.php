@@ -297,6 +297,8 @@ class CreateTest extends TestCase
 
         $commandLine = array_merge(['command' => $command->getName()], $commandLine);
         $commandTester->execute($commandLine);
+
+        $this->addToAssertionCount(1);
     }
 
     public function provideSimpleTemplateGenerator()
