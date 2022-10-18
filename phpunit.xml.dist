@@ -14,15 +14,6 @@
             <directory suffix=".php">src/Phinx/</directory>
         </include>
     </coverage>
-    <php>
-        <!-- MySQL -->
-        <env name="TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED" value="true"/>
-        <env name="TESTS_PHINX_DB_ADAPTER_MYSQL_HOST" value="localhost"/>
-        <env name="TESTS_PHINX_DB_ADAPTER_MYSQL_USERNAME" value="root"/>
-        <env name="TESTS_PHINX_DB_ADAPTER_MYSQL_PASSWORD" value=""/>
-        <env name="TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE" value="phinx_testing"/>
-        <env name="TESTS_PHINX_DB_ADAPTER_MYSQL_PORT" value="3306"/>
-    </php>
     <testsuites>
         <testsuite name="Phinx Test Suite">
             <directory>./tests/</directory>

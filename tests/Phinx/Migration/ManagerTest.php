@@ -10,6 +10,8 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
+use function defined;
+use const MYSQL_DB_CONFIG;
 
 class ManagerTest extends TestCase
 {
@@ -107,11 +109,11 @@ class ManagerTest extends TestCase
                 'default_database' => 'production',
                 'production' => [
                     'adapter' => 'mysql',
-                    'host' => TESTS_PHINX_DB_ADAPTER_MYSQL_HOST,
-                    'name' => TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE,
-                    'user' => TESTS_PHINX_DB_ADAPTER_MYSQL_USERNAME,
-                    'pass' => TESTS_PHINX_DB_ADAPTER_MYSQL_PASSWORD,
-                    'port' => TESTS_PHINX_DB_ADAPTER_MYSQL_PORT
+                    'host' => MYSQL_DB_CONFIG['host'],
+                    'name' => MYSQL_DB_CONFIG['name'],
+                    'user' => MYSQL_DB_CONFIG['user'],
+                    'pass' => MYSQL_DB_CONFIG['pass'],
+                    'port' => MYSQL_DB_CONFIG['port']
                 ]
             ]
         ];
@@ -5462,8 +5464,8 @@ class ManagerTest extends TestCase
 
     public function testReversibleMigrationsWorkAsExpected()
     {
-        if (!TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED) {
-            $this->markTestSkipped('Mysql tests disabled. See TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED constant.');
+        if (!defined('MYSQL_DB_CONFIG')) {
+            $this->markTestSkipped('Mysql tests disabled. See MYSQL_DB_CONFIG constant.');
         }
         $configArray = $this->getConfigArray();
         $adapter = $this->manager->getEnvironment('production')->getAdapter();
@@ -5473,8 +5475,8 @@ class ManagerTest extends TestCase
         $config = new Config($configArray);
 
         // ensure the database is empty
-        $adapter->dropDatabase(TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE);
-        $adapter->createDatabase(TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE);
+        $adapter->dropDatabase(MYSQL_DB_CONFIG['name']);
+        $adapter->createDatabase(MYSQL_DB_CONFIG['name']);
         $adapter->disconnect();
 
         // migrate to the latest version
@@ -5509,8 +5511,8 @@ class ManagerTest extends TestCase
 
     public function testReversibleMigrationsWorkAsExpectedWithNamespace()
     {
-        if (!TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED) {
-            $this->markTestSkipped('Mysql tests disabled. See TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED constant.');
+        if (!defined('MYSQL_DB_CONFIG')) {
+            $this->markTestSkipped('Mysql tests disabled. See MYSQL_DB_CONFIG constant.');
         }
         $configArray = $this->getConfigArray();
         $adapter = $this->manager->getEnvironment('production')->getAdapter();
@@ -5520,8 +5522,8 @@ class ManagerTest extends TestCase
         $config = new Config($configArray);
 
         // ensure the database is empty
-        $adapter->dropDatabase(TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE);
-        $adapter->createDatabase(TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE);
+        $adapter->dropDatabase(MYSQL_DB_CONFIG['name']);
+        $adapter->createDatabase(MYSQL_DB_CONFIG['name']);
         $adapter->disconnect();
 
         // migrate to the latest version
@@ -5549,8 +5551,8 @@ class ManagerTest extends TestCase
 
     public function testReversibleMigrationsWorkAsExpectedWithMixedNamespace()
     {
-        if (!TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED) {
-            $this->markTestSkipped('Mysql tests disabled. See TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED constant.');
+        if (!defined('MYSQL_DB_CONFIG')) {
+            $this->markTestSkipped('Mysql tests disabled. See MYSQL_DB_CONFIG constant.');
         }
         $configArray = $this->getConfigArray();
         $adapter = $this->manager->getEnvironment('production')->getAdapter();
@@ -5564,8 +5566,8 @@ class ManagerTest extends TestCase
         $config = new Config($configArray);
 
         // ensure the database is empty
-        $adapter->dropDatabase(TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE);
-        $adapter->createDatabase(TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE);
+        $adapter->dropDatabase(MYSQL_DB_CONFIG['name']);
+        $adapter->createDatabase(MYSQL_DB_CONFIG['name']);
         $adapter->disconnect();
 
         // migrate to the latest version
@@ -5617,8 +5619,8 @@ class ManagerTest extends TestCase
 
     public function testBreakpointsOperateAsExpected()
     {
-        if (!TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED) {
-            $this->markTestSkipped('Mysql tests disabled. See TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED constant.');
+        if (!defined('MYSQL_DB_CONFIG')) {
+            $this->markTestSkipped('Mysql tests disabled. See MYSQL_DB_CONFIG constant.');
         }
         $configArray = $this->getConfigArray();
         $adapter = $this->manager->getEnvironment('production')->getAdapter();
@@ -5626,8 +5628,8 @@ class ManagerTest extends TestCase
         $config = new Config($configArray);
 
         // ensure the database is empty
-        $adapter->dropDatabase(TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE);
-        $adapter->createDatabase(TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE);
+        $adapter->dropDatabase(MYSQL_DB_CONFIG['name']);
+        $adapter->createDatabase(MYSQL_DB_CONFIG['name']);
         $adapter->disconnect();
 
         // migrate to the latest version
@@ -5679,8 +5681,8 @@ class ManagerTest extends TestCase
 
     public function testBreakpointWithInvalidVersion()
     {
-        if (!TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED) {
-            $this->markTestSkipped('Mysql tests disabled. See TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED constant.');
+        if (!defined('MYSQL_DB_CONFIG')) {
+            $this->markTestSkipped('Mysql tests disabled. See MYSQL_DB_CONFIG constant.');
         }
         $configArray = $this->getConfigArray();
         $adapter = $this->manager->getEnvironment('production')->getAdapter();
@@ -5688,8 +5690,8 @@ class ManagerTest extends TestCase
         $config = new Config($configArray);
 
         // ensure the database is empty
-        $adapter->dropDatabase(TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE);
-        $adapter->createDatabase(TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE);
+        $adapter->dropDatabase(MYSQL_DB_CONFIG['name']);
+        $adapter->createDatabase(MYSQL_DB_CONFIG['name']);
         $adapter->disconnect();
 
         // migrate to the latest version

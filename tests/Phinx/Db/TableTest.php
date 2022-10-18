@@ -13,7 +13,7 @@ class TableTest extends TestCase
         $result = [];
         $adapters = array_filter(
             [
-                TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED ? new MysqlAdapter([]) : false,
+                defined('MYSQL_DB_CONFIG') ? new MysqlAdapter([]) : false,
             ]
         );
         foreach ($adapters as $adapter) {

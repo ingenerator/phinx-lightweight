@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\StreamOutput;
+use const MYSQL_DB_CONFIG;
 
 class MysqlAdapterTest extends TestCase
 {
@@ -21,22 +22,15 @@ class MysqlAdapterTest extends TestCase
 
     public function setUp()
     {
-        if (!TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED) {
-            $this->markTestSkipped('Mysql tests disabled. See TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED constant.');
+        if (!defined('MYSQL_DB_CONFIG')) {
+            $this->markTestSkipped('Mysql tests disabled.');
         }
 
-        $options = [
-            'host' => TESTS_PHINX_DB_ADAPTER_MYSQL_HOST,
-            'name' => TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE,
-            'user' => TESTS_PHINX_DB_ADAPTER_MYSQL_USERNAME,
-            'pass' => TESTS_PHINX_DB_ADAPTER_MYSQL_PASSWORD,
-            'port' => TESTS_PHINX_DB_ADAPTER_MYSQL_PORT
-        ];
-        $this->adapter = new MysqlAdapter($options, new ArrayInput([]), new NullOutput());
+        $this->adapter = new MysqlAdapter(MYSQL_DB_CONFIG, new ArrayInput([]), new NullOutput());
 
         // ensure the database is empty for each test
-        $this->adapter->dropDatabase($options['name']);
-        $this->adapter->createDatabase($options['name']);
+        $this->adapter->dropDatabase(MYSQL_DB_CONFIG['name']);
+        $this->adapter->createDatabase(MYSQL_DB_CONFIG['name']);
 
         // leave the adapter in a disconnected state for each test
         $this->adapter->disconnect();
@@ -63,9 +57,9 @@ class MysqlAdapterTest extends TestCase
     public function testConnectionWithInvalidCredentials()
     {
         $options = [
-            'host' => TESTS_PHINX_DB_ADAPTER_MYSQL_HOST,
-            'name' => TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE,
-            'port' => TESTS_PHINX_DB_ADAPTER_MYSQL_PORT,
+            'host' => MYSQL_DB_CONFIG['host'],
+            'name' => MYSQL_DB_CONFIG['name'],
+            'port' => MYSQL_DB_CONFIG['port'],
             'user' => 'invaliduser',
             'pass' => 'invalidpass'
         ];
@@ -86,15 +80,13 @@ class MysqlAdapterTest extends TestCase
 
     public function testConnectionWithSocketConnection()
     {
-        if (!TESTS_PHINX_DB_ADAPTER_MYSQL_UNIX_SOCKET) {
-            $this->markTestSkipped('MySQL socket connection skipped. See TESTS_PHINX_DB_ADAPTER_MYSQL_UNIX_SOCKET constant.');
-        }
+        $this->markTestSkipped('MySQL socket connection skipped. We don\'t support UNIX sockets.');
 
         $options = [
-            'name' => TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE,
-            'user' => TESTS_PHINX_DB_ADAPTER_MYSQL_USERNAME,
-            'pass' => TESTS_PHINX_DB_ADAPTER_MYSQL_PASSWORD,
-            'unix_socket' => TESTS_PHINX_DB_ADAPTER_MYSQL_UNIX_SOCKET,
+            'name' => MYSQL_DB_CONFIG['name'],
+            'user' => MYSQL_DB_CONFIG['user'],
+            'pass' => MYSQL_DB_CONFIG['pass'],
+            'unix_socket' => '',
         ];
 
         $adapter = new MysqlAdapter($options, new ArrayInput([]), new NullOutput());
@@ -157,7 +149,7 @@ class MysqlAdapterTest extends TestCase
 
         $rows = $this->adapter->fetchAll(sprintf(
             "SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='%s' AND table_name='ntable'",
-            TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE
+            MYSQL_DB_CONFIG['name']
         ));
         $comment = $rows[0];
 
@@ -185,7 +177,7 @@ class MysqlAdapterTest extends TestCase
             "SELECT table_name, column_name, referenced_table_name, referenced_column_name
              FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
              WHERE table_schema='%s' AND REFERENCED_TABLE_NAME='ntable_tag'",
-            TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE
+            MYSQL_DB_CONFIG['name']
         ));
         $foreignKey = $rows[0];
 
@@ -304,11 +296,11 @@ class MysqlAdapterTest extends TestCase
     public function testCreateTableAndInheritDefaultCollation()
     {
         $options = [
-            'host' => TESTS_PHINX_DB_ADAPTER_MYSQL_HOST,
-            'name' => TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE,
-            'user' => TESTS_PHINX_DB_ADAPTER_MYSQL_USERNAME,
-            'pass' => TESTS_PHINX_DB_ADAPTER_MYSQL_PASSWORD,
-            'port' => TESTS_PHINX_DB_ADAPTER_MYSQL_PORT,
+            'host' => MYSQL_DB_CONFIG['host'],
+            'name' => MYSQL_DB_CONFIG['name'],
+            'user' => MYSQL_DB_CONFIG['user'],
+            'pass' => MYSQL_DB_CONFIG['pass'],
+            'port' => MYSQL_DB_CONFIG['port'],
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
         ];
@@ -699,7 +691,7 @@ class MysqlAdapterTest extends TestCase
 
         $this->assertContains($described['TABLE_TYPE'], ['VIEW', 'BASE TABLE']);
         $this->assertEquals($described['TABLE_NAME'], 't');
-        $this->assertEquals($described['TABLE_SCHEMA'], TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE);
+        $this->assertEquals($described['TABLE_SCHEMA'], MYSQL_DB_CONFIG['name']);
         $this->assertEquals($described['TABLE_ROWS'], 0);
     }
 
@@ -758,7 +750,7 @@ class MysqlAdapterTest extends TestCase
         $this->assertTrue($table->hasIndex('email'));
         $index_data = $this->adapter->query(sprintf(
             'SELECT SUB_PART FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = "%s" AND TABLE_NAME = "table1" AND INDEX_NAME = "email"',
-            TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE
+            MYSQL_DB_CONFIG['name']
         ))->fetch(\PDO::FETCH_ASSOC);
         $expected_limit = $index_data['SUB_PART'];
         $this->assertEquals($expected_limit, 50);
@@ -1031,7 +1023,7 @@ class MysqlAdapterTest extends TestCase
     public function testHasDatabase()
     {
         $this->assertFalse($this->adapter->hasDatabase('fake_database_name'));
-        $this->assertTrue($this->adapter->hasDatabase(TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE));
+        $this->assertTrue($this->adapter->hasDatabase(MYSQL_DB_CONFIG['name']));
     }
 
     public function testDropDatabase()
@@ -1050,7 +1042,7 @@ class MysqlAdapterTest extends TestCase
 
         $rows = $this->adapter->fetchAll(sprintf(
             "SELECT column_name, column_comment FROM information_schema.columns WHERE table_schema='%s' AND table_name='table1'",
-            TESTS_PHINX_DB_ADAPTER_MYSQL_DATABASE
+            MYSQL_DB_CONFIG['name']
         ));
         $columnWithComment = $rows[1];
 

@@ -8,6 +8,7 @@ use Phinx\Db\Table\Index;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
+use function defined;
 
 class PDOMock extends \PDO
 {
@@ -68,8 +69,8 @@ class MysqlAdapterUnitTest extends TestCase
 
     public function setUp()
     {
-        if (!TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED) {
-            $this->markTestSkipped('Mysql tests disabled. See TESTS_PHINX_DB_ADAPTER_MYSQL_ENABLED constant.');
+        if (!defined('MYSQL_DB_CONFIG')) {
+            $this->markTestSkipped('Mysql tests disabled. See MYSQL_DB_CONFIG constant.');
         }
 
         $this->adapter = new MysqlAdapterTester([], new ArrayInput([]), new NullOutput());
@@ -1435,7 +1436,7 @@ class MysqlAdapterUnitTest extends TestCase
 
     public function testGetIndexes()
     {
-        list($index1, $index2, $index3, $index4) = $this->prepareCaseIndexes();
+        [$index1, $index2, $index3, $index4] = $this->prepareCaseIndexes();
         $indexes = $this->adapter->getIndexes("table_name");
 
         $this->assertInternalType('array', $indexes);
@@ -1471,7 +1472,7 @@ class MysqlAdapterUnitTest extends TestCase
 
     public function testAddIndex()
     {
-        list($table, $index) = $this->prepareAddIndex(['getColumns']);
+        [$table, $index] = $this->prepareAddIndex(['getColumns']);
 
         $this->assertExecuteSql('ALTER TABLE `table_name` ADD  KEY (`column_name`)');
         $this->adapter->addIndex($table, $index);
@@ -1479,7 +1480,7 @@ class MysqlAdapterUnitTest extends TestCase
 
     public function testAddIndexWithLimit()
     {
-        list($table, $index) = $this->prepareAddIndex(['getColumns', 'getLimit']);
+        [$table, $index] = $this->prepareAddIndex(['getColumns', 'getLimit']);
         $index->expects($this->any())->method('getLimit')->will($this->returnValue(50));
 
         $this->assertExecuteSql('ALTER TABLE `table_name` ADD  KEY (`column_name`(50))');
@@ -1591,7 +1592,7 @@ class MysqlAdapterUnitTest extends TestCase
 
     public function testGetForeignKeys()
     {
-        list($fk, $fk1, $fk2) = $this->prepareCaseForeignKeys();
+        [$fk, $fk1, $fk2] = $this->prepareCaseForeignKeys();
         $foreignkeys = $this->adapter->getForeignKeys("table_name");
 
         $this->assertInternalType('array', $foreignkeys);
