@@ -1,0 +1,93 @@
+name: Run tests
+on:
+  push:
+    branches:
+      # Only mainline branches, features etc are covered on the pull_request trigger
+      - '*.x'
+  pull_request:
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    name: Run tests
+    services:
+      mysql:
+        image: mysql:5.7
+        ports:
+          - 3306
+        env:
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+          MYSQL_DATABASE: cakephp
+          MYSQL_ROOT_PASSWORD: root
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+    strategy:
+      fail-fast: false
+      matrix:
+        php_version:
+          - '7.4'
+        dependencies:
+          - 'default'
+        include:
+          - php_version: '7.4'
+            dependencies: 'lowest'
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php_version }}
+          tools: composer:v2
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ matrix.dependencies }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-${{ matrix.dependencies }}
+
+      - name: Install composer dependencies
+        env:
+          DEPENDENCIES: ${{ matrix.dependencies }}
+        run: |
+          if [ $DEPENDENCIES == 'lowest' ]
+          then
+            composer update --prefer-lowest --no-interaction --no-progress
+          else
+            composer install --no-interaction --no-progress
+          fi
+
+      - name: Verify MySQL connection
+        env:
+          MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
+        timeout-minutes: 1
+        run: |
+          while ! mysqladmin ping -h"127.0.0.1" -P"$MYSQL_PORT" --silent; do
+          sleep 1
+          done
+
+      - name: Setup Database
+        env:
+          MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
+        run: |
+          n=0
+          until [ "$n" -ge 5 ]
+          do
+            mysql -h 127.0.0.1 -P"$MYSQL_PORT" -u root -proot -e 'CREATE DATABASE phinx;' && break || :
+            n=$((n+1))
+            sleep 2
+          done
+          mysql -h 127.0.0.1 -P"$MYSQL_PORT" -u root -proot -D phinx -e 'SELECT 1;'
+
+      - name: Run unit tests
+        env:
+          MYSQL_DSN: "mysql://root:root@127.0.0.1:${{ job.services.mysql.ports[3306] }}/phinx"
+        run: |
+          vendor/bin/phpunit
