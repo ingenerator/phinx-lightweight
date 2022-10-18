@@ -88,10 +88,10 @@ class StatusTest extends TestCase
         $this->assertEquals(0, $return);
 
         $display = $commandTester->getDisplay();
-        $this->assertRegExp('/no environment specified/', $display);
+        $this->assertMatchesRegularExpression('/no environment specified/', $display);
 
         // note that the default order is by creation time
-        $this->assertRegExp('/ordering by creation time/', $display);
+        $this->assertMatchesRegularExpression('/ordering by creation time/', $display);
     }
 
     public function testExecuteWithEnvironmentOption()
@@ -118,7 +118,7 @@ class StatusTest extends TestCase
         $commandTester = new CommandTester($command);
         $return = $commandTester->execute(['command' => $command->getName(), '--environment' => 'fakeenv'], ['decorated' => false]);
         $this->assertEquals(0, $return);
-        $this->assertRegExp('/using environment fakeenv/', $commandTester->getDisplay());
+        $this->assertMatchesRegularExpression('/using environment fakeenv/', $commandTester->getDisplay());
     }
 
     public function testFormatSpecified()
@@ -145,7 +145,7 @@ class StatusTest extends TestCase
         $commandTester = new CommandTester($command);
         $return = $commandTester->execute(['command' => $command->getName(), '--format' => 'json'], ['decorated' => false]);
         $this->assertEquals(0, $return);
-        $this->assertRegExp('/using format json/', $commandTester->getDisplay());
+        $this->assertMatchesRegularExpression('/using format json/', $commandTester->getDisplay());
     }
 
     public function testExecuteVersionOrderByExecutionTime()
@@ -177,7 +177,7 @@ class StatusTest extends TestCase
         $this->assertEquals(0, $return);
 
         $display = $commandTester->getDisplay();
-        $this->assertRegExp('/no environment specified/', $display);
-        $this->assertRegExp('/ordering by execution time/', $display);
+        $this->assertMatchesRegularExpression('/no environment specified/', $display);
+        $this->assertMatchesRegularExpression('/ordering by execution time/', $display);
     }
 }

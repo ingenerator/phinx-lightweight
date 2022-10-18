@@ -46,7 +46,7 @@ class TableTest extends TestCase
                 $e,
                 'Expected exception of type InvalidArgumentException, got ' . get_class($e)
             );
-            $this->assertRegExp('/^An invalid column type /', $e->getMessage());
+            $this->assertMatchesRegularExpression('/^An invalid column type /', $e->getMessage());
         }
     }
 
@@ -75,7 +75,7 @@ class TableTest extends TestCase
                 $e,
                 'Expected exception of type RuntimeException, got ' . get_class($e)
             );
-            $this->assertRegExp('/An adapter must be specified to add a column./', $e->getMessage());
+            $this->assertMatchesRegularExpression('/An adapter must be specified to add a column./', $e->getMessage());
         }
     }
 

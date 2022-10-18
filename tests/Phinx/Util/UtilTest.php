@@ -56,7 +56,7 @@ class UtilTest extends TestCase
         ];
 
         foreach ($expectedResults as $input => $expectedResult) {
-            $this->assertRegExp($expectedResult, Util::mapClassNameToFileName($input));
+            $this->assertMatchesRegularExpression($expectedResult, Util::mapClassNameToFileName($input));
         }
     }
 

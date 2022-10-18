@@ -32,7 +32,7 @@ class InitTest extends TestCase
             'decorated' => false
         ]);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/created (.*)phinx.yml(.*)/',
             $commandTester->getDisplay()
         );

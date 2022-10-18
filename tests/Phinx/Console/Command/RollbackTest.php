@@ -86,10 +86,10 @@ class RollbackTest extends TestCase
 
         $display = $commandTester->getDisplay();
 
-        $this->assertRegExp('/no environment specified/', $display);
+        $this->assertMatchesRegularExpression('/no environment specified/', $display);
 
         // note that the default order is by creation time
-        $this->assertRegExp('/ordering by creation time/', $display);
+        $this->assertMatchesRegularExpression('/ordering by creation time/', $display);
     }
 
     public function testExecuteWithEnvironmentOption()
@@ -114,7 +114,7 @@ class RollbackTest extends TestCase
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName(), '--environment' => 'fakeenv'], ['decorated' => false]);
-        $this->assertRegExp('/using environment fakeenv/', $commandTester->getDisplay());
+        $this->assertMatchesRegularExpression('/using environment fakeenv/', $commandTester->getDisplay());
     }
 
     public function testDatabaseNameSpecified()
@@ -139,7 +139,7 @@ class RollbackTest extends TestCase
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName()], ['decorated' => false]);
-        $this->assertRegExp('/using database development/', $commandTester->getDisplay());
+        $this->assertMatchesRegularExpression('/using database development/', $commandTester->getDisplay());
     }
 
     public function testStartTimeVersionOrder()
@@ -166,7 +166,7 @@ class RollbackTest extends TestCase
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName()], ['decorated' => false]);
-        $this->assertRegExp('/ordering by execution time/', $commandTester->getDisplay());
+        $this->assertMatchesRegularExpression('/ordering by execution time/', $commandTester->getDisplay());
     }
 
     public function testWithDate()
@@ -281,6 +281,6 @@ class RollbackTest extends TestCase
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName(), '-d' => $targetDate], ['decorated' => false]);
-        $this->assertRegExp('/ordering by execution time/', $commandTester->getDisplay());
+        $this->assertMatchesRegularExpression('/ordering by execution time/', $commandTester->getDisplay());
     }
 }

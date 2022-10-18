@@ -79,7 +79,7 @@ class SeedRunTest extends TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName()], ['decorated' => false]);
 
-        $this->assertRegExp('/no environment specified/', $commandTester->getDisplay());
+        $this->assertMatchesRegularExpression('/no environment specified/', $commandTester->getDisplay());
     }
 
     public function testExecuteWithEnvironmentOption()
@@ -103,7 +103,7 @@ class SeedRunTest extends TestCase
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName(), '--environment' => 'fakeenv'], ['decorated' => false]);
-        $this->assertRegExp('/using environment fakeenv/', $commandTester->getDisplay());
+        $this->assertMatchesRegularExpression('/using environment fakeenv/', $commandTester->getDisplay());
     }
 
     public function testDatabaseNameSpecified()
@@ -127,7 +127,7 @@ class SeedRunTest extends TestCase
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName()], ['decorated' => false]);
-        $this->assertRegExp('/using database development/', $commandTester->getDisplay());
+        $this->assertMatchesRegularExpression('/using database development/', $commandTester->getDisplay());
     }
 
     public function testExecuteMultipleSeeders()
@@ -162,6 +162,6 @@ class SeedRunTest extends TestCase
             ['decorated' => false]
         );
 
-        $this->assertRegExp('/no environment specified/', $commandTester->getDisplay());
+        $this->assertMatchesRegularExpression('/no environment specified/', $commandTester->getDisplay());
     }
 }
