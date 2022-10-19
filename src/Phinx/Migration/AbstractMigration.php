@@ -257,46 +257,4 @@ abstract class AbstractMigration implements MigrationInterface
         $table->insert($data)->save();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createDatabase($name, $options)
-    {
-        $this->getAdapter()->createDatabase($name, $options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropDatabase($name)
-    {
-        $this->getAdapter()->dropDatabase($name);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasTable($tableName)
-    {
-        return $this->getAdapter()->hasTable($tableName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function table($tableName, $options = [])
-    {
-        return new Table($tableName, $options, $this->getAdapter());
-    }
-
-    /**
-     * A short-hand method to drop the given database table.
-     *
-     * @param string $tableName Table Name
-     * @return void
-     */
-    public function dropTable($tableName)
-    {
-        $this->table($tableName)->drop();
-    }
 }

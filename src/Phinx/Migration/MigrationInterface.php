@@ -192,39 +192,4 @@ interface MigrationInterface
      */
     public function insert($tableName, $data);
 
-    /**
-     * Create a new database.
-     *
-     * @param string $name Database Name
-     * @param array $options Options
-     * @return void
-     */
-    public function createDatabase($name, $options);
-
-    /**
-     * Drop a database.
-     *
-     * @param string $name Database Name
-     * @return void
-     */
-    public function dropDatabase($name);
-
-    /**
-     * Checks to see if a table exists.
-     *
-     * @param string $tableName Table Name
-     * @return bool
-     */
-    public function hasTable($tableName);
-
-    /**
-     * Returns an instance of the <code>\Table</code> class.
-     *
-     * You can use this class to create and manipulate tables.
-     *
-     * @param string $tableName Table Name
-     * @param array $options Options
-     * @return \Phinx\Db\Table
-     */
-    public function table($tableName, $options);
 }

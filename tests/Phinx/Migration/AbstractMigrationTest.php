@@ -2,7 +2,6 @@
 
 namespace Test\Phinx\Migration;
 
-use Phinx\Db\Adapter\AdapterInterface;
 use Phinx\Db\Table;
 use PHPUnit\Framework\TestCase;
 
@@ -181,87 +180,4 @@ class AbstractMigrationTest extends TestCase
         $migrationStub->insert($table, ['row' => 'value']);
     }
 
-    public function testCreateDatabase()
-    {
-        // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
-
-        // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
-        $adapterStub->expects($this->once())
-                    ->method('createDatabase')
-                    ->will($this->returnValue([['0' => 'bar', 'foo' => 'bar']]));
-
-        $migrationStub->setAdapter($adapterStub);
-        $migrationStub->createDatabase('testdb', []);
-    }
-
-    public function testDropDatabase()
-    {
-        // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
-
-        // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
-        $adapterStub->expects($this->once())
-                    ->method('dropDatabase')
-                    ->will($this->returnValue([['0' => 'bar', 'foo' => 'bar']]));
-
-        $migrationStub->setAdapter($adapterStub);
-        $migrationStub->dropDatabase('testdb');
-    }
-
-    public function testHasTable()
-    {
-        // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
-
-        // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
-        $adapterStub->expects($this->once())
-                    ->method('hasTable')
-                    ->will($this->returnValue(true));
-
-        $migrationStub->setAdapter($adapterStub);
-        $this->assertTrue($migrationStub->hasTable('test_table'));
-    }
-
-    public function testTableMethod()
-    {
-        // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
-
-        // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
-        $migrationStub->setAdapter($adapterStub);
-
-        $this->assertInstanceOf(
-            'Phinx\Db\Table',
-            $migrationStub->table('test_table')
-        );
-    }
-
-    public function testDropTableMethod()
-    {
-        // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
-
-        // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
-        $adapterStub->expects($this->once())
-                    ->method('dropTable');
-
-        $migrationStub->setAdapter($adapterStub);
-        $migrationStub->dropTable('test_table');
-    }
 }
