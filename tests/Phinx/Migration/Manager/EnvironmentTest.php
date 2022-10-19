@@ -4,7 +4,6 @@ namespace Test\Phinx\Migration\Manager;
 
 use Phinx\Db\Adapter\AdapterFactory;
 use Phinx\Migration\Manager\Environment;
-use Phinx\Migration\MigrationInterface;
 use PHPUnit\Framework\TestCase;
 
 class PDOMock extends \PDO
@@ -151,30 +150,7 @@ class EnvironmentTest extends TestCase
         $upMigration->expects($this->once())
                     ->method('up');
 
-        $this->environment->executeMigration($upMigration, MigrationInterface::UP);
-    }
-
-    public function testExecutingAMigrationDown()
-    {
-        // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
-        $adapterStub->expects($this->once())
-                    ->method('migrated')
-                    ->will($this->returnArgument(0));
-
-        $this->environment->setAdapter($adapterStub);
-
-        // down
-        $downMigration = $this->getMockBuilder('\Phinx\Migration\AbstractMigration')
-            ->setConstructorArgs(['20110301080000'])
-            ->setMethods(['down'])
-            ->getMock();
-        $downMigration->expects($this->once())
-                      ->method('down');
-
-        $this->environment->executeMigration($downMigration, MigrationInterface::DOWN);
+        $this->environment->executeMigration($upMigration);
     }
 
     public function testExecutingAMigrationWithTransactions()
@@ -203,7 +179,7 @@ class EnvironmentTest extends TestCase
         $migration->expects($this->once())
                   ->method('up');
 
-        $this->environment->executeMigration($migration, MigrationInterface::UP);
+        $this->environment->executeMigration($migration);
     }
 
     public function testGettingInputObject()

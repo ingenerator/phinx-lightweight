@@ -154,12 +154,12 @@ interface AdapterInterface
      * Records a migration being run.
      *
      * @param \Phinx\Migration\MigrationInterface $migration Migration
-     * @param string $direction Direction
-     * @param int $startTime Start Time
-     * @param int $endTime End Time
+     * @param int                                 $startTime Start Time
+     * @param int                                 $endTime   End Time
+     *
      * @return \Phinx\Db\Adapter\AdapterInterface
      */
-    public function migrated(MigrationInterface $migration, $direction, $startTime, $endTime);
+    public function migrated(MigrationInterface $migration, $startTime, $endTime);
 
     /**
      * Toggle a migration breakpoint.

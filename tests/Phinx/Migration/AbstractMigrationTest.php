@@ -14,13 +14,6 @@ class AbstractMigrationTest extends TestCase
         $this->assertNull($migrationStub->up());
     }
 
-    public function testDown()
-    {
-        // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
-        $this->assertNull($migrationStub->down());
-    }
-
     public function testAdapterMethods()
     {
         // stub migration

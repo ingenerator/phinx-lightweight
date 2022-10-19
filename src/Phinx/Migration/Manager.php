@@ -324,21 +324,14 @@ class Manager
             }
         }
 
-        // are we migrating up or down?
-        $direction = $version > $current ? MigrationInterface::UP : MigrationInterface::DOWN;
-
-        if ($direction === MigrationInterface::DOWN) {
-            // run downs first
-            krsort($migrations);
-            foreach ($migrations as $migration) {
-                if ($migration->getVersion() <= $version) {
-                    break;
-                }
-
-                if (in_array($migration->getVersion(), $versions)) {
-                    $this->executeMigration($environment, $migration, MigrationInterface::DOWN);
-                }
-            }
+        if ($version < $current) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Cannot migrate down to an earlier version (requested %s, but we are at %s)',
+                    $version,
+                    $current
+                )
+            );
         }
 
         ksort($migrations);
@@ -348,7 +341,7 @@ class Manager
             }
 
             if (!in_array($migration->getVersion(), $versions)) {
-                $this->executeMigration($environment, $migration, MigrationInterface::UP);
+                $this->executeMigration($environment, $migration);
             }
         }
     }
@@ -356,29 +349,29 @@ class Manager
     /**
      * Execute a migration against the specified environment.
      *
-     * @param string $name Environment Name
+     * @param string                              $name      Environment Name
      * @param \Phinx\Migration\MigrationInterface $migration Migration
-     * @param string $direction Direction
+     *
      * @return void
      */
-    public function executeMigration($name, MigrationInterface $migration, $direction = MigrationInterface::UP)
+    public function executeMigration($name, MigrationInterface $migration)
     {
         $this->getOutput()->writeln('');
         $this->getOutput()->writeln(
             ' ==' .
             ' <info>' . $migration->getVersion() . ' ' . $migration->getName() . ':</info>' .
-            ' <comment>' . ($direction === MigrationInterface::UP ? 'migrating' : 'reverting') . '</comment>'
+            ' <comment>migrating</comment>'
         );
 
         // Execute the migration and log the time elapsed.
         $start = microtime(true);
-        $this->getEnvironment($name)->executeMigration($migration, $direction);
+        $this->getEnvironment($name)->executeMigration($migration);
         $end = microtime(true);
 
         $this->getOutput()->writeln(
             ' ==' .
             ' <info>' . $migration->getVersion() . ' ' . $migration->getName() . ':</info>' .
-            ' <comment>' . ($direction === MigrationInterface::UP ? 'migrated' : 'reverted') .
+            ' <comment>migrated' .
             ' ' . sprintf('%.4fs', $end - $start) . '</comment>'
         );
     }
@@ -410,116 +403,6 @@ class Manager
             ' <comment>seeded' .
             ' ' . sprintf('%.4fs', $end - $start) . '</comment>'
         );
-    }
-
-    /**
-     * Rollback an environment to the specified version.
-     *
-     * @param string $environment Environment
-     * @param int|string $target
-     * @param bool $force
-     * @param bool $targetMustMatchVersion
-     * @return void
-     */
-    public function rollback($environment, $target = null, $force = false, $targetMustMatchVersion = true)
-    {
-        // note that the migrations are indexed by name (aka creation time) in ascending order
-        $migrations = $this->getMigrations();
-
-        // note that the version log are also indexed by name with the proper ascending order according to the version order
-        $executedVersions = $this->getEnvironment($environment)->getVersionLog();
-
-        // get a list of migrations sorted in the opposite way of the executed versions
-        $sortedMigrations = [];
-
-        foreach ($executedVersions as $versionCreationTime => &$executedVersion) {
-            // if we have a date (ie. the target must not match a version) and we are sorting by execution time, we
-            // convert the version start time so we can compare directly with the target date
-            if (!$this->getConfig()->isVersionOrderCreationTime() && !$targetMustMatchVersion) {
-                $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $executedVersion['start_time']);
-                $executedVersion['start_time'] = $dateTime->format('YmdHis');
-            }
-
-            if (isset($migrations[$versionCreationTime])) {
-                array_unshift($sortedMigrations, $migrations[$versionCreationTime]);
-            } else {
-                // this means the version is missing so we unset it so that we don't consider it when rolling back
-                // migrations (or choosing the last up version as target)
-                unset($executedVersions[$versionCreationTime]);
-            }
-        }
-
-        if ($target === 'all' || $target === '0') {
-            $target = 0;
-        } elseif (!is_numeric($target) && !is_null($target)) { // try to find a target version based on name
-            // search through the migrations using the name
-            $migrationNames = array_map(function ($item) {
-                return $item['migration_name'];
-            }, $executedVersions);
-            $found = array_search($target, $migrationNames);
-
-            // check on was found
-            if ($found !== false) {
-                $target = (string)$found;
-            } else {
-                $this->getOutput()->writeln("<error>No migration found with name ($target)</error>");
-
-                return;
-            }
-        }
-
-        // Check we have at least 1 migration to revert
-        $executedVersionCreationTimes = array_keys($executedVersions);
-        if (empty($executedVersionCreationTimes) || $target == end($executedVersionCreationTimes)) {
-            $this->getOutput()->writeln('<error>No migrations to rollback</error>');
-
-            return;
-        }
-
-        // If no target was supplied, revert the last migration
-        if ($target === null) {
-            // Get the migration before the last run migration
-            $prev = count($executedVersionCreationTimes) - 2;
-            $target = $prev >= 0 ? $executedVersionCreationTimes[$prev] : 0;
-        }
-
-        // If the target must match a version, check the target version exists
-        if ($targetMustMatchVersion && 0 !== $target && !isset($migrations[$target])) {
-            $this->getOutput()->writeln("<error>Target version ($target) not found</error>");
-
-            return;
-        }
-
-        // Rollback all versions until we find the wanted rollback target
-        $rollbacked = false;
-
-        foreach ($sortedMigrations as $migration) {
-            if ($targetMustMatchVersion && $migration->getVersion() == $target) {
-                break;
-            }
-
-            if (in_array($migration->getVersion(), $executedVersionCreationTimes)) {
-                $executedVersion = $executedVersions[$migration->getVersion()];
-
-                if (!$targetMustMatchVersion) {
-                    if (($this->getConfig()->isVersionOrderCreationTime() && $executedVersion['version'] <= $target) ||
-                        (!$this->getConfig()->isVersionOrderCreationTime() && $executedVersion['start_time'] <= $target)) {
-                        break;
-                    }
-                }
-
-                if (0 != $executedVersion['breakpoint'] && !$force) {
-                    $this->getOutput()->writeln('<error>Breakpoint reached. Further rollbacks inhibited.</error>');
-                    break;
-                }
-                $this->executeMigration($environment, $migration, MigrationInterface::DOWN);
-                $rollbacked = true;
-            }
-        }
-
-        if (!$rollbacked) {
-            $this->getOutput()->writeln('<error>No migrations to rollback</error>');
-        }
     }
 
     /**

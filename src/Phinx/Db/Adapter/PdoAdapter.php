@@ -258,37 +258,24 @@ abstract class PdoAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function migrated(MigrationInterface $migration, $direction, $startTime, $endTime)
+    public function migrated(MigrationInterface $migration, $startTime, $endTime)
     {
-        if (strcasecmp($direction, MigrationInterface::UP) === 0) {
-            // up
-            $sql = sprintf(
-                "INSERT INTO %s (%s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', '%s', %s);",
-                $this->getSchemaTableName(),
-                $this->quoteColumnName('version'),
-                $this->quoteColumnName('migration_name'),
-                $this->quoteColumnName('start_time'),
-                $this->quoteColumnName('end_time'),
-                $this->quoteColumnName('breakpoint'),
-                $migration->getVersion(),
-                substr($migration->getName(), 0, 100),
-                $startTime,
-                $endTime,
-                $this->castToBool(false)
-            );
+        $sql = sprintf(
+            "INSERT INTO %s (%s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', '%s', %s);",
+            $this->getSchemaTableName(),
+            $this->quoteColumnName('version'),
+            $this->quoteColumnName('migration_name'),
+            $this->quoteColumnName('start_time'),
+            $this->quoteColumnName('end_time'),
+            $this->quoteColumnName('breakpoint'),
+            $migration->getVersion(),
+            substr($migration->getName(), 0, 100),
+            $startTime,
+            $endTime,
+            $this->castToBool(false)
+        );
 
-            $this->execute($sql);
-        } else {
-            // down
-            $sql = sprintf(
-                "DELETE FROM %s WHERE %s = '%s'",
-                $this->getSchemaTableName(),
-                $this->quoteColumnName('version'),
-                $migration->getVersion()
-            );
-
-            $this->execute($sql);
-        }
+        $this->execute($sql);
 
         return $this;
     }

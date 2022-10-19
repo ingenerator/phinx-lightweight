@@ -230,9 +230,9 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function migrated(MigrationInterface $migration, $direction, $startTime, $endTime)
+    public function migrated(MigrationInterface $migration, $startTime, $endTime)
     {
-        $this->getAdapter()->migrated($migration, $direction, $startTime, $endTime);
+        $this->getAdapter()->migrated($migration, $startTime, $endTime);
 
         return $this;
     }

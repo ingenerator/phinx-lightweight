@@ -41,28 +41,11 @@ interface MigrationInterface
 {
 
     /**
-     * @var string
-     */
-    const UP = 'up';
-
-    /**
-     * @var string
-     */
-    const DOWN = 'down';
-
-    /**
      * Migrate Up
      *
      * @return void
      */
     public function up();
-
-    /**
-     * Migrate Down
-     *
-     * @return void
-     */
-    public function down();
 
     /**
      * Sets the database adapter.
@@ -132,18 +115,11 @@ interface MigrationInterface
     public function getVersion();
 
     /**
-     * Sets whether this migration is being applied or reverted
-     *
-     * @param bool $isMigratingUp True if the migration is being applied
-     * @return \Phinx\Migration\MigrationInterface
-     */
-    public function setMigratingUp($isMigratingUp);
-
-    /**
      * Gets whether this migration is being applied or reverted.
      * True means that the migration is being applied.
      *
      * @return bool
+     * @deprecated this is always true now
      */
     public function isMigratingUp();
 
