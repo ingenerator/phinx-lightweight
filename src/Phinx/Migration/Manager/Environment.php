@@ -105,27 +105,7 @@ class Environment
             $this->getAdapter()->beginTransaction();
         }
 
-        // Run the migration
-        if (method_exists($migration, MigrationInterface::CHANGE)) {
-            if ($direction === MigrationInterface::DOWN) {
-                // Create an instance of the ProxyAdapter so we can record all
-                // of the migration commands for reverse playback
-
-                /** @var \Phinx\Db\Adapter\ProxyAdapter $proxyAdapter */
-                $proxyAdapter = AdapterFactory::instance()
-                    ->getWrapper('proxy', $this->getAdapter());
-                $migration->setAdapter($proxyAdapter);
-                /** @noinspection PhpUndefinedMethodInspection */
-                $migration->change();
-                $proxyAdapter->executeInvertedCommands();
-                $migration->setAdapter($this->getAdapter());
-            } else {
-                /** @noinspection PhpUndefinedMethodInspection */
-                $migration->change();
-            }
-        } else {
-            $migration->{$direction}();
-        }
+        $migration->{$direction}();
 
         // commit the transaction if the adapter supports it
         if ($this->getAdapter()->hasTransactions()) {

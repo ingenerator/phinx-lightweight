@@ -69,7 +69,7 @@ class AdapterFactoryTest extends TestCase
         $method = new \ReflectionMethod(get_class($this->factory), 'getWrapperClass');
         $method->setAccessible(true);
 
-        $wrapper = $method->invoke($this->factory, 'proxy');
+        $wrapper = $method->invoke($this->factory, 'timed');
         $this->factory->registerWrapper('test', $wrapper);
 
         $this->assertEquals($wrapper, $method->invoke($this->factory, 'test'));

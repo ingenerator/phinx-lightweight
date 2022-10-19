@@ -39,10 +39,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 interface MigrationInterface
 {
-    /**
-     * @var string
-     */
-    const CHANGE = 'change';
 
     /**
      * @var string

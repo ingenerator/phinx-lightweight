@@ -3,7 +3,6 @@
 namespace Test\Phinx\Migration\Manager;
 
 use Phinx\Db\Adapter\AdapterFactory;
-use Phinx\Db\Adapter\PdoAdapter;
 use Phinx\Migration\Manager\Environment;
 use Phinx\Migration\MigrationInterface;
 use PHPUnit\Framework\TestCase;
@@ -205,52 +204,6 @@ class EnvironmentTest extends TestCase
                   ->method('up');
 
         $this->environment->executeMigration($migration, MigrationInterface::UP);
-    }
-
-    public function testExecutingAChangeMigrationUp()
-    {
-        // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
-        $adapterStub->expects($this->once())
-                    ->method('migrated')
-                    ->will($this->returnArgument(0));
-
-        $this->environment->setAdapter($adapterStub);
-
-        // migration
-        $migration = $this->getMockBuilder('\Phinx\Migration\AbstractMigration')
-            ->setConstructorArgs(['20130301080000'])
-            ->setMethods(['change'])
-            ->getMock();
-        $migration->expects($this->once())
-                  ->method('change');
-
-        $this->environment->executeMigration($migration, MigrationInterface::UP);
-    }
-
-    public function testExecutingAChangeMigrationDown()
-    {
-        // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
-        $adapterStub->expects($this->once())
-                    ->method('migrated')
-                    ->will($this->returnArgument(0));
-
-        $this->environment->setAdapter($adapterStub);
-
-        // migration
-        $migration = $this->getMockBuilder('\Phinx\Migration\AbstractMigration')
-            ->setConstructorArgs(['20130301080000'])
-            ->setMethods(['change'])
-            ->getMock();
-        $migration->expects($this->once())
-                  ->method('change');
-
-        $this->environment->executeMigration($migration, MigrationInterface::DOWN);
     }
 
     public function testGettingInputObject()
