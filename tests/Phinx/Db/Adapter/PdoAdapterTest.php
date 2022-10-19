@@ -20,14 +20,16 @@ class PdoAdapterTestPDOMock extends \PDO
  */
 class PdoAdapterTestPDOMockWithExecChecks extends PdoAdapterTestPDOMock
 {
-    private $sql;
+    private string $sql;
 
-    public function exec($sql)
+    public function exec(string $sql): int|false
     {
         $this->sql = $sql;
+
+        return 1;
     }
 
-    public function getExecutedSqlForTest()
+    public function getExecutedSqlForTest(): string
     {
         return $this->sql;
     }

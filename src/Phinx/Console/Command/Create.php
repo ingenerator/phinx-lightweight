@@ -285,7 +285,7 @@ class Create extends AbstractCommand
             '$version' => Util::getVersionFromFileName($fileName),
             '$baseClassName' => $this->getConfig()->getMigrationBaseClassName(true),
         ];
-        $contents = strtr($contents, $classes);
+        $contents = strtr((string) $contents, $classes);
 
         if (file_put_contents($filePath, $contents) === false) {
             throw new \RuntimeException(sprintf(

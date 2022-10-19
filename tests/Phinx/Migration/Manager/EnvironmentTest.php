@@ -16,14 +16,16 @@ class PDOMock extends \PDO
     {
     }
 
-    public function getAttribute($attribute)
+    public function getAttribute(int $attribute): mixed
     {
         return isset($this->attributes[$attribute]) ? $this->attributes[$attribute] : 'pdomock';
     }
 
-    public function setAttribute($attribute, $value)
+    public function setAttribute(int $attribute, mixed $value): bool
     {
         $this->attributes[$attribute] = $value;
+
+        return TRUE;
     }
 }
 

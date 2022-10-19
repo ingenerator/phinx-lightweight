@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
+use function usleep;
 
 /**
  * Class CreateTest
@@ -87,7 +88,7 @@ class CreateTest extends TestCase
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
-        sleep(1.01); // need at least a second due to file naming scheme
+        usleep(1.01 * 1_000_000); // need at least a second due to file naming scheme
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The migration class name "MyDuplicateMigration" already exists');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
@@ -117,7 +118,7 @@ class CreateTest extends TestCase
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
-        sleep(1.01); // need at least a second due to file naming scheme
+        usleep(1.01 * 1_000_000); // need at least a second due to file naming scheme
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The migration class name "Foo\Bar\MyDuplicateMigration" already exists');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);

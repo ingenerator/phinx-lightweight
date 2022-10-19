@@ -4,7 +4,6 @@ namespace Test\Phinx\Migration;
 
 use Phinx\Config\Config;
 use Phinx\Migration\Manager;
-use Phinx\Migration\Manager\Environment;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,6 +34,10 @@ class ManagerTest extends TestCase
 
     protected function setUp(): void
     {
+        if (!defined('MYSQL_DB_CONFIG')) {
+            $this->markTestSkipped('Mysql tests disabled. See MYSQL_DB_CONFIG constant.');
+        }
+
         $this->config = new Config($this->getConfigArray());
         $this->input = new ArrayInput([]);
         $this->output = new StreamOutput(fopen('php://memory', 'a', false));
@@ -97,7 +100,7 @@ class ManagerTest extends TestCase
      *
      * @return array
      */
-    public function getConfigArray()
+    public function getConfigArray(): array
     {
         return [
             'paths' => [
