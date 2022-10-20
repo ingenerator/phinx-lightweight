@@ -1,7 +1,7 @@
 {
     "name": "ingenerator/phinx-lightweight",
     "type": "library",
-    "description": "A very lightweight fork of cakephp/phinx",
+    "description": "Very simple SQL-based database migrations tool - a heavily stripped down fork of robmorgan/phinx",
     "keywords": [
         "phinx",
         "migrations",
@@ -11,28 +11,38 @@
     ],
     "homepage": "https://github.com/ingenerator/phinx-lightweight",
     "license": "MIT",
-    "version": "0.9.2",
     "authors": [
+        {
+            "name": "Andrew Coulton",
+            "email": "andrew@ingenerator.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Craig Gosman",
+            "email": "craig@ingenerator.com",
+            "role": "Developer"
+        },
         {
             "name": "Rob Morgan",
             "email": "robbym@gmail.com",
             "homepage": "https://robmorgan.id.au",
-            "role": "Lead Developer"
+            "role": "Original Lead Developer"
         },
         {
             "name": "Woody Gilk",
             "email": "woody.gilk@gmail.com",
             "homepage": "http://shadowhand.me",
-            "role": "Developer"
+            "role": "Original Developer"
         },
         {
             "name": "Richard Quadling",
             "email": "rquadling@gmail.com",
-            "role": "Developer"
+            "role": "Original Developer"
         },
         {
             "name": "CakePHP Community",
-            "homepage": "https://github.com/cakephp/phinx/graphs/contributors"
+            "homepage": "https://github.com/cakephp/phinx/graphs/contributors",
+            "role": "Original contributors"
         }
     ],
     "require": {
@@ -43,6 +53,9 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5.5"
+    },
+    "conflict": {
+        "robmorgan/phinx": "*"
     },
     "autoload": {
         "psr-4": {

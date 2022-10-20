@@ -1,5 +1,20 @@
 # Version History
 
+**1.0.0** (DATE DATE DATE)
+
+* First release of the phinx-lightweight forked library
+* Removed support for all database platforms/drivers other than MySQL over PDO
+* Removed support for rolling back migrations or setting breakpoints
+* Removed support for the automagic "reversible" migrations through the `change()` method
+* Removed the entire table / column / index modelling layer - migrations should issue direct SQL commands
+* Removed support for seeding the database with test data - use a standalone seeding library if required
+* Removed support for automagically applying a global prefix / suffix to names of tables that migrations are operating
+  on.
+* Removed a number of database manipulation helper methods - express your changes in SQL
+* Removed support for some unusual / edge-case uses of the `->insert()` method in migrations
+* Removed support for the `--dry-run` mode : this didn't consistently skip all queries so gave a false sense of security
+* Support PHP 8.0, 8.1 and 8.2 and drop support for older versions
+
 **0.9.2** (Saturday, 23 December 2017)
 * Pull requests
   * [#1169](https://github.com/cakephp/phinx/pull/1169) Apply default collation on tables as per documentation
