@@ -190,32 +190,6 @@ Supported Adapters
 Phinx currently supports the following database adapters natively:
 
 * `MySQL <http://www.mysql.com/>`_: specify the ``mysql`` adapter.
-* `PostgreSQL <http://www.postgresql.org/>`_: specify the ``pgsql`` adapter.
-* `SQLite <http://www.sqlite.org/>`_: specify the ``sqlite`` adapter.
-* `SQL Server <http://www.microsoft.com/sqlserver>`_: specify the ``sqlsrv`` adapter.
-
-SQLite
-`````````````````
-
-Declaring an SQLite database uses a simplified structure:
-
-.. code-block:: yaml
-
-    environments:
-        development:
-            adapter: sqlite
-            name: ./data/derby
-        testing:
-            adapter: sqlite
-            memory: true     # Setting memory to *any* value overrides name
-
-SQL Server
-`````````````````
-
-When using the ``sqlsrv`` adapter and connecting to a named instance you should
-omit the ``port`` setting as SQL Server will negotiate the port automatically.
-Additionally, omit the ``charset: utf8`` or change to ``charset: 65001`` which
-corresponds to UTF8 for SQL Server.
 
 Custom Adapters
 `````````````````
