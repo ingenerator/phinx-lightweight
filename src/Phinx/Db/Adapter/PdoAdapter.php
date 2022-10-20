@@ -171,11 +171,11 @@ abstract class PdoAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function insert(Table $table, $row)
+    public function insert(string $table_name_name, array $row): void
     {
         $sql = sprintf(
             "INSERT INTO %s ",
-            $this->quoteTableName($table->getName())
+            $this->quoteTableName($table_name_name)
         );
 
         $columns = array_keys($row);
@@ -189,11 +189,11 @@ abstract class PdoAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function bulkinsert(Table $table, $rows)
+    public function bulkinsert(string $table_name, array $rows): void
     {
         $sql = sprintf(
             "INSERT INTO %s ",
-            $this->quoteTableName($table->getName())
+            $this->quoteTableName($table_name)
         );
 
         $current = current($rows);

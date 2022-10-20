@@ -182,17 +182,17 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function insert(Table $table, $row)
+    public function insert(string $table_name, array $row): void
     {
-        $this->getAdapter()->insert($table, $row);
+        $this->getAdapter()->insert($table_name, $row);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function bulkinsert(Table $table, $rows)
+    public function bulkinsert(string $table_name, array $rows): void
     {
-        $this->getAdapter()->bulkinsert($table, $rows);
+        $this->getAdapter()->bulkinsert($table_name, $rows);
     }
 
     /**

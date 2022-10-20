@@ -26,10 +26,10 @@
  * @package    Phinx
  * @subpackage Phinx\Migration
  */
+
 namespace Phinx\Migration;
 
 use Phinx\Db\Adapter\AdapterInterface;
-use Phinx\Db\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -68,17 +68,17 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * Class Constructor.
      *
-     * @param int $version Migration Version
-     * @param \Symfony\Component\Console\Input\InputInterface|null $input
+     * @param int                                                    $version Migration Version
+     * @param \Symfony\Component\Console\Input\InputInterface|null   $input
      * @param \Symfony\Component\Console\Output\OutputInterface|null $output
      */
-    final public function __construct($version, InputInterface $input = null, OutputInterface $output = null)
+    final public function __construct($version, InputInterface $input = NULL, OutputInterface $output = NULL)
     {
         $this->version = $version;
-        if (!is_null($input)) {
+        if ( ! is_null($input)) {
             $this->setInput($input);
         }
-        if (!is_null($output)) {
+        if ( ! is_null($output)) {
             $this->setOutput($output);
         }
 
@@ -224,13 +224,34 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      */
-    public function insert($table, $data)
+    public function insert(string $table, array $data): void
     {
-        // convert to table object
-        if (is_string($table)) {
-            $table = new Table($table, [], $this->getAdapter());
+        if (isset($data[0]) && \is_array($data[0])) {
+            // We have been given multiple rows
+            $rows = $data;
+        } else {
+            // We have been given a single row
+            $rows = [$data];
         }
-        $table->insert($data)->saveData();
+
+        $expect_keys = array_keys($rows[0]);
+        foreach ($rows as $row) {
+            if (array_keys($row) !== $expect_keys) {
+                throw new \InvalidArgumentException(
+                    <<<TEXT
+                    AbstractMigration::insert() no longer supports inserts with mixed column keys
+
+                    ->insert() used to automagically guess whether to perform a bulk insert or single inserts
+                    depending on whether each row item had the same columns. This can produce very inefficient
+                    inserts. If you need to insert different column values in different rows, your code should
+                    work out how to logically split & batch these into insert statements and call ->insert()
+                    separately for each batch.
+                    TEXT
+                );
+            }
+        }
+
+        $this->getAdapter()->bulkinsert($table, $rows);
     }
 
 }

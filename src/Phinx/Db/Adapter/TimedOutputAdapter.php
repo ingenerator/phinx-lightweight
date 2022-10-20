@@ -107,11 +107,11 @@ class TimedOutputAdapter extends AdapterWrapper
      *
      * @return void
      */
-    public function insert(Table $table, $row)
+    public function insert(string $table_name, array $row): void
     {
         $end = $this->startCommandTimer();
-        $this->writeCommand('insert', [$table->getName()]);
-        parent::insert($table, $row);
+        $this->writeCommand('insert', [$table_name]);
+        parent::insert($table_name, $row);
         $end();
     }
 
@@ -120,11 +120,11 @@ class TimedOutputAdapter extends AdapterWrapper
      *
      * @return void
      */
-    public function bulkinsert(Table $table, $rows)
+    public function bulkinsert(string $table_name, array $rows): void
     {
         $end = $this->startCommandTimer();
-        $this->writeCommand('bulkinsert', [$table->getName()]);
-        parent::bulkinsert($table, $rows);
+        $this->writeCommand('bulkinsert', [$table_name]);
+        parent::bulkinsert($table_name, $rows);
         $end();
     }
 

@@ -159,9 +159,10 @@ interface MigrationInterface
      * Insert data into a table.
      *
      * @param string $tableName
-     * @param array $data
+     * @param array  $data
+     *
      * @return void
      */
-    public function insert($tableName, $data);
+    public function insert(string $tableName, array $data):void;
 
 }

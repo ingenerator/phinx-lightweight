@@ -277,20 +277,22 @@ interface AdapterInterface
     /**
      * Inserts data into a table.
      *
-     * @param \Phinx\Db\Table $table where to insert data
-     * @param array $row
+     * @param string $table_name where to insert data
+     * @param array  $row
+     *
      * @return void
      */
-    public function insert(Table $table, $row);
+    public function insert(string $table_name, array $row): void;
 
     /**
      * Inserts data into a table in a bulk.
      *
-     * @param \Phinx\Db\Table $table where to insert data
-     * @param array $rows
+     * @param string $table where to insert data
+     * @param array  $rows
+     *
      * @return void
      */
-    public function bulkinsert(Table $table, $rows);
+    public function bulkinsert(string $table_name, array $rows): void;
 
     /**
      * Quotes a table name for use in a query.
