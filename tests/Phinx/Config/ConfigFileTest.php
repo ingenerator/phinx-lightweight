@@ -15,13 +15,13 @@ class ConfigFileTest extends TestCase
 
     private $baseDir;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->previousDir = getcwd();
         $this->baseDir = realpath(__DIR__ . '/_rootDirectories');
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         chdir($this->previousDir);
     }
@@ -50,10 +50,10 @@ class ConfigFileTest extends TestCase
      *
      * @param $input
      * @param $dir
-     * @expectedException \InvalidArgumentException
      */
     public function testNotWorkingGetConfigFile($input, $dir)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->runLocateFile($input, $dir);
     }
 

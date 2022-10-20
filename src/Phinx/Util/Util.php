@@ -41,11 +41,6 @@ class Util
     const MIGRATION_FILE_NAME_PATTERN = '/^\d+_([\w_]+).php$/i';
 
     /**
-     * @var string
-     */
-    const SEED_FILE_NAME_PATTERN = '/^([A-Z][a-z0-9]+).php$/i';
-
-    /**
      * Gets the current timestamp string, in UTC.
      *
      * @return string
@@ -108,7 +103,7 @@ class Util
     {
         $arr = preg_split('/(?=[A-Z])/', $className);
         unset($arr[0]); // remove the first element ('')
-        $fileName = static::getCurrentTimestamp() . '_' . strtolower(implode($arr, '_')) . '.php';
+        $fileName = static::getCurrentTimestamp() . '_' . strtolower(implode('_', $arr)) . '.php';
 
         return $fileName;
     }
@@ -153,10 +148,10 @@ class Util
     }
 
     /**
-     * Check if a migration/seed class name is valid.
+     * Check if a migration class name is valid.
      *
-     * Migration & Seed class names must be in CamelCase format.
-     * e.g: CreateUserTable, AddIndexToPostsTable or UserSeeder.
+     * Migration class names must be in CamelCase format.
+     * e.g: CreateUserTable, AddIndexToPostsTable
      *
      * Single words are not allowed on their own.
      *
@@ -179,19 +174,6 @@ class Util
         $matches = [];
 
         return preg_match(static::MIGRATION_FILE_NAME_PATTERN, $fileName, $matches);
-    }
-
-    /**
-     * Check if a seed file name is valid.
-     *
-     * @param string $fileName File Name
-     * @return bool
-     */
-    public static function isValidSeedFileName($fileName)
-    {
-        $matches = [];
-
-        return preg_match(static::SEED_FILE_NAME_PATTERN, $fileName, $matches);
     }
 
     /**
@@ -220,5 +202,56 @@ class Util
     public static function glob($path)
     {
         return glob($path, defined('GLOB_BRACE') ? GLOB_BRACE : 0);
+    }
+
+    /**
+     * Parses DSN string into db config array.
+     *
+     * @param string $dsn DSN string
+     * @return array
+     */
+    public static function parseDsn(string $dsn): array
+    {
+        $pattern = <<<'REGEXP'
+{
+    ^
+    (?:
+        (?P<adapter>[\w\\\\]+)://
+    )
+    (?:
+        (?P<user>.*?)
+        (?:
+            :(?P<pass>.*?)
+        )?
+        @
+    )?
+    (?:
+        (?P<host>[^?#/:@]+)
+        (?:
+            :(?P<port>\d+)
+        )?
+    )?
+    (?:
+        /(?P<name>[^?#]*)
+    )?
+    (?:
+        \?(?P<query>[^#]*)
+    )?
+    $
+}x
+REGEXP;
+
+        if (!preg_match($pattern, $dsn, $parsed)) {
+            return [];
+        }
+
+        // filter out everything except the matched groups
+        $config = array_intersect_key($parsed, array_flip(['adapter', 'user', 'pass', 'host', 'port', 'name']));
+        $config = array_filter($config);
+
+        parse_str($parsed['query'] ?? '', $query);
+        $config = array_merge($query, $config);
+
+        return $config;
     }
 }

@@ -9,7 +9,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class InitTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $file = sys_get_temp_dir() . '/phinx.yml';
         if (is_file($file)) {
@@ -32,7 +32,7 @@ class InitTest extends TestCase
             'decorated' => false
         ]);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/created (.*)phinx.yml(.*)/',
             $commandTester->getDisplay()
         );
@@ -43,10 +43,6 @@ class InitTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException              \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /The file "(.*)" already exists/
-     */
     public function testThrowsExceptionWhenConfigFilePresent()
     {
         touch(sys_get_temp_dir() . '/phinx.yml');
@@ -56,6 +52,8 @@ class InitTest extends TestCase
         $command = $application->find('init');
 
         $commandTester = new CommandTester($command);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/The file "(.*)" already exists/');
         $commandTester->execute([
             'command' => $command->getName(),
             'path' => sys_get_temp_dir()

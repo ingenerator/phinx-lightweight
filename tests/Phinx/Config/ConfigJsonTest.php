@@ -24,11 +24,11 @@ class ConfigJsonTest extends TestCase
 
     /**
      * @covers \Phinx\Config\Config::fromJson
-     * @expectedException \RuntimeException
      */
     public function testFromJSONInvalidJson()
     {
         $path = __DIR__ . '/_files';
+        $this->expectException(\RuntimeException::class);
         Config::fromJson($path . '/invalid.json');
     }
 }

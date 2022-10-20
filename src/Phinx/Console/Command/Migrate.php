@@ -47,7 +47,6 @@ class Migrate extends AbstractCommand
             ->setDescription('Migrate the database')
             ->addOption('--target', '-t', InputOption::VALUE_REQUIRED, 'The version number to migrate to')
             ->addOption('--date', '-d', InputOption::VALUE_REQUIRED, 'The date to migrate to')
-            ->addOption('--dry-run', '-x', InputOption::VALUE_NONE, 'Dump query to standard output instead of executing it')
             ->setHelp(
                 <<<EOT
 The <info>migrate</info> command runs all available migrations, optionally up to a specific version
@@ -98,13 +97,6 @@ EOT
             $output->writeln('<error>Could not determine database name! Please specify a database name in your config file.</error>');
 
             return 1;
-        }
-
-        if (isset($envOptions['table_prefix'])) {
-            $output->writeln('<info>using table prefix</info> ' . $envOptions['table_prefix']);
-        }
-        if (isset($envOptions['table_suffix'])) {
-            $output->writeln('<info>using table suffix</info> ' . $envOptions['table_suffix']);
         }
 
         // run the migrations

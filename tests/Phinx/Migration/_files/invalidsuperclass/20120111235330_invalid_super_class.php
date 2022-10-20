@@ -10,11 +10,4 @@ class InvalidSuperClass
         // do nothing
     }
 
-    /**
-     * Migrate Down.
-     */
-    public function down()
-    {
-        // do nothing
-    }
 }

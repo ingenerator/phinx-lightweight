@@ -20,8 +20,6 @@ class ConfigTest extends AbstractConfigTest
         $config = new Config([]);
         // this option is set to its default value when not being passed in the constructor, so we can ignore it
         unset($config['version_order']);
-        $this->assertAttributeEmpty('values', $config);
-        $this->assertAttributeEmpty('configFilePath', $config);
         $this->assertNull($config->getConfigFilePath());
     }
 
@@ -32,8 +30,6 @@ class ConfigTest extends AbstractConfigTest
     public function testConstructByArray()
     {
         $config = new Config($this->getConfigArray());
-        $this->assertAttributeNotEmpty('values', $config);
-        $this->assertAttributeEmpty('configFilePath', $config);
         $this->assertNull($config->getConfigFilePath());
     }
 
@@ -82,7 +78,7 @@ class ConfigTest extends AbstractConfigTest
     {
         $config = new Config($this->getConfigArray());
         $db = $config->getEnvironment('testing');
-        $this->assertEquals('sqllite', $db['adapter']);
+        $this->assertEquals('mysql', $db['adapter']);
     }
 
     /**
@@ -114,11 +110,11 @@ class ConfigTest extends AbstractConfigTest
 
     /**
      * @covers \Phinx\Config\Config::offsetGet
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Identifier "foo" is not defined.
      */
     public function testUndefinedArrayAccess()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Identifier "foo" is not defined.');
         $config = new Config([]);
         $config['foo'];
     }
@@ -192,26 +188,6 @@ class ConfigTest extends AbstractConfigTest
     {
         $config = new \Phinx\Config\Config(['aliases' => ['Short' => 'Some\Long\Classname']]);
         $this->assertEquals('Some\Long\Classname', $config->getAlias('Short'));
-    }
-
-    public function testGetSeedPath()
-    {
-        $config = new \Phinx\Config\Config(['paths' => ['seeds' => 'db/seeds']]);
-        $this->assertEquals(['db/seeds'], $config->getSeedPaths());
-
-        $config = new \Phinx\Config\Config(['paths' => ['seeds' => ['db/seeds1', 'db/seeds2']]]);
-        $this->assertEquals(['db/seeds1', 'db/seeds2'], $config->getSeedPaths());
-    }
-
-    /**
-     * @covers \Phinx\Config\Config::getSeedPaths
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Seeds path missing from config file
-     */
-    public function testGetSeedPathThrowsException()
-    {
-        $config = new \Phinx\Config\Config([]);
-        $this->assertEquals('db/seeds', $config->getSeedPaths());
     }
 
     /**

@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Tester\CommandTester;
+use function usleep;
 
 /**
  * Class CreateTest
@@ -36,7 +37,7 @@ class CreateTest extends TestCase
      */
     protected $output;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         @mkdir(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'migrations', 0777, true);
         $this->config = new Config(
@@ -69,10 +70,6 @@ class CreateTest extends TestCase
         $this->output = new StreamOutput(fopen('php://memory', 'a', false));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The migration class name "MyDuplicateMigration" already exists
-     */
     public function testExecuteWithDuplicateMigrationNames()
     {
         $application = new PhinxApplication('testing');
@@ -91,14 +88,12 @@ class CreateTest extends TestCase
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
-        sleep(1.01); // need at least a second due to file naming scheme
+        usleep(1.01 * 1_000_000); // need at least a second due to file naming scheme
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The migration class name "MyDuplicateMigration" already exists');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The migration class name "Foo\Bar\MyDuplicateMigration" already exists
-     */
     public function testExecuteWithDuplicateMigrationNamesWithNamespace()
     {
         $application = new PhinxApplication('testing');
@@ -123,14 +118,12 @@ class CreateTest extends TestCase
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
-        sleep(1.01); // need at least a second due to file naming scheme
+        usleep(1.01 * 1_000_000); // need at least a second due to file naming scheme
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The migration class name "Foo\Bar\MyDuplicateMigration" already exists');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Cannot use --template and --class at the same time
-     */
     public function testSupplyingBothClassAndTemplateAtCommandLineThrowsException()
     {
         $application = new PhinxApplication('testing');
@@ -148,13 +141,11 @@ class CreateTest extends TestCase
         $command->setManager($managerStub);
 
         $commandTester = new CommandTester($command);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot use --template and --class at the same time');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyFailingMigration', '--template' => 'MyTemplate', '--class' => 'MyTemplateClass']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot define template:class and template:file at the same time
-     */
     public function testSupplyingBothClassAndTemplateInConfigThrowsException()
     {
         $application = new PhinxApplication('testing');
@@ -177,6 +168,8 @@ class CreateTest extends TestCase
         $command->setManager($managerStub);
 
         $commandTester = new CommandTester($command);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot define template:class and template:file at the same time');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyFailingMigration']);
     }
 
@@ -305,6 +298,8 @@ class CreateTest extends TestCase
 
         $commandLine = array_merge(['command' => $command->getName()], $commandLine);
         $commandTester->execute($commandLine);
+
+        $this->addToAssertionCount(1);
     }
 
     public function provideSimpleTemplateGenerator()
@@ -382,18 +377,13 @@ class CreateTest extends TestCase
 
     public function setExpectedException($exceptionName, $exceptionMessage = '', $exceptionCode = null)
     {
-        if (method_exists($this, 'expectException')) {
-            //PHPUnit 5+
-            $this->expectException($exception);
-            if ($exceptionMessage !== '') {
-                $this->expectExceptionMessage($exceptionMessage);
-            }
-            if ($exceptionCode !== null) {
-                $this->expectExceptionCode($exceptionCode);
-            }
-        } else {
-            //PHPUnit 4
-            parent::setExpectedException($exceptionName, $exceptionMessage, $exceptionCode);
+        //PHPUnit 5+
+        $this->expectException($exceptionName);
+        if ($exceptionMessage !== '') {
+            $this->expectExceptionMessage($exceptionMessage);
+        }
+        if ($exceptionCode !== null) {
+            $this->expectExceptionCode($exceptionCode);
         }
     }
 }

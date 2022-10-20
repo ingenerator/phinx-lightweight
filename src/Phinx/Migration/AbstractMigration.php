@@ -26,10 +26,10 @@
  * @package    Phinx
  * @subpackage Phinx\Migration
  */
+
 namespace Phinx\Migration;
 
 use Phinx\Db\Adapter\AdapterInterface;
-use Phinx\Db\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -66,30 +66,41 @@ abstract class AbstractMigration implements MigrationInterface
     protected $input;
 
     /**
-     * Whether this migration is being applied or reverted
-     *
-     * @var bool
-     */
-    protected $isMigratingUp = true;
-
-    /**
      * Class Constructor.
      *
-     * @param int $version Migration Version
-     * @param \Symfony\Component\Console\Input\InputInterface|null $input
+     * @param int                                                    $version Migration Version
+     * @param \Symfony\Component\Console\Input\InputInterface|null   $input
      * @param \Symfony\Component\Console\Output\OutputInterface|null $output
      */
-    final public function __construct($version, InputInterface $input = null, OutputInterface $output = null)
+    final public function __construct($version, InputInterface $input = NULL, OutputInterface $output = NULL)
     {
         $this->version = $version;
-        if (!is_null($input)) {
+        if ( ! is_null($input)) {
             $this->setInput($input);
         }
-        if (!is_null($output)) {
+        if ( ! is_null($output)) {
             $this->setOutput($output);
         }
 
         $this->init();
+    }
+
+    final public function change(): void
+    {
+        // Prevent migration classes from defining or calling a `change()` method as we no longer support this.
+        // This will provide a runtime catch for any legacy migration classes that are doing the wrong thing.
+        throw new \BadMethodCallException(
+            'Unexpected call to '.__METHOD__.' - migration classes should only use `up()`'
+        );
+    }
+
+    final public function down(): void
+    {
+        // Prevent migration classes from defining or calling a `down()` method as we no longer support this.
+        // This will provide a runtime catch for any legacy migration classes that are doing the wrong thing.
+        throw new \BadMethodCallException(
+            'Unexpected call to '.__METHOD__.' - migration classes should only use `up()`'
+        );
     }
 
     /**
@@ -104,16 +115,7 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      */
-    public function up()
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function down()
-    {
-    }
+    abstract public function up();
 
     /**
      * {@inheritdoc}
@@ -198,25 +200,15 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      */
-    public function setMigratingUp($isMigratingUp)
-    {
-        $this->isMigratingUp = $isMigratingUp;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function isMigratingUp()
     {
-        return $this->isMigratingUp;
+        return TRUE;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function execute($sql)
+    public function execute(string $sql): false|int
     {
         return $this->getAdapter()->execute($sql);
     }
@@ -224,7 +216,7 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      */
-    public function query($sql)
+    public function query(string $sql): \PDOStatement
     {
         return $this->getAdapter()->query($sql);
     }
@@ -232,7 +224,7 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      */
-    public function fetchRow($sql)
+    public function fetchRow(string $sql): array|false
     {
         return $this->getAdapter()->fetchRow($sql);
     }
@@ -240,7 +232,7 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      */
-    public function fetchAll($sql)
+    public function fetchAll(string $sql): array
     {
         return $this->getAdapter()->fetchAll($sql);
     }
@@ -248,55 +240,39 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      */
-    public function insert($table, $data)
+    public function insert(string $table, array $data): void
     {
-        // convert to table object
-        if (is_string($table)) {
-            $table = new Table($table, [], $this->getAdapter());
+        if (isset($data[0]) && \is_array($data[0])) {
+            // We have been given multiple rows
+            $rows = $data;
+        } else {
+            // We have been given a single row
+            $rows = [$data];
         }
-        $table->insert($data)->save();
+
+        $expect_keys = array_keys($rows[0]);
+        foreach ($rows as $row) {
+            if (array_keys($row) !== $expect_keys) {
+                throw new \InvalidArgumentException(
+                    <<<TEXT
+                    AbstractMigration::insert() no longer supports inserts with mixed column keys
+
+                    ->insert() used to automagically guess whether to perform a bulk insert or single inserts
+                    depending on whether each row item had the same columns. This can produce very inefficient
+                    inserts. If you need to insert different column values in different rows, your code should
+                    work out how to logically split & batch these into insert statements and call ->insert()
+                    separately for each batch.
+                    TEXT
+                );
+            }
+        }
+
+        $this->getAdapter()->bulkinsert($table, $rows);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createDatabase($name, $options)
+    public function prepareAndExecute(string $sql, array $params): void
     {
-        $this->getAdapter()->createDatabase($name, $options);
+        $this->getAdapter()->getConnection()->prepare($sql)->execute($params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function dropDatabase($name)
-    {
-        $this->getAdapter()->dropDatabase($name);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasTable($tableName)
-    {
-        return $this->getAdapter()->hasTable($tableName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function table($tableName, $options = [])
-    {
-        return new Table($tableName, $options, $this->getAdapter());
-    }
-
-    /**
-     * A short-hand method to drop the given database table.
-     *
-     * @param string $tableName Table Name
-     * @return void
-     */
-    public function dropTable($tableName)
-    {
-        $this->table($tableName)->drop();
-    }
 }

@@ -103,42 +103,6 @@ setting ``migration_base_class`` in your config:
 
     migration_base_class: MyMagicalMigration
 
-Seed Paths
-----------
-
-The second option specifies the path to your seed directory. Phinx uses
-``%%PHINX_CONFIG_DIR%%/db/seeds`` by default.
-
-.. note::
-
-    ``%%PHINX_CONFIG_DIR%%`` is a special token and is automatically replaced
-    with the root directory where your ``phinx.yml`` file is stored.
-
-In order to overwrite the default ``%%PHINX_CONFIG_DIR%%/db/seeds``, you
-need to add the following to the yaml configuration.
-
-.. code-block:: yaml
-
-    paths:
-        seeds: /your/full/path
-
-You can also provide multiple seed paths by using an array in your configuration:
-
-.. code-block:: yaml
-
-    paths:
-        seeds:
-            - /your/full/path1
-            - /your/full/path2
-
-
-You can also use the ``%%PHINX_CONFIG_DIR%%`` token in your path.
-
-.. code-block:: yaml
-
-    paths:
-        seeds: '%%PHINX_CONFIG_DIR%%/your/relative/path'
-
 Environments
 ------------
 
@@ -174,24 +138,6 @@ file:
 .. code-block:: bash
 
     export PHINX_ENVIRONMENT=dev-`whoami`-`hostname`
-
-
-Table Prefix and Suffix
------------------------
-
-You can define a table prefix and table suffix:
-
-.. code-block:: yaml
-
-    environments:
-        development:
-            ....
-            table_prefix: dev_
-            table_suffix: _v1
-        testing:
-            ....
-            table_prefix: test_
-            table_suffix: _v2
 
 
 Socket Connections
@@ -244,32 +190,6 @@ Supported Adapters
 Phinx currently supports the following database adapters natively:
 
 * `MySQL <http://www.mysql.com/>`_: specify the ``mysql`` adapter.
-* `PostgreSQL <http://www.postgresql.org/>`_: specify the ``pgsql`` adapter.
-* `SQLite <http://www.sqlite.org/>`_: specify the ``sqlite`` adapter.
-* `SQL Server <http://www.microsoft.com/sqlserver>`_: specify the ``sqlsrv`` adapter.
-
-SQLite
-`````````````````
-
-Declaring an SQLite database uses a simplified structure:
-
-.. code-block:: yaml
-
-    environments:
-        development:
-            adapter: sqlite
-            name: ./data/derby
-        testing:
-            adapter: sqlite
-            memory: true     # Setting memory to *any* value overrides name
-
-SQL Server
-`````````````````
-
-When using the ``sqlsrv`` adapter and connecting to a named instance you should
-omit the ``port`` setting as SQL Server will negotiate the port automatically.
-Additionally, omit the ``charset: utf8`` or change to ``charset: 65001`` which
-corresponds to UTF8 for SQL Server.
 
 Custom Adapters
 `````````````````
@@ -303,7 +223,7 @@ The aliased classes will still be required to implement the ``Phinx\Migration\Cr
 Version Order
 ------
 
-When rolling back or printing the status of migrations, Phinx orders the executed migrations according to the 
+When rolling back or printing the status of migrations, Phinx orders the executed migrations according to the
 ``version_order`` option, which can have the following values:
 
 * ``creation`` (the default): migrations are ordered by their creation time, which is also part of their filename.

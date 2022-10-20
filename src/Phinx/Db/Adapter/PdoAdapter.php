@@ -26,9 +26,9 @@
  * @package    Phinx
  * @subpackage Phinx\Db\Adapter
  */
+
 namespace Phinx\Db\Adapter;
 
-use BadMethodCallException;
 use Phinx\Db\Table;
 use Phinx\Migration\MigrationInterface;
 
@@ -62,44 +62,41 @@ abstract class PdoAdapter extends AbstractAdapter
      * Sets the database connection.
      *
      * @param \PDO $connection Connection
+     *
      * @return \Phinx\Db\Adapter\AdapterInterface
      */
     public function setConnection(\PDO $connection)
     {
         $this->connection = $connection;
 
-        // Create the schema table if it doesn't already exist
-        if (!$this->hasSchemaTable()) {
-            $this->createSchemaTable();
-        } else {
-            $table = new Table($this->getSchemaTableName(), [], $this);
-            if (!$table->hasColumn('migration_name')) {
-                $table
-                    ->addColumn(
-                        'migration_name',
-                        'string',
-                        ['limit' => 100, 'after' => 'version', 'default' => null, 'null' => true]
-                    )
-                    ->save();
-            }
-            if (!$table->hasColumn('breakpoint')) {
-                $table
-                    ->addColumn('breakpoint', 'boolean', ['default' => false])
-                    ->save();
-            }
+        try {
+            $this->ensureSchemaTableExistsAndCorrect();
+        } catch (\Exception $e) {
+            throw new \RuntimeException(
+                sprintf(
+                    'There was a problem creating the schema table: [%s at %s:%s] %s',
+                    \get_class($e),
+                    $e->getFile(),
+                    $e->getLine(),
+                    $e->getMessage()
+                ), 0,
+                $e
+            );
         }
 
         return $this;
     }
+
+    abstract protected function ensureSchemaTableExistsAndCorrect(): void;
 
     /**
      * Gets the database connection
      *
      * @return \PDO
      */
-    public function getConnection()
+    public function getConnection(): \PDO
     {
-        if ($this->connection === null) {
+        if ($this->connection === NULL) {
             $this->connect();
         }
 
@@ -123,14 +120,8 @@ abstract class PdoAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function execute($sql)
+    public function execute(string $sql): false|int
     {
-        if ($this->isDryRunEnabled()) {
-            $this->getOutput()->writeln($sql);
-
-            return 0;
-        }
-
         return $this->getConnection()->exec($sql);
     }
 
@@ -138,9 +129,10 @@ abstract class PdoAdapter extends AbstractAdapter
      * Executes a query and returns PDOStatement.
      *
      * @param string $sql SQL
+     *
      * @return \PDOStatement
      */
-    public function query($sql)
+    public function query(string $sql): \PDOStatement
     {
         return $this->getConnection()->query($sql);
     }
@@ -148,35 +140,29 @@ abstract class PdoAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function fetchRow($sql)
+    public function fetchRow(string $sql): array|false
     {
-        $result = $this->query($sql);
-
-        return $result->fetch();
+        return $this->query($sql)
+            ->fetch(\PDO::FETCH_ASSOC);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function fetchAll($sql)
+    public function fetchAll(string $sql): array
     {
-        $rows = [];
-        $result = $this->query($sql);
-        while ($row = $result->fetch()) {
-            $rows[] = $row;
-        }
-
-        return $rows;
+        return $this->query($sql)
+            ->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function insert(Table $table, $row)
+    public function insert(string $table_name_name, array $row): void
     {
         $sql = sprintf(
             "INSERT INTO %s ",
-            $this->quoteTableName($table->getName())
+            $this->quoteTableName($table_name_name)
         );
 
         $columns = array_keys($row);
@@ -190,11 +176,11 @@ abstract class PdoAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function bulkinsert(Table $table, $rows)
+    public function bulkinsert(string $table_name, array $rows): void
     {
         $sql = sprintf(
             "INSERT INTO %s ",
-            $this->quoteTableName($table->getName())
+            $this->quoteTableName($table_name)
         );
 
         $current = current($rows);
@@ -258,129 +244,26 @@ abstract class PdoAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function migrated(MigrationInterface $migration, $direction, $startTime, $endTime)
+    public function migrated(MigrationInterface $migration, $startTime, $endTime)
     {
-        if (strcasecmp($direction, MigrationInterface::UP) === 0) {
-            // up
-            $sql = sprintf(
-                "INSERT INTO %s (%s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', '%s', %s);",
-                $this->getSchemaTableName(),
-                $this->quoteColumnName('version'),
-                $this->quoteColumnName('migration_name'),
-                $this->quoteColumnName('start_time'),
-                $this->quoteColumnName('end_time'),
-                $this->quoteColumnName('breakpoint'),
-                $migration->getVersion(),
-                substr($migration->getName(), 0, 100),
-                $startTime,
-                $endTime,
-                $this->castToBool(false)
-            );
+        $sql = sprintf(
+            "INSERT INTO %s (%s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', '%s', %s);",
+            $this->getSchemaTableName(),
+            $this->quoteColumnName('version'),
+            $this->quoteColumnName('migration_name'),
+            $this->quoteColumnName('start_time'),
+            $this->quoteColumnName('end_time'),
+            $this->quoteColumnName('breakpoint'),
+            $migration->getVersion(),
+            substr($migration->getName(), 0, 100),
+            $startTime,
+            $endTime,
+            0
+        );
 
-            $this->execute($sql);
-        } else {
-            // down
-            $sql = sprintf(
-                "DELETE FROM %s WHERE %s = '%s'",
-                $this->getSchemaTableName(),
-                $this->quoteColumnName('version'),
-                $migration->getVersion()
-            );
-
-            $this->execute($sql);
-        }
+        $this->execute($sql);
 
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function toggleBreakpoint(MigrationInterface $migration)
-    {
-        $this->query(
-            sprintf(
-                'UPDATE %1$s SET %2$s = CASE %2$s WHEN %3$s THEN %4$s ELSE %3$s END, %7$s = %7$s WHERE %5$s = \'%6$s\';',
-                $this->getSchemaTableName(),
-                $this->quoteColumnName('breakpoint'),
-                $this->castToBool(true),
-                $this->castToBool(false),
-                $this->quoteColumnName('version'),
-                $migration->getVersion(),
-                $this->quoteColumnName('start_time')
-            )
-        );
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function resetAllBreakpoints()
-    {
-        return $this->execute(
-            sprintf(
-                'UPDATE %1$s SET %2$s = %3$s, %4$s = %4$s WHERE %2$s <> %3$s;',
-                $this->getSchemaTableName(),
-                $this->quoteColumnName('breakpoint'),
-                $this->castToBool(false),
-                $this->quoteColumnName('start_time')
-            )
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSchema($schemaName = 'public')
-    {
-        throw new BadMethodCallException('Creating a schema is not supported');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropSchema($name)
-    {
-        throw new BadMethodCallException('Dropping a schema is not supported');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getColumnTypes()
-    {
-        return [
-            'string',
-            'char',
-            'text',
-            'integer',
-            'biginteger',
-            'float',
-            'decimal',
-            'datetime',
-            'timestamp',
-            'time',
-            'date',
-            'blob',
-            'binary',
-            'varbinary',
-            'boolean',
-            'uuid',
-            // Geospatial data types
-            'geometry',
-            'point',
-            'linestring',
-            'polygon',
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function castToBool($value)
-    {
-        return (bool)$value ? 1 : 0;
-    }
 }

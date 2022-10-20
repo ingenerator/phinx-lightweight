@@ -1,135 +1,58 @@
-# [Phinx](https://phinx.org): Simple PHP Database Migrations
+# :axe: phinx-lightweight :axe: (VERY) Simple PHP Database Migrations
 
-[![Build Status](https://travis-ci.org/cakephp/phinx.png?branch=master)](https://travis-ci.org/cakephp/phinx)
-[![Build status](https://ci.appveyor.com/api/projects/status/9vag4892hfq6effr)](https://ci.appveyor.com/project/robmorgan/phinx)
-[![Code Coverage](https://codecov.io/gh/cakephp/phinx/branch/master/graph/badge.svg)](https://codecov.io/gh/cakephp/phinx)
-[![Latest Stable Version](https://poser.pugx.org/robmorgan/phinx/version.png)](https://packagist.org/packages/robmorgan/phinx)
-[![Total Downloads](https://poser.pugx.org/robmorgan/phinx/d/total.png)](https://packagist.org/packages/robmorgan/phinx)
-[![Join the chat at https://gitter.im/phinx-php/Lobby](https://badges.gitter.im/phinx-php/Lobby.svg)](https://gitter.im/phinx-php/Lobby)
+phinx-lightweight is a tool to manage and apply a sequence of migrations to your database. Migrations are written as
+PHP classes, and can execute SQL statements, compare & coalesce data, pull in constants and values from your
+application code, etc.
 
-## Intro
+phinx-lightweight has (and will always have) the bare minimum of third-party dependencies, and can be used with any
+app or framework.
 
-Phinx makes it ridiculously easy to manage the database migrations for your PHP app. In less than 5 minutes, you can install Phinx and create your first database migration. Phinx is just about migrations without all the bloat of a database ORM system or framework.
+### DO NOT USE THIS PACKAGE WITHOUT READING THIS
 
-**Check out https://book.cakephp.org/3.0/en/phinx.html ([EN](https://book.cakephp.org/3.0/en/phinx.html), [ZH](https://tsy12321.gitbooks.io/phinx-doc/)) for the comprehensive documentation.**
+This is a permanent hard fork from [robmorgan/phinx](https://github.com/cakephp/phinx) at v0.9.3. If you are migrating
+from phinx, you should be aware that we have made fundamental changes to the upstream version, notably:
 
-![phinxterm](https://cloud.githubusercontent.com/assets/178939/3887559/e6b5e524-21f2-11e4-8256-0ba6040725fc.gif)
+* Migration classes will usually execute explicit SQL commands to modify the database. We have removed Phinx's entire
+  database modelling layer and many schema manipulation helper functions. You can, of course, implement any helper
+  functions that are useful for your app e.g. by using a custom base migration class.
 
-### Features
+* phinx-lightweight only supports MySQL (or MySQL compatible) databases over PDO, all other drivers have been removed.
 
-* Write database migrations using database agnostic PHP code.
-* Migrate up and down.
-* Migrate on deployment.
-* Seed data after database creation.
-* Get going in less than 5 minutes.
-* Stop worrying about the state of your database.
-* Take advantage of SCM features such as branching.
-* Integrate with any app.
+* There is no mechanism for automatically rolling back migrations. Rolling back database migrations is hard, and often
+  not as simple as applying the opposite statements in reverse. Rolling back also loses history and can leave the
+  database in an unexpected state for the next migration. We enforce a roll-forwards-only strategy : if a migration
+  does not work as expected in production you will need to write, commit, and deploy a new migration to get you from
+  where you are now to where you want to be.
 
-### Supported Adapters
+* We have removed functionality for seeding database content. Seeds should not be running in production and are
+  (in our opinion) not the concern of a database migration tool. If you want to seed a development database, use one of
+  the tools designed for that purpose.
 
-Phinx natively supports the following database adapters:
+See the changelog for more information on removed functionality.
 
-* MySQL
-* PostgreSQL
-* SQLite
-* Microsoft SQL Server
+### Documentation
 
-## Install & Run
+See the information in the `docs` folder. Note that the online documentation for phinx covers a number of features that
+are not present in phinx-lightweight.
 
-### Composer
-
-The fastest way to install Phinx is to add it to your project using Composer (http://getcomposer.org/).
-
-1. Install Composer:
-
-    ```
-    curl -sS https://getcomposer.org/installer | php
-    ```
-
-1. Require Phinx as a dependency using Composer:
-
-    ```
-    php composer.phar require robmorgan/phinx
-    ```
-
-1. Install Phinx:
-
-    ```
-    php composer.phar install
-    ```
-
-1. Execute Phinx:
-
-    ```
-    php vendor/bin/phinx
-    ```
-
-### As a Phar
-
-You can also use the Box application to build Phinx as a Phar archive (https://box-project.github.io/box2/).
-
-1. Clone Phinx from GitHub
-
-    ```
-    git clone https://github.com/cakephp/phinx.git
-    cd phinx
-    ```
-
-1. Install Composer
-
-    ```
-    curl -s https://getcomposer.org/installer | php
-    ```
-
-1. Install the Phinx dependencies
-
-    ```
-    php composer.phar install
-    ```
-
-1. Install Box:
-
-    ```
-    curl -LSs https://box-project.github.io/box2/installer.php | php
-    ```
-
-1. Create a Phar archive
-
-    ```
-    php box.phar build
-    ```
-
-## Documentation
-
-Check out https://book.cakephp.org/3.0/en/phinx.html for the comprehensive documentation.
-
-Other translations include:
-
- * [Chinese](https://tsy12321.gitbooks.io/phinx-doc/) (Maintained by [@tsy12321](https://github.com/tsy12321/phinx-doc))
-
-## Contributing
-
-Please read the [CONTRIBUTING](CONTRIBUTING.md) document.
-
-## News & Updates
-
-Follow [@CakePHP](https://twitter.com/cakephp) on Twitter to stay up to date.
-
-## Misc
-
-### Version History
-
-Please read the [CHANGELOG](CHANGELOG.md) document.
+---
 
 ### License
 
 (The MIT license)
 
 Copyright (c) 2017 Rob Morgan
+Copyright (c) 2022 inGenerator Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

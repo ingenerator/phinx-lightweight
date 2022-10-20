@@ -1,5 +1,7 @@
 <?php
-/*
+declare(strict_types=1);
+
+/**
  * This file is part of the Phinx package.
  *
  * (c) Rob Morgan <robbym@gmail.com>
@@ -8,14 +10,14 @@
  * file that was distributed with this source code.
  */
 
-$autoloader = require __DIR__ . '/../src/composer_autoloader.php';
+use Phinx\Util\Util;
 
-if (!$autoloader()) {
-    die(
-        'You need to set up the project dependencies using the following commands:' . PHP_EOL .
-        'curl -s http://getcomposer.org/installer | php' . PHP_EOL .
-        'php composer.phar install' . PHP_EOL
-    );
+if (is_file('vendor/autoload.php')) {
+    require_once 'vendor/autoload.php';
+} else {
+    require_once dirname(__DIR__) . '/vendor/autoload.php';
 }
 
-require __DIR__ . '/TestConfiguration.php';
+if (getenv('MYSQL_DSN')) {
+    define('MYSQL_DB_CONFIG', Util::parseDsn(getenv('MYSQL_DSN')));
+}

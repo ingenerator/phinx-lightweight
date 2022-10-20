@@ -1,75 +1,25 @@
-# How to contribute to Phinx
+# How to contribute to phinx-lightweight
 
-Phinx relies heavily on external contributions in order to make it the best database migration
-tool possible. Without the support of our 130+ contributors we wouldn't be where we are today!
-We encourage anyone to submit documentation enhancements and code.
+Contributions to improve phinx-lightweight are welcome. Issues and pull requests should be submitted through our github
+repository.
 
-Issues, feature requests and bugs should be submitted using the Github issue tool:
-https://github.com/robmorgan/phinx/issues.
+Before you start, please bear in mind the following:
 
-This document briefly outlines the requirements to contribute code to Phinx.
+* We are explicitly aiming to keep this lightweight. Features that are not critical to writing & running database
+  migrations are unlikely to be merged.
 
-## Considerations
+* Any changes that add new external dependencies will probably not be merged.
 
-Before you submit your pull request take a moment to answer the following questions.
+* Drivers for other databases may be considered, but we are not likely to reinstate platform portability for migrations
+  themselves.
 
-Answering '**YES**' to all questions will increase the likelihood of your PR being accepted!
+* We fundamentally believe that migrations should modify the database with explicit SQL statements, not through an
+  abstraction layer.
 
-* Have I implemented my feature for as many database adapters as possible?
-* Does my new feature improve Phinx's performance or keep it consistent?
-* Does my feature fit within the database migration space?
-* Is the code entirely my own and free from any commercial licensing?
-* Am I happy to release my code under the MIT license?
-* Is my code formatted using the [PSR-2](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md) coding standard?
+* We fundamentally believe that database migrations should be roll-forwards-only.
 
-**Note:** We accept bug fixes much faster into our development branch than new features.
 
-## Getting Started
+If you're unsure whether your proposed contribution is in scope for this package, please discuss it with us in an issue
+before you start work.
 
-Great, so you want to contribute. Let's get started:
-
-1. Start by forking Phinx on GitHub: https://github.com/robmorgan/phinx
-
-1. Clone your repository to a local directory on your development box.
-
-1. If you do not have Composer set up already, install it:
-
-    ```
-    curl -sS https://getcomposer.org/installer | php
-    ```
-
-1. Change to your Phinx clone directory and pull the necessary dependencies:
-
-    ```
-    php composer.phar install
-    ```
-
-1. Copy the `phpunit.xml.dist` template to `phpunit.xml` and change the configuration to suit your environment. If you are not using any particular adapter you can disable it in the `phpunit.xml` file.
-
-1. Run the unit tests locally to ensure they pass:
-
-    ```
-    php vendor/bin/phpunit --config phpunit.xml
-    ```
-
-1. Write the code and unit tests for your bug fix or feature.
-
-1. Add any relevant documentation.
-
-1. Run the unit tests again and ensure they pass.
-
-1. Open a pull request on the Github project page. Ensure the code is being merged into `master`.
-
-## Getting Started with docker
-
-If you do not wish to install MySQL and Postgres locally to run unit tests
-can use [docker-compose](https://docs.docker.com/compose/) which will start
-both database, install all development dependencies and run all unit tests.
-
-To get started, just run `docker-compose run --rm phinx`. It will download all
-images, build & start development container and switch you to it. So just install dependencies with `composer update --prefer-lowest` and run unittests with `vendor/bin/phpunit`.
-
-## Documentation
-
-The Phinx documentation is stored in the **docs** directory using the [RestructedText](http://docutils.sourceforge.net/rst.html)
-format. All documentation merged to `master` is automatically published to the Phinx documentation site available at: http://docs.phinx.org.
+All contributions should be accompanied by unit tests wherever possible.

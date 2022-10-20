@@ -107,11 +107,11 @@ class TimedOutputAdapter extends AdapterWrapper
      *
      * @return void
      */
-    public function insert(Table $table, $row)
+    public function insert(string $table_name, array $row): void
     {
         $end = $this->startCommandTimer();
-        $this->writeCommand('insert', [$table->getName()]);
-        parent::insert($table, $row);
+        $this->writeCommand('insert', [$table_name]);
+        parent::insert($table_name, $row);
         $end();
     }
 
@@ -120,205 +120,12 @@ class TimedOutputAdapter extends AdapterWrapper
      *
      * @return void
      */
-    public function bulkinsert(Table $table, $rows)
+    public function bulkinsert(string $table_name, array $rows): void
     {
         $end = $this->startCommandTimer();
-        $this->writeCommand('bulkinsert', [$table->getName()]);
-        parent::bulkinsert($table, $rows);
+        $this->writeCommand('bulkinsert', [$table_name]);
+        parent::bulkinsert($table_name, $rows);
         $end();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createTable(Table $table)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('createTable', [$table->getName()]);
-        parent::createTable($table);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renameTable($tableName, $newTableName)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('renameTable', [$tableName, $newTableName]);
-        parent::renameTable($tableName, $newTableName);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropTable($tableName)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('dropTable', [$tableName]);
-        parent::dropTable($tableName);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function truncateTable($tableName)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('truncateTable', [$tableName]);
-        parent::truncateTable($tableName);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addColumn(Table $table, Column $column)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand(
-            'addColumn',
-            [
-                $table->getName(),
-                $column->getName(),
-                $column->getType()
-            ]
-        );
-        parent::addColumn($table, $column);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renameColumn($tableName, $columnName, $newColumnName)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('renameColumn', [$tableName, $columnName, $newColumnName]);
-        parent::renameColumn($tableName, $columnName, $newColumnName);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function changeColumn($tableName, $columnName, Column $newColumn)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('changeColumn', [$tableName, $columnName, $newColumn->getType()]);
-        parent::changeColumn($tableName, $columnName, $newColumn);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropColumn($tableName, $columnName)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('dropColumn', [$tableName, $columnName]);
-        parent::dropColumn($tableName, $columnName);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addIndex(Table $table, Index $index)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('addIndex', [$table->getName(), $index->getColumns()]);
-        parent::addIndex($table, $index);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropIndex($tableName, $columns)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('dropIndex', [$tableName, $columns]);
-        parent::dropIndex($tableName, $columns);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropIndexByName($tableName, $indexName)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('dropIndexByName', [$tableName, $indexName]);
-        parent::dropIndexByName($tableName, $indexName);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addForeignKey(Table $table, ForeignKey $foreignKey)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('addForeignKey', [$table->getName(), $foreignKey->getColumns()]);
-        parent::addForeignKey($table, $foreignKey);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropForeignKey($tableName, $columns, $constraint = null)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('dropForeignKey', [$tableName, $columns]);
-        parent::dropForeignKey($tableName, $columns, $constraint);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createDatabase($name, $options = [])
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('createDatabase', [$name]);
-        parent::createDatabase($name, $options);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropDatabase($name)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('dropDatabase', [$name]);
-        parent::dropDatabase($name);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSchema($name = 'public')
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('createSchema', [$name]);
-        parent::createSchema($name);
-        $end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropSchema($name)
-    {
-        $end = $this->startCommandTimer();
-        $this->writeCommand('dropSchema', [$name]);
-        parent::dropSchema($name);
-        $end();
-    }
 }

@@ -24,5 +24,19 @@
  * IN THE SOFTWARE.
  */
 
-$app = require __DIR__ . '/../app/phinx.php';
+
+foreach (
+    [
+        __DIR__.'/../vendor/autoload.php', // Top-level checkout of this repo
+        __DIR__.'/../../../autoload.php', // Installed as a composer dependency
+    ]
+    as $autoloadFile
+) {
+    if (is_file($autoloadFile)) {
+        require_once $autoloadFile;
+        break;
+    }
+}
+
+$app        = new Phinx\Console\PhinxApplication();
 $app->run();

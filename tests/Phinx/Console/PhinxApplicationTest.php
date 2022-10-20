@@ -26,7 +26,7 @@ class PhinxApplicationTest extends TestCase
         $stream = $appTester->getOutput()->getStream();
         rewind($stream);
 
-        $this->assertRegExp($result, stream_get_contents($stream));
+        $this->assertMatchesRegularExpression($result, stream_get_contents($stream));
     }
 
     public function provider()

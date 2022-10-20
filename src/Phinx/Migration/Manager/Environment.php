@@ -31,7 +31,6 @@ namespace Phinx\Migration\Manager;
 use Phinx\Db\Adapter\AdapterFactory;
 use Phinx\Db\Adapter\AdapterInterface;
 use Phinx\Migration\MigrationInterface;
-use Phinx\Seed\SeedInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -89,14 +88,11 @@ class Environment
      * Executes the specified migration on this environment.
      *
      * @param \Phinx\Migration\MigrationInterface $migration Migration
-     * @param string $direction Direction
+     *
      * @return void
      */
-    public function executeMigration(MigrationInterface $migration, $direction = MigrationInterface::UP)
+    public function executeMigration(MigrationInterface $migration)
     {
-        $direction = ($direction === MigrationInterface::UP) ? MigrationInterface::UP : MigrationInterface::DOWN;
-        $migration->setMigratingUp($direction === MigrationInterface::UP);
-
         $startTime = time();
         $migration->setAdapter($this->getAdapter());
 
@@ -105,27 +101,7 @@ class Environment
             $this->getAdapter()->beginTransaction();
         }
 
-        // Run the migration
-        if (method_exists($migration, MigrationInterface::CHANGE)) {
-            if ($direction === MigrationInterface::DOWN) {
-                // Create an instance of the ProxyAdapter so we can record all
-                // of the migration commands for reverse playback
-
-                /** @var \Phinx\Db\Adapter\ProxyAdapter $proxyAdapter */
-                $proxyAdapter = AdapterFactory::instance()
-                    ->getWrapper('proxy', $this->getAdapter());
-                $migration->setAdapter($proxyAdapter);
-                /** @noinspection PhpUndefinedMethodInspection */
-                $migration->change();
-                $proxyAdapter->executeInvertedCommands();
-                $migration->setAdapter($this->getAdapter());
-            } else {
-                /** @noinspection PhpUndefinedMethodInspection */
-                $migration->change();
-            }
-        } else {
-            $migration->{$direction}();
-        }
+        $migration->up();
 
         // commit the transaction if the adapter supports it
         if ($this->getAdapter()->hasTransactions()) {
@@ -133,33 +109,7 @@ class Environment
         }
 
         // Record it in the database
-        $this->getAdapter()->migrated($migration, $direction, date('Y-m-d H:i:s', $startTime), date('Y-m-d H:i:s', time()));
-    }
-
-    /**
-     * Executes the specified seeder on this environment.
-     *
-     * @param \Phinx\Seed\SeedInterface $seed
-     * @return void
-     */
-    public function executeSeed(SeedInterface $seed)
-    {
-        $seed->setAdapter($this->getAdapter());
-
-        // begin the transaction if the adapter supports it
-        if ($this->getAdapter()->hasTransactions()) {
-            $this->getAdapter()->beginTransaction();
-        }
-
-        // Run the seeder
-        if (method_exists($seed, SeedInterface::RUN)) {
-            $seed->run();
-        }
-
-        // commit the transaction if the adapter supports it
-        if ($this->getAdapter()->hasTransactions()) {
-            $this->getAdapter()->commitTransaction();
-        }
+        $this->getAdapter()->migrated($migration, date('Y-m-d H:i:s', $startTime), date('Y-m-d H:i:s', time()));
     }
 
     /**
@@ -367,8 +317,16 @@ class Environment
 
         // Use the TablePrefixAdapter if table prefix/suffixes are in use
         if ($adapter->hasOption('table_prefix') || $adapter->hasOption('table_suffix')) {
-            $adapter = AdapterFactory::instance()
-                ->getWrapper('prefix', $adapter);
+            throw new \InvalidArgumentException(
+                <<<TEXT
+                Automatic table prefix/suffix option is no longer supported.
+
+                We advise against automagically modifying table names (this never worked with raw sql statements
+                anyway). Specify the explicit table names you need in your migration files. If you absolutely
+                need to apply a variation based on environment, you should implement this yourself e.g. by setting
+                a process environment variable and reading it in your migration files as required.
+                TEXT
+            );
         }
 
         $this->setAdapter($adapter);

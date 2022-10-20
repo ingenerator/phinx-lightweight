@@ -12,11 +12,4 @@ class TestMigration extends AbstractMigration
         // do nothing
     }
 
-    /**
-     * Migrate Down.
-     */
-    public function down()
-    {
-        // do nothing
-    }
 }

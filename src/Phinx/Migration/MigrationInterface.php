@@ -26,6 +26,7 @@
  * @package    Phinx
  * @subpackage Phinx\Migration
  */
+
 namespace Phinx\Migration;
 
 use Phinx\Db\Adapter\AdapterInterface;
@@ -39,20 +40,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 interface MigrationInterface
 {
-    /**
-     * @var string
-     */
-    const CHANGE = 'change';
-
-    /**
-     * @var string
-     */
-    const UP = 'up';
-
-    /**
-     * @var string
-     */
-    const DOWN = 'down';
 
     /**
      * Migrate Up
@@ -62,16 +49,10 @@ interface MigrationInterface
     public function up();
 
     /**
-     * Migrate Down
-     *
-     * @return void
-     */
-    public function down();
-
-    /**
      * Sets the database adapter.
      *
      * @param \Phinx\Db\Adapter\AdapterInterface $adapter Database Adapter
+     *
      * @return \Phinx\Migration\MigrationInterface
      */
     public function setAdapter(AdapterInterface $adapter);
@@ -87,6 +68,7 @@ interface MigrationInterface
      * Sets the input object to be used in migration object
      *
      * @param \Symfony\Component\Console\Input\InputInterface $input
+     *
      * @return \Phinx\Migration\MigrationInterface
      */
     public function setInput(InputInterface $input);
@@ -102,6 +84,7 @@ interface MigrationInterface
      * Sets the output object to be used in migration object
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
      * @return \Phinx\Migration\MigrationInterface
      */
     public function setOutput(OutputInterface $output);
@@ -124,6 +107,7 @@ interface MigrationInterface
      * Sets the migration version number.
      *
      * @param float $version Version
+     *
      * @return \Phinx\Migration\MigrationInterface
      */
     public function setVersion($version);
@@ -136,18 +120,11 @@ interface MigrationInterface
     public function getVersion();
 
     /**
-     * Sets whether this migration is being applied or reverted
-     *
-     * @param bool $isMigratingUp True if the migration is being applied
-     * @return \Phinx\Migration\MigrationInterface
-     */
-    public function setMigratingUp($isMigratingUp);
-
-    /**
      * Gets whether this migration is being applied or reverted.
      * True means that the migration is being applied.
      *
      * @return bool
+     * @deprecated this is always true now
      */
     public function isMigratingUp();
 
@@ -155,76 +132,46 @@ interface MigrationInterface
      * Executes a SQL statement and returns the number of affected rows.
      *
      * @param string $sql SQL
-     * @return int
+     *
+     * @return false|int
      */
-    public function execute($sql);
+    public function execute(string $sql): false|int;
 
     /**
-     * Executes a SQL statement and returns the result as an array.
+     * Executes a SQL statement and returns the result as a raw database statement.
      *
      * @param string $sql SQL
-     * @return array
+     *
+     * @return \PDOStatement
      */
-    public function query($sql);
+    public function query(string $sql): \PDOStatement;
 
     /**
-     * Executes a query and returns only one row as an array.
+     * Executes a query and returns only one row as an associative array.
      *
      * @param string $sql SQL
-     * @return array
+     *
+     * @return array|false
      */
-    public function fetchRow($sql);
+    public function fetchRow(string $sql): array|false;
 
     /**
      * Executes a query and returns an array of rows.
      *
      * @param string $sql SQL
+     *
      * @return array
      */
-    public function fetchAll($sql);
+    public function fetchAll(string $sql): array;
 
     /**
      * Insert data into a table.
      *
      * @param string $tableName
-     * @param array $data
+     * @param array  $data
+     *
      * @return void
      */
-    public function insert($tableName, $data);
+    public function insert(string $tableName, array $data): void;
 
-    /**
-     * Create a new database.
-     *
-     * @param string $name Database Name
-     * @param array $options Options
-     * @return void
-     */
-    public function createDatabase($name, $options);
-
-    /**
-     * Drop a database.
-     *
-     * @param string $name Database Name
-     * @return void
-     */
-    public function dropDatabase($name);
-
-    /**
-     * Checks to see if a table exists.
-     *
-     * @param string $tableName Table Name
-     * @return bool
-     */
-    public function hasTable($tableName);
-
-    /**
-     * Returns an instance of the <code>\Table</code> class.
-     *
-     * You can use this class to create and manipulate tables.
-     *
-     * @param string $tableName Table Name
-     * @param array $options Options
-     * @return \Phinx\Db\Table
-     */
-    public function table($tableName, $options);
 }

@@ -26,6 +26,7 @@
  * @package    Phinx
  * @subpackage Phinx\Db\Adapter
  */
+
 namespace Phinx\Db\Adapter;
 
 use Phinx\Db\Table;
@@ -166,7 +167,7 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function execute($sql)
+    public function execute(string $sql): false|int
     {
         return $this->getAdapter()->execute($sql);
     }
@@ -174,7 +175,7 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function query($sql)
+    public function query(string $sql): \PDOStatement
     {
         return $this->getAdapter()->query($sql);
     }
@@ -182,23 +183,23 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function insert(Table $table, $row)
+    public function insert(string $table_name, array $row): void
     {
-        $this->getAdapter()->insert($table, $row);
+        $this->getAdapter()->insert($table_name, $row);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function bulkinsert(Table $table, $rows)
+    public function bulkinsert(string $table_name, array $rows): void
     {
-        $this->getAdapter()->bulkinsert($table, $rows);
+        $this->getAdapter()->bulkinsert($table_name, $rows);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function fetchRow($sql)
+    public function fetchRow(string $sql): array|false
     {
         return $this->getAdapter()->fetchRow($sql);
     }
@@ -206,7 +207,7 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function fetchAll($sql)
+    public function fetchAll(string $sql): array
     {
         return $this->getAdapter()->fetchAll($sql);
     }
@@ -230,61 +231,11 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function migrated(MigrationInterface $migration, $direction, $startTime, $endTime)
+    public function migrated(MigrationInterface $migration, $startTime, $endTime)
     {
-        $this->getAdapter()->migrated($migration, $direction, $startTime, $endTime);
+        $this->getAdapter()->migrated($migration, $startTime, $endTime);
 
         return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function toggleBreakpoint(MigrationInterface $migration)
-    {
-        $this->getAdapter()->toggleBreakpoint($migration);
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function resetAllBreakpoints()
-    {
-        return $this->getAdapter()->resetAllBreakpoints();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasSchemaTable()
-    {
-        return $this->getAdapter()->hasSchemaTable();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSchemaTable()
-    {
-        $this->getAdapter()->createSchemaTable();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getColumnTypes()
-    {
-        return $this->getAdapter()->getColumnTypes();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isValidColumnType(Column $column)
-    {
-        return $this->getAdapter()->isValidColumnType($column);
     }
 
     /**
@@ -346,207 +297,7 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function createTable(Table $table)
-    {
-        $this->getAdapter()->createTable($table);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renameTable($tableName, $newTableName)
-    {
-        $this->getAdapter()->renameTable($tableName, $newTableName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropTable($tableName)
-    {
-        $this->getAdapter()->dropTable($tableName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function truncateTable($tableName)
-    {
-        $this->getAdapter()->truncateTable($tableName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getColumns($tableName)
-    {
-        return $this->getAdapter()->getColumns($tableName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasColumn($tableName, $columnName)
-    {
-        return $this->getAdapter()->hasColumn($tableName, $columnName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addColumn(Table $table, Column $column)
-    {
-        $this->getAdapter()->addColumn($table, $column);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renameColumn($tableName, $columnName, $newColumnName)
-    {
-        $this->getAdapter()->renameColumn($tableName, $columnName, $newColumnName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function changeColumn($tableName, $columnName, Column $newColumn)
-    {
-        return $this->getAdapter()->changeColumn($tableName, $columnName, $newColumn);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropColumn($tableName, $columnName)
-    {
-        $this->getAdapter()->dropColumn($tableName, $columnName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasIndex($tableName, $columns)
-    {
-        return $this->getAdapter()->hasIndex($tableName, $columns);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasIndexByName($tableName, $indexName)
-    {
-        return $this->getAdapter()->hasIndexByName($tableName, $indexName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addIndex(Table $table, Index $index)
-    {
-        $this->getAdapter()->addIndex($table, $index);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropIndex($tableName, $columns)
-    {
-        $this->getAdapter()->dropIndex($tableName, $columns);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropIndexByName($tableName, $indexName)
-    {
-        $this->getAdapter()->dropIndexByName($tableName, $indexName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasForeignKey($tableName, $columns, $constraint = null)
-    {
-        return $this->getAdapter()->hasForeignKey($tableName, $columns, $constraint);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addForeignKey(Table $table, ForeignKey $foreignKey)
-    {
-        $this->getAdapter()->addForeignKey($table, $foreignKey);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropForeignKey($tableName, $columns, $constraint = null)
-    {
-        $this->getAdapter()->dropForeignKey($tableName, $columns, $constraint);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSqlType($type, $limit = null)
-    {
-        return $this->getAdapter()->getSqlType($type, $limit);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createDatabase($name, $options = [])
-    {
-        $this->getAdapter()->createDatabase($name, $options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasDatabase($name)
-    {
-        $this->getAdapter()->hasDatabase($name);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropDatabase($name)
-    {
-        $this->getAdapter()->dropDatabase($name);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSchema($schemaName = 'public')
-    {
-        $this->getAdapter()->createSchema($schemaName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropSchema($schemaName)
-    {
-        $this->getAdapter()->dropSchema($schemaName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function castToBool($value)
-    {
-        return $this->getAdapter()->castToBool($value);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getConnection()
+    public function getConnection(): \PDO
     {
         return $this->getAdapter()->getConnection();
     }

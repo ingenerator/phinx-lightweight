@@ -2,7 +2,6 @@
 
 namespace Test\Phinx\Db\Adapter;
 
-use Phinx\Db\Adapter\PdoAdapter;
 use PHPUnit\Framework\TestCase;
 
 class PdoAdapterTestPDOMock extends \PDO
@@ -20,14 +19,16 @@ class PdoAdapterTestPDOMock extends \PDO
  */
 class PdoAdapterTestPDOMockWithExecChecks extends PdoAdapterTestPDOMock
 {
-    private $sql;
+    private string $sql;
 
-    public function exec($sql)
+    public function exec(string $sql): int|false
     {
         $this->sql = $sql;
+
+        return 1;
     }
 
-    public function getExecutedSqlForTest()
+    public function getExecutedSqlForTest(): string
     {
         return $this->sql;
     }
@@ -37,12 +38,12 @@ class PdoAdapterTest extends TestCase
 {
     private $adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->adapter = $this->getMockForAbstractClass('\Phinx\Db\Adapter\PdoAdapter', [['foo' => 'bar']]);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->adapter);
     }
@@ -56,8 +57,6 @@ class PdoAdapterTest extends TestCase
 
     public function testOptionsSetConnection()
     {
-        $this->assertNull($this->adapter->getConnection());
-
         $connection = new PdoAdapterTestPDOMock();
         $this->adapter->setOptions(['connection' => $connection]);
 
@@ -141,10 +140,6 @@ class PdoAdapterTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Invalid version_order configuration option
-     */
     public function testGetVersionLogInvalidVersionOrderKO()
     {
         $adapter = $this->getMockForAbstractClass(
@@ -152,6 +147,8 @@ class PdoAdapterTest extends TestCase
             [['version_order' => 'invalid']]
         );
 
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid version_order configuration option');
         $adapter->getVersionLog();
     }
 

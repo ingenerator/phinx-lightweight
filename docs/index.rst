@@ -13,7 +13,6 @@ Contents
    goals
    install
    migrations
-   seeding
    commands
    configuration
    copyright

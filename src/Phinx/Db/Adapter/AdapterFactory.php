@@ -63,9 +63,6 @@ class AdapterFactory
      */
     protected $adapters = [
         'mysql' => 'Phinx\Db\Adapter\MysqlAdapter',
-        'pgsql' => 'Phinx\Db\Adapter\PostgresAdapter',
-        'sqlite' => 'Phinx\Db\Adapter\SQLiteAdapter',
-        'sqlsrv' => 'Phinx\Db\Adapter\SqlServerAdapter',
     ];
 
     /**
@@ -74,8 +71,6 @@ class AdapterFactory
      * @var array
      */
     protected $wrappers = [
-        'prefix' => 'Phinx\Db\Adapter\TablePrefixAdapter',
-        'proxy' => 'Phinx\Db\Adapter\ProxyAdapter',
         'timed' => 'Phinx\Db\Adapter\TimedOutputAdapter',
     ];
 

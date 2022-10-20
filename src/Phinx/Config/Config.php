@@ -270,22 +270,6 @@ class Config implements ConfigInterface, NamespaceAwareInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getSeedPaths()
-    {
-        if (!isset($this->values['paths']['seeds'])) {
-            throw new \UnexpectedValueException('Seeds path missing from config file');
-        }
-
-        if (is_string($this->values['paths']['seeds'])) {
-            $this->values['paths']['seeds'] = [$this->values['paths']['seeds']];
-        }
-
-        return $this->values['paths']['seeds'];
-    }
-
-    /**
      * Get the template file name.
      *
      * @return string|false
@@ -358,7 +342,7 @@ class Config implements ConfigInterface, NamespaceAwareInterface
 
         // Phinx defined tokens (override env tokens)
         $tokens['%%PHINX_CONFIG_PATH%%'] = $this->getConfigFilePath();
-        $tokens['%%PHINX_CONFIG_DIR%%'] = dirname($this->getConfigFilePath());
+        $tokens['%%PHINX_CONFIG_DIR%%'] = dirname((string) $this->getConfigFilePath());
 
         // Recurse the array and replace tokens
         return $this->recurseArrayForTokens($arr, $tokens);
@@ -381,7 +365,7 @@ class Config implements ConfigInterface, NamespaceAwareInterface
             }
             if (is_string($value)) {
                 foreach ($tokens as $token => $tval) {
-                    $value = str_replace($token, $tval, $value);
+                    $value = str_replace($token, (string) $tval, $value);
                 }
                 $out[$name] = $value;
                 continue;
@@ -395,7 +379,8 @@ class Config implements ConfigInterface, NamespaceAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($id, $value)
+    public function offsetSet($id, $value): void
+
     {
         $this->values[$id] = $value;
     }
@@ -403,7 +388,7 @@ class Config implements ConfigInterface, NamespaceAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($id)
+    public function offsetGet($id): mixed
     {
         if (!array_key_exists($id, $this->values)) {
             throw new \InvalidArgumentException(sprintf('Identifier "%s" is not defined.', $id));
@@ -415,7 +400,7 @@ class Config implements ConfigInterface, NamespaceAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($id)
+    public function offsetExists($id): bool
     {
         return isset($this->values[$id]);
     }
@@ -423,7 +408,7 @@ class Config implements ConfigInterface, NamespaceAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($id)
+    public function offsetUnset($id): void
     {
         unset($this->values[$id]);
     }

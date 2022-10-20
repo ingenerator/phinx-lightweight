@@ -49,21 +49,13 @@ class PhinxApplication extends Application
      */
     public function __construct()
     {
-        $composerConfig = json_decode(file_get_contents(__DIR__ . '/../../../composer.json'));
-        $version = $composerConfig->version;
-
-        parent::__construct('Phinx by CakePHP - https://phinx.org.', $version);
+        parent::__construct('phinx-lightweight by inGenerator - https://github.com/ingenerator/phinx-lightweight');
 
         $this->addCommands([
             new Command\Init(),
             new Command\Create(),
             new Command\Migrate(),
-            new Command\Rollback(),
             new Command\Status(),
-            new Command\Breakpoint(),
-            new Command\Test(),
-            new Command\SeedCreate(),
-            new Command\SeedRun(),
         ]);
     }
 
