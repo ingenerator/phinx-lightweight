@@ -26,12 +26,10 @@
  * @package    Phinx
  * @subpackage Phinx\Db\Adapter
  */
+
 namespace Phinx\Db\Adapter;
 
-use Phinx\Db\Table;
-use Phinx\Db\Table\Column;
-use Phinx\Db\Table\ForeignKey;
-use Phinx\Db\Table\Index;
+use PDOStatement;
 use Phinx\Migration\MigrationInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -40,7 +38,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Adapter Interface.
  *
  * @author Rob Morgan <robbym@gmail.com>
- * @method \PDO getConnection()
  */
 interface AdapterInterface
 {
@@ -63,7 +60,8 @@ interface AdapterInterface
     /**
      * Set adapter configuration options.
      *
-     * @param  array $options
+     * @param array $options
+     *
      * @return \Phinx\Db\Adapter\AdapterInterface
      */
     public function setOptions(array $options);
@@ -78,7 +76,8 @@ interface AdapterInterface
     /**
      * Check if an option has been set.
      *
-     * @param  string $name
+     * @param string $name
+     *
      * @return bool
      */
     public function hasOption($name);
@@ -86,7 +85,8 @@ interface AdapterInterface
     /**
      * Get a single adapter option, or null if the option does not exist.
      *
-     * @param  string $name
+     * @param string $name
+     *
      * @return mixed
      */
     public function getOption($name);
@@ -95,6 +95,7 @@ interface AdapterInterface
      * Sets the console input.
      *
      * @param \Symfony\Component\Console\Input\InputInterface $input Input
+     *
      * @return \Phinx\Db\Adapter\AdapterInterface
      */
     public function setInput(InputInterface $input);
@@ -110,6 +111,7 @@ interface AdapterInterface
      * Sets the console output.
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output Output
+     *
      * @return \Phinx\Db\Adapter\AdapterInterface
      */
     public function setOutput(OutputInterface $output);
@@ -142,10 +144,17 @@ interface AdapterInterface
     /**
      * Initializes the database connection.
      *
-     * @throws \RuntimeException When the requested database driver is not installed.
      * @return void
+     * @throws \RuntimeException When the requested database driver is not installed.
      */
     public function connect();
+
+    /**
+     * Get the current database connection
+     *
+     * @return \PDO
+     */
+    public function getConnection(): \PDO;
 
     /**
      * Closes the database connection.
@@ -186,33 +195,37 @@ interface AdapterInterface
      * Executes a SQL statement and returns the number of affected rows.
      *
      * @param string $sql SQL
-     * @return int
+     *
+     * @return false|int
      */
-    public function execute($sql);
+    public function execute(string $sql): false|int;
 
     /**
-     * Executes a SQL statement and returns the result as an array.
+     * Executes a SQL statement and returns the result as a PDO statement.
      *
      * @param string $sql SQL
-     * @return mixed
+     *
+     * @return PDOStatement
      */
-    public function query($sql);
+    public function query(string $sql): PDOStatement;
 
     /**
-     * Executes a query and returns only one row as an array.
+     * Executes a query and returns only one row as an associative array.
      *
      * @param string $sql SQL
-     * @return array
+     *
+     * @return array|false
      */
-    public function fetchRow($sql);
+    public function fetchRow(string $sql): array|false;
 
     /**
      * Executes a query and returns an array of rows.
      *
      * @param string $sql SQL
+     *
      * @return array
      */
-    public function fetchAll($sql);
+    public function fetchAll(string $sql): array;
 
     /**
      * Inserts data into a table.
@@ -238,6 +251,7 @@ interface AdapterInterface
      * Quotes a table name for use in a query.
      *
      * @param string $tableName Table Name
+     *
      * @return string
      */
     public function quoteTableName($tableName);
@@ -246,6 +260,7 @@ interface AdapterInterface
      * Quotes a column name for use in a query.
      *
      * @param string $columnName Table Name
+     *
      * @return string
      */
     public function quoteColumnName($columnName);

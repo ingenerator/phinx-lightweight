@@ -26,6 +26,7 @@
  * @package    Phinx
  * @subpackage Phinx\Migration
  */
+
 namespace Phinx\Migration;
 
 use Phinx\Db\Adapter\AdapterInterface;
@@ -51,6 +52,7 @@ interface MigrationInterface
      * Sets the database adapter.
      *
      * @param \Phinx\Db\Adapter\AdapterInterface $adapter Database Adapter
+     *
      * @return \Phinx\Migration\MigrationInterface
      */
     public function setAdapter(AdapterInterface $adapter);
@@ -66,6 +68,7 @@ interface MigrationInterface
      * Sets the input object to be used in migration object
      *
      * @param \Symfony\Component\Console\Input\InputInterface $input
+     *
      * @return \Phinx\Migration\MigrationInterface
      */
     public function setInput(InputInterface $input);
@@ -81,6 +84,7 @@ interface MigrationInterface
      * Sets the output object to be used in migration object
      *
      * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
      * @return \Phinx\Migration\MigrationInterface
      */
     public function setOutput(OutputInterface $output);
@@ -103,6 +107,7 @@ interface MigrationInterface
      * Sets the migration version number.
      *
      * @param float $version Version
+     *
      * @return \Phinx\Migration\MigrationInterface
      */
     public function setVersion($version);
@@ -127,33 +132,37 @@ interface MigrationInterface
      * Executes a SQL statement and returns the number of affected rows.
      *
      * @param string $sql SQL
-     * @return int
+     *
+     * @return false|int
      */
-    public function execute($sql);
+    public function execute(string $sql): false|int;
 
     /**
-     * Executes a SQL statement and returns the result as an array.
+     * Executes a SQL statement and returns the result as a raw database statement.
      *
      * @param string $sql SQL
-     * @return array
+     *
+     * @return \PDOStatement
      */
-    public function query($sql);
+    public function query(string $sql): \PDOStatement;
 
     /**
-     * Executes a query and returns only one row as an array.
+     * Executes a query and returns only one row as an associative array.
      *
      * @param string $sql SQL
-     * @return array
+     *
+     * @return array|false
      */
-    public function fetchRow($sql);
+    public function fetchRow(string $sql): array|false;
 
     /**
      * Executes a query and returns an array of rows.
      *
      * @param string $sql SQL
+     *
      * @return array
      */
-    public function fetchAll($sql);
+    public function fetchAll(string $sql): array;
 
     /**
      * Insert data into a table.
@@ -163,6 +172,6 @@ interface MigrationInterface
      *
      * @return void
      */
-    public function insert(string $tableName, array $data):void;
+    public function insert(string $tableName, array $data): void;
 
 }

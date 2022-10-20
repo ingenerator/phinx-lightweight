@@ -14,6 +14,10 @@
 * Removed support for some unusual / edge-case uses of the `->insert()` method in migrations
 * Removed support for the `--dry-run` mode : this didn't consistently skip all queries so gave a false sense of security
 * Support PHP 8.0, 8.1 and 8.2 and drop support for older versions
+* Added hard typehints to most database adapter and migration helper methods e.g. fetchRow / query for better
+  end-user autocompletion. Note that these now tie to PDO objects/interfaces in many cases.
+* `fetchAll` and `fetchRow` now always return query results as **associative** arrays, not PDO::FETCH_BOTH which was the
+  old default.
 
 **0.9.2** (Saturday, 23 December 2017)
 * Pull requests

@@ -26,6 +26,7 @@
  * @package    Phinx
  * @subpackage Phinx\Db\Adapter
  */
+
 namespace Phinx\Db\Adapter;
 
 use Phinx\Db\Table;
@@ -166,7 +167,7 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function execute($sql)
+    public function execute(string $sql): false|int
     {
         return $this->getAdapter()->execute($sql);
     }
@@ -174,7 +175,7 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function query($sql)
+    public function query(string $sql): \PDOStatement
     {
         return $this->getAdapter()->query($sql);
     }
@@ -198,7 +199,7 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function fetchRow($sql)
+    public function fetchRow(string $sql): array|false
     {
         return $this->getAdapter()->fetchRow($sql);
     }
@@ -206,7 +207,7 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function fetchAll($sql)
+    public function fetchAll(string $sql): array
     {
         return $this->getAdapter()->fetchAll($sql);
     }
@@ -296,7 +297,7 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function getConnection()
+    public function getConnection(): \PDO
     {
         return $this->getAdapter()->getConnection();
     }

@@ -26,6 +26,7 @@
  * @package    Phinx
  * @subpackage Phinx\Db\Adapter
  */
+
 namespace Phinx\Db\Adapter;
 
 use Phinx\Db\Table;
@@ -93,9 +94,9 @@ abstract class PdoAdapter extends AbstractAdapter
      *
      * @return \PDO
      */
-    public function getConnection()
+    public function getConnection(): \PDO
     {
-        if ($this->connection === null) {
+        if ($this->connection === NULL) {
             $this->connect();
         }
 
@@ -119,7 +120,7 @@ abstract class PdoAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function execute($sql)
+    public function execute(string $sql): false|int
     {
         return $this->getConnection()->exec($sql);
     }
@@ -128,9 +129,10 @@ abstract class PdoAdapter extends AbstractAdapter
      * Executes a query and returns PDOStatement.
      *
      * @param string $sql SQL
+     *
      * @return \PDOStatement
      */
-    public function query($sql)
+    public function query(string $sql): \PDOStatement
     {
         return $this->getConnection()->query($sql);
     }
@@ -138,25 +140,19 @@ abstract class PdoAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    public function fetchRow($sql)
+    public function fetchRow(string $sql): array|false
     {
-        $result = $this->query($sql);
-
-        return $result->fetch();
+        return $this->query($sql)
+            ->fetch(\PDO::FETCH_ASSOC);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function fetchAll($sql)
+    public function fetchAll(string $sql): array
     {
-        $rows = [];
-        $result = $this->query($sql);
-        while ($row = $result->fetch()) {
-            $rows[] = $row;
-        }
-
-        return $rows;
+        return $this->query($sql)
+            ->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**

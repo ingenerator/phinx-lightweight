@@ -24,7 +24,12 @@ class MysqlAdapterTester extends MysqlAdapter
         $this->connection = $connection;
     }
 
-    public function getConnection()
+    public function getConnection(): \PDO
+    {
+        return $this->connection;
+    }
+
+    public function getConnectionOrNull(): ?\PDO
     {
         return $this->connection;
     }
@@ -44,20 +49,20 @@ class MysqlAdapterUnitTest extends TestCase
 
     public function setUp(): void
     {
-        if (!defined('MYSQL_DB_CONFIG')) {
+        if ( ! defined('MYSQL_DB_CONFIG')) {
             $this->markTestSkipped('Mysql tests disabled. See MYSQL_DB_CONFIG constant.');
         }
 
         $this->adapter = new MysqlAdapterTester([], new ArrayInput([]), new NullOutput());
 
-        $this->conn = $this->getMockBuilder('PDOMock')
-                           ->disableOriginalConstructor()
-                           ->setMethods([ 'query', 'exec', 'quote' ])
-                           ->getMock();
-        $this->result = $this->getMockBuilder('stdclass')
-                             ->disableOriginalConstructor()
-                             ->setMethods([ 'fetch' ])
-                             ->getMock();
+        $this->conn   = $this->getMockBuilder(PDOMock::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['query', 'exec', 'quote'])
+            ->getMock();
+        $this->result = $this->getMockBuilder(\PDOStatement::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['fetch'])
+            ->getMock();
         $this->adapter->setMockConnection($this->conn);
     }
 
@@ -65,16 +70,17 @@ class MysqlAdapterUnitTest extends TestCase
     private function assertExecuteSql($expected_sql)
     {
         $this->conn->expects($this->once())
-                   ->method('exec')
-                   ->with($this->equalTo($expected_sql));
+            ->method('exec')
+            ->with($this->equalTo($expected_sql))
+            ->willReturn(1);
     }
 
-    private function assertQuerySql($expectedSql, $returnValue = null)
+    private function assertQuerySql($expectedSql, $returnValue = NULL)
     {
         $expect = $this->conn->expects($this->once())
-                       ->method('query')
-                       ->with($this->equalTo($expectedSql));
-        if (!is_null($returnValue)) {
+            ->method('query')
+            ->with($this->equalTo($expectedSql));
+        if ( ! is_null($returnValue)) {
             $expect->will($this->returnValue($returnValue));
         }
     }
@@ -82,8 +88,8 @@ class MysqlAdapterUnitTest extends TestCase
     private function assertFetchRowSql($expectedSql, $returnValue)
     {
         $this->result->expects($this->once())
-                     ->method('fetch')
-                     ->will($this->returnValue($returnValue));
+            ->method('fetch')
+            ->will($this->returnValue($returnValue));
         $this->assertQuerySql($expectedSql, $this->result);
     }
 
@@ -91,7 +97,7 @@ class MysqlAdapterUnitTest extends TestCase
     {
         $this->assertNotNull($this->adapter->getConnection());
         $this->adapter->disconnect();
-        $this->assertNull($this->adapter->getConnection());
+        $this->assertNull($this->adapter->getConnectionOrNull());
     }
 
     public function testHasTransactions()
@@ -121,8 +127,8 @@ class MysqlAdapterUnitTest extends TestCase
     {
         $this->adapter->setOptions(['name' => 'database_name']);
         $this->result->expects($this->once())
-                     ->method('fetch')
-                     ->will($this->returnValue(['somecontent']));
+            ->method('fetch')
+            ->will($this->returnValue(['somecontent']));
         $expectedSql = 'SELECT TABLE_NAME
             FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_SCHEMA = \'database_name\' AND TABLE_NAME = \'table_name\'';
@@ -134,8 +140,8 @@ class MysqlAdapterUnitTest extends TestCase
     {
         $this->adapter->setOptions(['name' => 'database_name']);
         $this->result->expects($this->once())
-                     ->method('fetch')
-                     ->will($this->returnValue([]));
+            ->method('fetch')
+            ->will($this->returnValue([]));
         $expectedSql = 'SELECT TABLE_NAME
             FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_SCHEMA = \'database_name\' AND TABLE_NAME = \'table_name\'';

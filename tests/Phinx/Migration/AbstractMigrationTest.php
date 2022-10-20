@@ -108,16 +108,18 @@ class AbstractMigrationTest extends TestCase
         // stub migration
         $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
 
+        $queryStub = new class extends \PDOStatement {};
+
         // stub adapter
         $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
             ->setConstructorArgs([[]])
             ->getMock();
         $adapterStub->expects($this->once())
             ->method('query')
-            ->will($this->returnValue([['0' => 'bar', 'foo' => 'bar']]));
+            ->will($this->returnValue($queryStub));
 
         $migrationStub->setAdapter($adapterStub);
-        $this->assertEquals([['0' => 'bar', 'foo' => 'bar']], $migrationStub->query('SELECT FOO FROM BAR'));
+        $this->assertEquals($queryStub, $migrationStub->query('SELECT FOO FROM BAR'));
     }
 
     public function testFetchRow()

@@ -210,7 +210,7 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      */
-    public function execute($sql)
+    public function execute(string $sql): false|int
     {
         return $this->getAdapter()->execute($sql);
     }
@@ -218,7 +218,7 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      */
-    public function query($sql)
+    public function query(string $sql): \PDOStatement
     {
         return $this->getAdapter()->query($sql);
     }
@@ -226,7 +226,7 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      */
-    public function fetchRow($sql)
+    public function fetchRow(string $sql): array|false
     {
         return $this->getAdapter()->fetchRow($sql);
     }
@@ -234,7 +234,7 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      */
-    public function fetchAll($sql)
+    public function fetchAll(string $sql): array
     {
         return $this->getAdapter()->fetchAll($sql);
     }
