@@ -85,6 +85,24 @@ abstract class AbstractMigration implements MigrationInterface
         $this->init();
     }
 
+    final public function change(): void
+    {
+        // Prevent migration classes from defining or calling a `change()` method as we no longer support this.
+        // This will provide a runtime catch for any legacy migration classes that are doing the wrong thing.
+        throw new \BadMethodCallException(
+            'Unexpected call to '.__METHOD__.' - migration classes should only use `up()`'
+        );
+    }
+
+    final public function down(): void
+    {
+        // Prevent migration classes from defining or calling a `down()` method as we no longer support this.
+        // This will provide a runtime catch for any legacy migration classes that are doing the wrong thing.
+        throw new \BadMethodCallException(
+            'Unexpected call to '.__METHOD__.' - migration classes should only use `up()`'
+        );
+    }
+
     /**
      * Initialize method.
      *
