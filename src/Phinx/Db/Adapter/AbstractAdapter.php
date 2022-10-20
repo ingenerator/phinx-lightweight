@@ -198,37 +198,6 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function hasSchemaTable()
-    {
-        return $this->hasTable($this->getSchemaTableName());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSchemaTable()
-    {
-        try {
-            $options = [
-                'id' => false,
-                'primary_key' => 'version'
-            ];
-
-            $table = new Table($this->getSchemaTableName(), $options, $this);
-            $table->addColumn('version', 'biginteger')
-                ->addColumn('migration_name', 'string', ['limit' => 100, 'default' => null, 'null' => true])
-                ->addColumn('start_time', 'timestamp', ['default' => null, 'null' => true])
-                ->addColumn('end_time', 'timestamp', ['default' => null, 'null' => true])
-                ->addColumn('breakpoint', 'boolean', ['default' => false])
-                ->save();
-        } catch (\Exception $exception) {
-            throw new \InvalidArgumentException('There was a problem creating the schema table: ' . $exception->getMessage());
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getAdapterType()
     {
         return $this->getOption('adapter');

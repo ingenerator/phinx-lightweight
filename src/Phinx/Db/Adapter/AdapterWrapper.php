@@ -240,22 +240,6 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function hasSchemaTable()
-    {
-        return $this->getAdapter()->hasSchemaTable();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSchemaTable()
-    {
-        $this->getAdapter()->createSchemaTable();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getColumnTypes()
     {
         return $this->getAdapter()->getColumnTypes();
@@ -315,14 +299,6 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     public function hasTable($tableName)
     {
         return $this->getAdapter()->hasTable($tableName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasColumn($tableName, $columnName)
-    {
-        return $this->getAdapter()->hasColumn($tableName, $columnName);
     }
 
     /**

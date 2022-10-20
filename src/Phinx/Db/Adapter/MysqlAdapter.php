@@ -195,19 +195,52 @@ class MysqlAdapter extends PdoAdapter implements AdapterInterface
         return !empty($exists);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasColumn($tableName, $columnName)
+    protected function ensureSchemaTableExistsAndCorrect(): void
     {
-        $rows = $this->fetchAll(sprintf('SHOW COLUMNS FROM %s', $this->quoteTableName($tableName)));
-        foreach ($rows as $column) {
-            if (strcasecmp($column['Field'], $columnName) === 0) {
-                return true;
-            }
+        $tableName       = $this->getSchemaTableName();
+        $quotedTableName = $this->quoteTableName($tableName);
+
+        if ( ! $this->hasTable($tableName)) {
+            // Create the schema table if it doesn't already exist
+            $this->execute(
+                <<<SQL
+                CREATE TABLE $quotedTableName (
+                    `version` bigint(20) NOT NULL,
+                    `migration_name` varchar(100) DEFAULT NULL,
+                    `start_time` timestamp NULL DEFAULT NULL,
+                    `end_time` timestamp NULL DEFAULT NULL,
+                    `breakpoint` tinyint(1) NOT NULL DEFAULT '0',
+                    PRIMARY KEY (`version`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+                SQL
+            );
+
+            return;
         }
 
-        return false;
+        // The schema table exists but may need upgrading
+        $columnNames = array_map(
+            fn($col) => \strtolower($col['Field']),
+            $this->fetchAll(sprintf('SHOW COLUMNS FROM %s', $quotedTableName))
+        );
+
+        if ( ! \in_array('migration_name', $columnNames)) {
+            $this->execute(
+                <<<SQL
+                ALTER TABLE $quotedTableName
+                    ADD COLUMN `migration_name` varchar(100) DEFAULT NULL AFTER `version`;
+            SQL
+            );
+        }
+
+        if ( ! \in_array('breakpoint', $columnNames)) {
+            $this->execute(
+                <<<SQL
+                ALTER TABLE $quotedTableName
+                    ADD COLUMN `breakpoint` tinyint(1) NOT NULL DEFAULT '0' AFTER `end_time`;
+            SQL
+            );
+        }
     }
 
 }

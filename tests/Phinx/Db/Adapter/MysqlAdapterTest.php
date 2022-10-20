@@ -10,6 +10,50 @@ use const MYSQL_DB_CONFIG;
 
 class MysqlAdapterTest extends TestCase
 {
+    private const EXPECTED_SCHEMA_TABLE_STRUCTURE = [
+        [
+            'Field'   => 'version',
+            'Type'    => 'bigint(20)',
+            'Null'    => 'NO',
+            'Key'     => 'PRI',
+            'Default' => NULL,
+            'Extra'   => '',
+        ],
+        [
+            'Field'   => 'migration_name',
+            'Type'    => 'varchar(100)',
+            'Null'    => 'YES',
+            'Key'     => '',
+            'Default' => NULL,
+            'Extra'   => '',
+        ],
+        [
+            'Field'   => 'start_time',
+            'Type'    => 'timestamp',
+            'Null'    => 'YES',
+            'Key'     => '',
+            'Default' => NULL,
+            'Extra'   => '',
+        ],
+
+        [
+            'Field'   => 'end_time',
+            'Type'    => 'timestamp',
+            'Null'    => 'YES',
+            'Key'     => '',
+            'Default' => NULL,
+            'Extra'   => '',
+        ],
+        [
+            'Field'   => 'breakpoint',
+            'Type'    => 'tinyint(1)',
+            'Null'    => 'NO',
+            'Key'     => '',
+            'Default' => '0',
+            'Extra'   => '',
+        ],
+    ];
+
     /**
      * @var \Phinx\Db\Adapter\MysqlAdapter
      */
@@ -104,11 +148,59 @@ class MysqlAdapterTest extends TestCase
         $this->assertTrue($this->adapter->hasTable($this->adapter->getSchemaTableName()));
     }
 
-    public function testSchemaTableIsCreatedWithPrimaryKey()
+    public function testSchemaTableIsCreatedWithExpectedStructureIfMissing()
     {
+        $this->adapter->setSchemaTableName('db_migrations');
         $this->adapter->connect();
-        $table = new \Phinx\Db\Table($this->adapter->getSchemaTableName(), [], $this->adapter);
-        $this->assertTrue($this->adapter->hasIndex($this->adapter->getSchemaTableName(), ['version']));
+        $schema = $this->adapter->query('DESCRIBE `db_migrations`')->fetchAll(\PDO::FETCH_ASSOC);
+        $this->assertSame(self::EXPECTED_SCHEMA_TABLE_STRUCTURE, $schema);
+    }
+
+    public function providerOldSchemaTablesToUpgrade()
+    {
+        return [
+            'no breakpoint'     => [
+                <<<SQL
+                CREATE TABLE `old_migrations_table` (
+                    `version` bigint(20) NOT NULL,
+                    `migration_name` varchar(100) DEFAULT NULL,
+                    `start_time` timestamp NULL DEFAULT NULL,
+                    `end_time` timestamp NULL DEFAULT NULL,
+                    PRIMARY KEY (`version`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+                SQL
+    ,
+            ],
+            'no migration_name' => [
+                <<<SQL
+                CREATE TABLE `old_migrations_table` (
+                    `version` bigint(20) NOT NULL,
+                    `start_time` timestamp NULL DEFAULT NULL,
+                    `end_time` timestamp NULL DEFAULT NULL,
+                    `breakpoint` tinyint(1) NOT NULL DEFAULT '0',
+                    PRIMARY KEY (`version`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+                SQL
+    ,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providerOldSchemaTablesToUpgrade
+     */
+    public function testConnectUpgradesSchemaTableIfRequired($old_schema_create_statement)
+    {
+        // Create a table with the old schema
+        $this->adapter->connect();
+        $this->adapter->execute($old_schema_create_statement);
+        $this->adapter->disconnect();
+
+        $this->adapter->setSchemaTableName('old_migrations_table');
+        $this->assertSame(
+            self::EXPECTED_SCHEMA_TABLE_STRUCTURE,
+            $this->adapter->query('DESCRIBE `old_migrations_table`')->fetchAll(\PDO::FETCH_ASSOC)
+        );
     }
 
     public function testQuoteTableName()

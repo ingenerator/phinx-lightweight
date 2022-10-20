@@ -61,35 +61,32 @@ abstract class PdoAdapter extends AbstractAdapter
      * Sets the database connection.
      *
      * @param \PDO $connection Connection
+     *
      * @return \Phinx\Db\Adapter\AdapterInterface
      */
     public function setConnection(\PDO $connection)
     {
         $this->connection = $connection;
 
-        // Create the schema table if it doesn't already exist
-        if (!$this->hasSchemaTable()) {
-            $this->createSchemaTable();
-        } else {
-            $table = new Table($this->getSchemaTableName(), [], $this);
-            if (!$table->hasColumn('migration_name')) {
-                $table
-                    ->addColumn(
-                        'migration_name',
-                        'string',
-                        ['limit' => 100, 'after' => 'version', 'default' => null, 'null' => true]
-                    )
-                    ->save();
-            }
-            if (!$table->hasColumn('breakpoint')) {
-                $table
-                    ->addColumn('breakpoint', 'boolean', ['default' => false])
-                    ->save();
-            }
+        try {
+            $this->ensureSchemaTableExistsAndCorrect();
+        } catch (\Exception $e) {
+            throw new \RuntimeException(
+                sprintf(
+                    'There was a problem creating the schema table: [%s at %s:%s] %s',
+                    \get_class($e),
+                    $e->getFile(),
+                    $e->getLine(),
+                    $e->getMessage()
+                ), 0,
+                $e
+            );
         }
 
         return $this;
     }
+
+    abstract protected function ensureSchemaTableExistsAndCorrect(): void;
 
     /**
      * Gets the database connection

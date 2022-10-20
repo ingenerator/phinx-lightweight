@@ -162,21 +162,6 @@ interface AdapterInterface
     public function migrated(MigrationInterface $migration, $startTime, $endTime);
 
     /**
-     * Does the schema table exist?
-     *
-     * @deprecated use hasTable instead.
-     * @return bool
-     */
-    public function hasSchemaTable();
-
-    /**
-     * Creates the schema table.
-     *
-     * @return void
-     */
-    public function createSchemaTable();
-
-    /**
      * Returns the adapter type.
      *
      * @return string
@@ -293,23 +278,6 @@ interface AdapterInterface
      * @return string
      */
     public function quoteColumnName($columnName);
-
-    /**
-     * Checks to see if a table exists.
-     *
-     * @param string $tableName Table Name
-     * @return bool
-     */
-    public function hasTable($tableName);
-
-    /**
-     * Checks to see if a column exists.
-     *
-     * @param string $tableName  Table Name
-     * @param string $columnName Column Name
-     * @return bool
-     */
-    public function hasColumn($tableName, $columnName);
 
     /**
      * Returns an array of the supported Phinx column types.
