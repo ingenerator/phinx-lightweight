@@ -203,15 +203,4 @@ abstract class AbstractAdapter implements AdapterInterface
         return $this->getOption('adapter');
     }
 
-    /**
-     * Determines if instead of executing queries a dump to standard output is needed
-     *
-     * @return bool
-     */
-    public function isDryRunEnabled()
-    {
-        $input = $this->getInput();
-
-        return ($input && $input->hasOption('dry-run')) ? $input->getOption('dry-run') : false;
-    }
 }

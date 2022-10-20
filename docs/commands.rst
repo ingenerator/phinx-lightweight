@@ -74,12 +74,6 @@ for short.
 
         $ phinx migrate -e development -t 20110103081132
 
-Use ``--dry-run`` to print the queries to standard output without executing them
-
-.. code-block:: bash
-
-        $ phinx migrate --dry-run
-
 The Status Command
 ------------------
 
