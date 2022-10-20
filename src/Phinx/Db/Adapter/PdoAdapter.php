@@ -268,7 +268,7 @@ abstract class PdoAdapter extends AbstractAdapter
             substr($migration->getName(), 0, 100),
             $startTime,
             $endTime,
-            $this->castToBool(false)
+            0
         );
 
         $this->execute($sql);
@@ -276,41 +276,4 @@ abstract class PdoAdapter extends AbstractAdapter
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getColumnTypes()
-    {
-        return [
-            'string',
-            'char',
-            'text',
-            'integer',
-            'biginteger',
-            'float',
-            'decimal',
-            'datetime',
-            'timestamp',
-            'time',
-            'date',
-            'blob',
-            'binary',
-            'varbinary',
-            'boolean',
-            'uuid',
-            // Geospatial data types
-            'geometry',
-            'point',
-            'linestring',
-            'polygon',
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function castToBool($value)
-    {
-        return (bool)$value ? 1 : 0;
-    }
 }

@@ -40,29 +40,6 @@ use Phinx\Db\Table\Index;
 class MysqlAdapter extends PdoAdapter implements AdapterInterface
 {
 
-    protected $signedColumnTypes = ['integer' => true, 'biginteger' => true, 'float' => true, 'decimal' => true, 'boolean' => true];
-
-    const TEXT_TINY = 255;
-    const TEXT_SMALL = 255; /* deprecated, alias of TEXT_TINY */
-    const TEXT_REGULAR = 65535;
-    const TEXT_MEDIUM = 16777215;
-    const TEXT_LONG = 4294967295;
-
-    // According to https://dev.mysql.com/doc/refman/5.0/en/blob.html BLOB sizes are the same as TEXT
-    const BLOB_TINY = 255;
-    const BLOB_SMALL = 255; /* deprecated, alias of BLOB_TINY */
-    const BLOB_REGULAR = 65535;
-    const BLOB_MEDIUM = 16777215;
-    const BLOB_LONG = 4294967295;
-
-    const INT_TINY = 255;
-    const INT_SMALL = 65535;
-    const INT_MEDIUM = 16777215;
-    const INT_REGULAR = 4294967295;
-    const INT_BIG = 18446744073709551615;
-
-    const TYPE_YEAR = 'year';
-
     /**
      * {@inheritdoc}
      */

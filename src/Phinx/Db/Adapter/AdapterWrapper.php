@@ -240,14 +240,6 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function getColumnTypes()
-    {
-        return $this->getAdapter()->getColumnTypes();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function hasTransactions()
     {
         return $this->getAdapter()->hasTransactions();
@@ -299,14 +291,6 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     public function hasTable($tableName)
     {
         return $this->getAdapter()->hasTable($tableName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function castToBool($value)
-    {
-        return $this->getAdapter()->castToBool($value);
     }
 
     /**

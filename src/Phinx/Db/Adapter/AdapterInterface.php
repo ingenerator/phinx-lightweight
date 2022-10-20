@@ -44,35 +44,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 interface AdapterInterface
 {
-    const PHINX_TYPE_STRING = 'string';
-    const PHINX_TYPE_CHAR = 'char';
-    const PHINX_TYPE_TEXT = 'text';
-    const PHINX_TYPE_INTEGER = 'integer';
-    const PHINX_TYPE_BIG_INTEGER = 'biginteger';
-    const PHINX_TYPE_FLOAT = 'float';
-    const PHINX_TYPE_DECIMAL = 'decimal';
-    const PHINX_TYPE_DATETIME = 'datetime';
-    const PHINX_TYPE_TIMESTAMP = 'timestamp';
-    const PHINX_TYPE_TIME = 'time';
-    const PHINX_TYPE_DATE = 'date';
-    const PHINX_TYPE_BINARY = 'binary';
-    const PHINX_TYPE_VARBINARY = 'varbinary';
-    const PHINX_TYPE_BLOB = 'blob';
-    const PHINX_TYPE_BOOLEAN = 'boolean';
-    const PHINX_TYPE_JSON = 'json';
-    const PHINX_TYPE_JSONB = 'jsonb';
-    const PHINX_TYPE_UUID = 'uuid';
-    const PHINX_TYPE_FILESTREAM = 'filestream';
-
-    // Geospatial database types
-    const PHINX_TYPE_GEOMETRY = 'geometry';
-    const PHINX_TYPE_POINT = 'point';
-    const PHINX_TYPE_LINESTRING = 'linestring';
-    const PHINX_TYPE_POLYGON = 'polygon';
-
-    // only for mysql so far
-    const PHINX_TYPE_ENUM = 'enum';
-    const PHINX_TYPE_SET = 'set';
 
     /**
      * Get all migrated version numbers.
@@ -279,19 +250,4 @@ interface AdapterInterface
      */
     public function quoteColumnName($columnName);
 
-    /**
-     * Returns an array of the supported Phinx column types.
-     *
-     * @return array
-     */
-    public function getColumnTypes();
-
-    /**
-     * Cast a value to a boolean appropriate for the adapter.
-     *
-     * @param mixed $value The value to be cast
-     *
-     * @return mixed
-     */
-    public function castToBool($value);
 }
