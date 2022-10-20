@@ -197,8 +197,8 @@ class Manager
                     '%s %14.0f  %19s  %19s  <comment>%s</comment>',
                     $status,
                     $migration->getVersion(),
-                    $version['start_time'],
-                    $version['end_time'],
+                    $version ? $version['start_time'] : NULL,
+                    $version ? $version['end_time'] : NULL,
                     $migration->getName()
                 ));
 
