@@ -31,7 +31,6 @@ namespace Phinx\Migration\Manager;
 use Phinx\Db\Adapter\AdapterFactory;
 use Phinx\Db\Adapter\AdapterInterface;
 use Phinx\Migration\MigrationInterface;
-use Phinx\Seed\SeedInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -111,32 +110,6 @@ class Environment
 
         // Record it in the database
         $this->getAdapter()->migrated($migration, date('Y-m-d H:i:s', $startTime), date('Y-m-d H:i:s', time()));
-    }
-
-    /**
-     * Executes the specified seeder on this environment.
-     *
-     * @param \Phinx\Seed\SeedInterface $seed
-     * @return void
-     */
-    public function executeSeed(SeedInterface $seed)
-    {
-        $seed->setAdapter($this->getAdapter());
-
-        // begin the transaction if the adapter supports it
-        if ($this->getAdapter()->hasTransactions()) {
-            $this->getAdapter()->beginTransaction();
-        }
-
-        // Run the seeder
-        if (method_exists($seed, SeedInterface::RUN)) {
-            $seed->run();
-        }
-
-        // commit the transaction if the adapter supports it
-        if ($this->getAdapter()->hasTransactions()) {
-            $this->getAdapter()->commitTransaction();
-        }
     }
 
     /**

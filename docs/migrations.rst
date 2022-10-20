@@ -267,10 +267,7 @@ Both methods accept raw SQL as their only parameter.
 Inserting Data
 --------------
 
-Phinx makes it easy to insert data into your tables. Whilst this feature is
-intended for the :doc:`seed feature <seeding>`, you are also free to use the
-insert methods in your migrations.
-
+Phinx makes it easy to insert data into your tables.
 .. code-block:: php
 
         <?php
@@ -1119,7 +1116,7 @@ using the ``name`` parameter.
                 $table = $this->table('users');
                 $table->addColumn('email', 'string')
                       ->addIndex(['email'], [
-                            'unique' => true, 
+                            'unique' => true,
                             'name' => 'idx_users_email'])
                       ->save();
             }

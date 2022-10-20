@@ -81,12 +81,6 @@ EOT
             Util::globAll($this->getConfig()->getMigrationPaths())
         );
 
-        // Verify the seed path(s)
-        array_map(
-            [$this, 'verifySeedDirectory'],
-            Util::globAll($this->getConfig()->getSeedPaths())
-        );
-
         $envName = $input->getOption('environment');
         if ($envName) {
             if (!$this->getConfig()->hasEnvironment($envName)) {

@@ -5,10 +5,6 @@ return [
             'application/migrations',
             'application2/migrations'
         ],
-        'seeds' => [
-            'application/seeds',
-            'application2/seeds'
-        ]
     ],
     'environments' => [
         'default_migration_table' => 'phinxlog',

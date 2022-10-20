@@ -270,22 +270,6 @@ class Config implements ConfigInterface, NamespaceAwareInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getSeedPaths()
-    {
-        if (!isset($this->values['paths']['seeds'])) {
-            throw new \UnexpectedValueException('Seeds path missing from config file');
-        }
-
-        if (is_string($this->values['paths']['seeds'])) {
-            $this->values['paths']['seeds'] = [$this->values['paths']['seeds']];
-        }
-
-        return $this->values['paths']['seeds'];
-    }
-
-    /**
      * Get the template file name.
      *
      * @return string|false

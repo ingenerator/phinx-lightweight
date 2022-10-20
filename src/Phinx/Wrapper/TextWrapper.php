@@ -130,36 +130,6 @@ class TextWrapper
     }
 
     /**
-     * Returns the output from running the "seed:run" command.
-     * @param  string|null       $env environment name
-     * @param  string|null       $target target version
-     * @param  array|string|null $seed array of seed names or seed name
-     * @return string
-     */
-    public function getSeed($env = null, $target = null, $seed = null)
-    {
-        $command = ['seed:run'];
-        if ($env ?: $this->hasOption('environment')) {
-            $command += ['-e' => $env ?: $this->getOption('environment')];
-        }
-        if ($this->hasOption('configuration')) {
-            $command += ['-c' => $this->getOption('configuration')];
-        }
-        if ($this->hasOption('parser')) {
-            $command += ['-p' => $this->getOption('parser')];
-        }
-        if ($target) {
-            $command += ['-t' => $target];
-        }
-        if ($seed) {
-            $seed = (array)$seed;
-            $command += ['-s' => $seed];
-        }
-
-        return $this->executeRun($command);
-    }
-
-    /**
      * Returns the output from running the "rollback" command.
      * @param  string $env environment name (optional)
      * @param  mixed $target target version, or 0 (zero) fully revert (optional)

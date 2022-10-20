@@ -31,8 +31,6 @@ namespace Phinx\Migration;
 use Phinx\Config\ConfigInterface;
 use Phinx\Config\NamespaceAwareInterface;
 use Phinx\Migration\Manager\Environment;
-use Phinx\Seed\AbstractSeed;
-use Phinx\Seed\SeedInterface;
 use Phinx\Util\Util;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -63,11 +61,6 @@ class Manager
      * @var array
      */
     protected $migrations;
-
-    /**
-     * @var array
-     */
-    protected $seeds;
 
     /**
      * @var integer
@@ -370,63 +363,6 @@ class Manager
     }
 
     /**
-     * Execute a seeder against the specified environment.
-     *
-     * @param string $name Environment Name
-     * @param \Phinx\Seed\SeedInterface $seed Seed
-     * @return void
-     */
-    public function executeSeed($name, SeedInterface $seed)
-    {
-        $this->getOutput()->writeln('');
-        $this->getOutput()->writeln(
-            ' ==' .
-            ' <info>' . $seed->getName() . ':</info>' .
-            ' <comment>seeding</comment>'
-        );
-
-        // Execute the seeder and log the time elapsed.
-        $start = microtime(true);
-        $this->getEnvironment($name)->executeSeed($seed);
-        $end = microtime(true);
-
-        $this->getOutput()->writeln(
-            ' ==' .
-            ' <info>' . $seed->getName() . ':</info>' .
-            ' <comment>seeded' .
-            ' ' . sprintf('%.4fs', $end - $start) . '</comment>'
-        );
-    }
-
-    /**
-     * Run database seeders against an environment.
-     *
-     * @param string $environment Environment
-     * @param string $seed Seeder
-     * @return void
-     */
-    public function seed($environment, $seed = null)
-    {
-        $seeds = $this->getSeeds();
-
-        if ($seed === null) {
-            // run all seeders
-            foreach ($seeds as $seeder) {
-                if (array_key_exists($seeder->getName(), $seeds)) {
-                    $this->executeSeed($environment, $seeder);
-                }
-            }
-        } else {
-            // run only one seeder
-            if (array_key_exists($seed, $seeds)) {
-                $this->executeSeed($environment, $seeds[$seed]);
-            } else {
-                throw new \InvalidArgumentException(sprintf('The seed class "%s" does not exist', $seed));
-            }
-        }
-    }
-
-    /**
      * Sets the environments.
      *
      * @param array $environments Environments
@@ -614,152 +550,6 @@ class Manager
     {
         $config = $this->getConfig();
         $paths = $config->getMigrationPaths();
-        $files = [];
-
-        foreach ($paths as $path) {
-            $files = array_merge(
-                $files,
-                Util::glob($path . DIRECTORY_SEPARATOR . '*.php')
-            );
-        }
-        // glob() can return the same file multiple times
-        // This will cause the migration to fail with a
-        // false assumption of duplicate migrations
-        // http://php.net/manual/en/function.glob.php#110340
-        $files = array_unique($files);
-
-        return $files;
-    }
-
-    /**
-     * Sets the database seeders.
-     *
-     * @param array $seeds Seeders
-     * @return \Phinx\Migration\Manager
-     */
-    public function setSeeds(array $seeds)
-    {
-        $this->seeds = $seeds;
-
-        return $this;
-    }
-
-    /**
-     * Get seed dependencies instances from seed dependency array
-     *
-     * @param AbstractSeed $seed Seed
-     *
-     * @return AbstractSeed[]
-     */
-    private function getSeedDependenciesInstances(AbstractSeed $seed)
-    {
-        $dependenciesInstances = [];
-        $dependencies = $seed->getDependencies();
-        if (!empty($dependencies)) {
-            foreach ($dependencies as $dependency) {
-                foreach ($this->seeds as $seed) {
-                    if (get_class($seed) === $dependency) {
-                        $dependenciesInstances[get_class($seed)] = $seed;
-                    }
-                }
-            }
-        }
-
-        return $dependenciesInstances;
-    }
-
-    /**
-     * Order seeds by dependencies
-     *
-     * @param AbstractSeed[] $seeds Seeds
-     *
-     * @return AbstractSeed[]
-     */
-    private function orderSeedsByDependencies(array $seeds)
-    {
-        $orderedSeeds = [];
-        foreach ($seeds as $seed) {
-            $key = get_class($seed);
-            $dependencies = $this->getSeedDependenciesInstances($seed);
-            if (!empty($dependencies)) {
-                $orderedSeeds[$key] = $seed;
-                $orderedSeeds = array_merge($this->orderSeedsByDependencies($dependencies), $orderedSeeds);
-            } else {
-                $orderedSeeds[$key] = $seed;
-            }
-        }
-
-        return $orderedSeeds;
-    }
-
-    /**
-     * Gets an array of database seeders.
-     *
-     * @throws \InvalidArgumentException
-     * @return \Phinx\Seed\AbstractSeed[]
-     */
-    public function getSeeds()
-    {
-        if ($this->seeds === null) {
-            $phpFiles = $this->getSeedFiles();
-
-            // filter the files to only get the ones that match our naming scheme
-            $fileNames = [];
-            /** @var \Phinx\Seed\AbstractSeed[] $seeds */
-            $seeds = [];
-
-            foreach ($phpFiles as $filePath) {
-                if (Util::isValidSeedFileName(basename($filePath))) {
-                    $config = $this->getConfig();
-                    $namespace = $config instanceof NamespaceAwareInterface ? $config->getSeedNamespaceByPath(dirname($filePath)) : null;
-
-                    // convert the filename to a class name
-                    $class = ($namespace === null ? '' : $namespace . '\\') . pathinfo($filePath, PATHINFO_FILENAME);
-                    $fileNames[$class] = basename($filePath);
-
-                    // load the seed file
-                    /** @noinspection PhpIncludeInspection */
-                    require_once $filePath;
-                    if (!class_exists($class)) {
-                        throw new \InvalidArgumentException(sprintf(
-                            'Could not find class "%s" in file "%s"',
-                            $class,
-                            $filePath
-                        ));
-                    }
-
-                    // instantiate it
-                    $seed = new $class($this->getInput(), $this->getOutput());
-
-                    if (!($seed instanceof AbstractSeed)) {
-                        throw new \InvalidArgumentException(sprintf(
-                            'The class "%s" in file "%s" must extend \Phinx\Seed\AbstractSeed',
-                            $class,
-                            $filePath
-                        ));
-                    }
-
-                    $seeds[$class] = $seed;
-                }
-            }
-
-            ksort($seeds);
-            $this->setSeeds($seeds);
-        }
-
-        $this->seeds = $this->orderSeedsByDependencies($this->seeds);
-        return $this->seeds;
-    }
-
-    /**
-     * Returns a list of seed files found in the provided seed paths.
-     *
-     * @return string[]
-     */
-    protected function getSeedFiles()
-    {
-        $config = $this->getConfig();
-        $paths = $config->getSeedPaths();
         $files = [];
 
         foreach ($paths as $path) {

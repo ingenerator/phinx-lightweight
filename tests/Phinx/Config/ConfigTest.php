@@ -190,26 +190,6 @@ class ConfigTest extends AbstractConfigTest
         $this->assertEquals('Some\Long\Classname', $config->getAlias('Short'));
     }
 
-    public function testGetSeedPath()
-    {
-        $config = new \Phinx\Config\Config(['paths' => ['seeds' => 'db/seeds']]);
-        $this->assertEquals(['db/seeds'], $config->getSeedPaths());
-
-        $config = new \Phinx\Config\Config(['paths' => ['seeds' => ['db/seeds1', 'db/seeds2']]]);
-        $this->assertEquals(['db/seeds1', 'db/seeds2'], $config->getSeedPaths());
-    }
-
-    /**
-     * @covers \Phinx\Config\Config::getSeedPaths
-     */
-    public function testGetSeedPathThrowsException()
-    {
-        $config = new \Phinx\Config\Config([]);
-        $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('Seeds path missing from config file');
-        $this->assertEquals('db/seeds', $config->getSeedPaths());
-    }
-
     /**
      * Checks if base class is returned correctly when specified without
      * a namespace.

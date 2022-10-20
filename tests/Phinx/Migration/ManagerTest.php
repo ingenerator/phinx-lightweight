@@ -52,9 +52,6 @@ class ManagerTest extends TestCase
                 'migrations' => [
                     'Foo\Bar' => $this->getCorrectedPath(__DIR__ . '/_files_foo_bar/migrations'),
                 ],
-                'seeds' => [
-                    'Foo\Bar' => $this->getCorrectedPath(__DIR__ . '/_files_foo_bar/seeds'),
-                ],
             ];
         }
         $config = clone $this->config;
@@ -71,11 +68,6 @@ class ManagerTest extends TestCase
                     $this->getCorrectedPath(__DIR__ . '/_files/migrations'),
                     'Baz' => $this->getCorrectedPath(__DIR__ . '/_files_baz/migrations'),
                     'Foo\Bar' => $this->getCorrectedPath(__DIR__ . '/_files_foo_bar/migrations'),
-                ],
-                'seeds' => [
-                    $this->getCorrectedPath(__DIR__ . '/_files/seeds'),
-                    'Baz' => $this->getCorrectedPath(__DIR__ . '/_files_baz/seeds'),
-                    'Foo\Bar' => $this->getCorrectedPath(__DIR__ . '/_files_foo_bar/seeds'),
                 ],
             ];
         }
@@ -105,7 +97,6 @@ class ManagerTest extends TestCase
         return [
             'paths' => [
                 'migrations' => $this->getCorrectedPath(__DIR__ . '/_files/migrations'),
-                'seeds' => $this->getCorrectedPath(__DIR__ . '/_files/seeds'),
             ],
             'environments' => [
                 'default_migration_table' => 'phinxlog',
@@ -883,184 +874,25 @@ class ManagerTest extends TestCase
         ];
     }
 
-    public function testExecuteSeedWorksAsExpected()
-    {
-        // stub environment
-        $envStub = $this->getMockBuilder('\Phinx\Migration\Manager\Environment')
-            ->setConstructorArgs(['mockenv', []])
-            ->getMock();
-        $this->manager->setEnvironments(['mockenv' => $envStub]);
-        $this->manager->seed('mockenv');
-        rewind($this->manager->getOutput()->getStream());
-        $output = stream_get_contents($this->manager->getOutput()->getStream());
-        $this->assertStringContainsString('GSeeder', $output);
-        $this->assertStringContainsString('PostSeeder', $output);
-        $this->assertStringContainsString('UserSeeder', $output);
-    }
-
-    public function testExecuteSeedWorksAsExpectedWithNamespace()
-    {
-        // stub environment
-        $envStub = $this->getMockBuilder('\Phinx\Migration\Manager\Environment')
-            ->setConstructorArgs(['mockenv', []])
-            ->getMock();
-        $this->manager->setConfig($this->getConfigWithNamespace());
-        $this->manager->setEnvironments(['mockenv' => $envStub]);
-        $this->manager->seed('mockenv');
-        rewind($this->manager->getOutput()->getStream());
-        $output = stream_get_contents($this->manager->getOutput()->getStream());
-        $this->assertStringContainsString('Foo\Bar\GSeeder', $output);
-        $this->assertStringContainsString('Foo\Bar\PostSeeder', $output);
-        $this->assertStringContainsString('Foo\Bar\UserSeeder', $output);
-    }
-
-    public function testExecuteSeedWorksAsExpectedWithMixedNamespace()
-    {
-        // stub environment
-        $envStub = $this->getMockBuilder('\Phinx\Migration\Manager\Environment')
-            ->setConstructorArgs(['mockenv', []])
-            ->getMock();
-        $this->manager->setConfig($this->getConfigWithMixedNamespace());
-        $this->manager->setEnvironments(['mockenv' => $envStub]);
-        $this->manager->seed('mockenv');
-        rewind($this->manager->getOutput()->getStream());
-        $output = stream_get_contents($this->manager->getOutput()->getStream());
-        $this->assertStringContainsString('GSeeder', $output);
-        $this->assertStringContainsString('PostSeeder', $output);
-        $this->assertStringContainsString('UserSeeder', $output);
-        $this->assertStringContainsString('Baz\GSeeder', $output);
-        $this->assertStringContainsString('Baz\PostSeeder', $output);
-        $this->assertStringContainsString('Baz\UserSeeder', $output);
-        $this->assertStringContainsString('Foo\Bar\GSeeder', $output);
-        $this->assertStringContainsString('Foo\Bar\PostSeeder', $output);
-        $this->assertStringContainsString('Foo\Bar\UserSeeder', $output);
-    }
-
-    public function testExecuteASingleSeedWorksAsExpected()
-    {
-        // stub environment
-        $envStub = $this->getMockBuilder('\Phinx\Migration\Manager\Environment')
-            ->setConstructorArgs(['mockenv', []])
-            ->getMock();
-        $this->manager->setEnvironments(['mockenv' => $envStub]);
-        $this->manager->seed('mockenv', 'UserSeeder');
-        rewind($this->manager->getOutput()->getStream());
-        $output = stream_get_contents($this->manager->getOutput()->getStream());
-        $this->assertStringContainsString('UserSeeder', $output);
-    }
-
-    public function testExecuteASingleSeedWorksAsExpectedWithNamespace()
-    {
-        // stub environment
-        $envStub = $this->getMockBuilder('\Phinx\Migration\Manager\Environment')
-            ->setConstructorArgs(['mockenv', []])
-            ->getMock();
-        $this->manager->setConfig($this->getConfigWithNamespace());
-        $this->manager->setEnvironments(['mockenv' => $envStub]);
-        $this->manager->seed('mockenv', 'Foo\Bar\UserSeeder');
-        rewind($this->manager->getOutput()->getStream());
-        $output = stream_get_contents($this->manager->getOutput()->getStream());
-        $this->assertStringContainsString('Foo\Bar\UserSeeder', $output);
-    }
-
-    public function testExecuteASingleSeedWorksAsExpectedWithMixedNamespace()
-    {
-        // stub environment
-        $envStub = $this->getMockBuilder('\Phinx\Migration\Manager\Environment')
-            ->setConstructorArgs(['mockenv', []])
-            ->getMock();
-        $this->manager->setConfig($this->getConfigWithMixedNamespace());
-        $this->manager->setEnvironments(['mockenv' => $envStub]);
-        $this->manager->seed('mockenv', 'Baz\UserSeeder');
-        rewind($this->manager->getOutput()->getStream());
-        $output = stream_get_contents($this->manager->getOutput()->getStream());
-        $this->assertStringContainsString('Baz\UserSeeder', $output);
-    }
-
-    public function testExecuteANonExistentSeedWorksAsExpected()
-    {
-        // stub environment
-        $envStub = $this->getMockBuilder('\Phinx\Migration\Manager\Environment')
-            ->setConstructorArgs(['mockenv', []])
-            ->getMock();
-        $this->manager->setEnvironments(['mockenv' => $envStub]);
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The seed class "NonExistentSeeder" does not exist');
-        $this->manager->seed('mockenv', 'NonExistentSeeder');
-        rewind($this->manager->getOutput()->getStream());
-        $output = stream_get_contents($this->manager->getOutput()->getStream());
-        $this->assertStringContainsString('UserSeeder', $output);
-    }
-
-    public function testExecuteANonExistentSeedWorksAsExpectedWithNamespace()
-    {
-        // stub environment
-        $envStub = $this->getMockBuilder('\Phinx\Migration\Manager\Environment')
-            ->setConstructorArgs(['mockenv', []])
-            ->getMock();
-        $this->manager->setConfig($this->getConfigWithNamespace());
-        $this->manager->setEnvironments(['mockenv' => $envStub]);
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The seed class "Foo\Bar\NonExistentSeeder" does not exist');
-        $this->manager->seed('mockenv', 'Foo\Bar\NonExistentSeeder');
-        rewind($this->manager->getOutput()->getStream());
-        $output = stream_get_contents($this->manager->getOutput()->getStream());
-        $this->assertStringContainsString('Foo\Bar\UserSeeder', $output);
-    }
-
-    public function testExecuteANonExistentSeedWorksAsExpectedWithMixedNamespace()
-    {
-        // stub environment
-        $envStub = $this->getMockBuilder('\Phinx\Migration\Manager\Environment')
-            ->setConstructorArgs(['mockenv', []])
-            ->getMock();
-        $this->manager->setConfig($this->getConfigWithMixedNamespace());
-        $this->manager->setEnvironments(['mockenv' => $envStub]);
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The seed class "Baz\NonExistentSeeder" does not exist');
-        $this->manager->seed('mockenv', 'Baz\NonExistentSeeder');
-        rewind($this->manager->getOutput()->getStream());
-        $output = stream_get_contents($this->manager->getOutput()->getStream());
-        $this->assertStringContainsString('UserSeeder', $output);
-        $this->assertStringContainsString('Baz\UserSeeder', $output);
-        $this->assertStringContainsString('Foo\Bar\UserSeeder', $output);
-    }
-
-    public function testOrderSeeds()
-    {
-        $seeds = array_values($this->manager->getSeeds());
-        $this->assertInstanceOf('UserSeeder', $seeds[0]);
-        $this->assertInstanceOf('GSeeder', $seeds[1]);
-        $this->assertInstanceOf('PostSeeder', $seeds[2]);
-    }
-
     public function testGettingInputObject()
     {
         $migrations = $this->manager->getMigrations();
-        $seeds = $this->manager->getSeeds();
         $inputObject = $this->manager->getInput();
         $this->assertInstanceOf('\Symfony\Component\Console\Input\InputInterface', $inputObject);
 
         foreach ($migrations as $migration) {
             $this->assertEquals($inputObject, $migration->getInput());
         }
-        foreach ($seeds as $seed) {
-            $this->assertEquals($inputObject, $seed->getInput());
-        }
     }
 
     public function testGettingOutputObject()
     {
         $migrations = $this->manager->getMigrations();
-        $seeds = $this->manager->getSeeds();
         $outputObject = $this->manager->getOutput();
         $this->assertInstanceOf('\Symfony\Component\Console\Output\OutputInterface', $outputObject);
 
         foreach ($migrations as $migration) {
             $this->assertEquals($outputObject, $migration->getOutput());
-        }
-        foreach ($seeds as $seed) {
-            $this->assertEquals($outputObject, $seed->getOutput());
         }
     }
 

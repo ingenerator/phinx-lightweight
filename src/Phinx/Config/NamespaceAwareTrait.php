@@ -44,13 +44,6 @@ trait NamespaceAwareTrait
     abstract public function getMigrationPaths();
 
     /**
-     * Gets the paths to search for seed files.
-     *
-     * @return string[]
-     */
-    abstract public function getSeedPaths();
-
-    /**
      * Search $needle in $haystack and return key associate with him.
      *
      * @param string $needle
@@ -80,16 +73,4 @@ trait NamespaceAwareTrait
         return $this->searchNamespace($path, $paths);
     }
 
-    /**
-     * Get Seed Namespace associated with path.
-     *
-     * @param string $path
-     * @return string|null
-     */
-    public function getSeedNamespaceByPath($path)
-    {
-        $paths = $this->getSeedPaths();
-
-        return $this->searchNamespace($path, $paths);
-    }
 }

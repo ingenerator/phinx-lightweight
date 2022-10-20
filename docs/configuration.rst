@@ -103,42 +103,6 @@ setting ``migration_base_class`` in your config:
 
     migration_base_class: MyMagicalMigration
 
-Seed Paths
-----------
-
-The second option specifies the path to your seed directory. Phinx uses
-``%%PHINX_CONFIG_DIR%%/db/seeds`` by default.
-
-.. note::
-
-    ``%%PHINX_CONFIG_DIR%%`` is a special token and is automatically replaced
-    with the root directory where your ``phinx.yml`` file is stored.
-
-In order to overwrite the default ``%%PHINX_CONFIG_DIR%%/db/seeds``, you
-need to add the following to the yaml configuration.
-
-.. code-block:: yaml
-
-    paths:
-        seeds: /your/full/path
-
-You can also provide multiple seed paths by using an array in your configuration:
-
-.. code-block:: yaml
-
-    paths:
-        seeds:
-            - /your/full/path1
-            - /your/full/path2
-
-
-You can also use the ``%%PHINX_CONFIG_DIR%%`` token in your path.
-
-.. code-block:: yaml
-
-    paths:
-        seeds: '%%PHINX_CONFIG_DIR%%/your/relative/path'
-
 Environments
 ------------
 

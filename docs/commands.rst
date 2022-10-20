@@ -146,37 +146,6 @@ This command exits with code 0 if the database is up-to-date (ie. all migrations
 * 1: There is at least one down migration.
 * 2: There is at least one missing migration.
 
-The Seed Create Command
------------------------
-
-The Seed Create command can be used to create new database seed classes. It
-requires one argument, the name of the class. The class name should be specified
-in CamelCase format.
-
-.. code-block:: bash
-
-        $ phinx seed:create MyNewSeeder
-
-Open the new seed file in your text editor to add your database seed commands.
-Phinx creates seed files using the path specified in your ``phinx.yml`` file.
-Please see the :doc:`Configuration <configuration>` chapter for more information.
-
-The Seed Run Command
---------------------
-
-The Seed Run command runs all of the available seed classes or optionally just
-one.
-
-.. code-block:: bash
-
-        $ phinx seed:run -e development
-
-To run only one seed class use the ``--seed`` parameter or ``-s`` for short.
-
-.. code-block:: bash
-
-        $ phinx seed:run -e development -s MyNewSeeder
-
 Configuration File Parameter
 ----------------------------
 
@@ -254,7 +223,7 @@ and to rollback use `<http://localhost:8000/rollback>`__.
 Using Phinx with PHPUnit
 --------------------------
 
-Phinx can be used within your unit tests to prepare or seed the database. You can use it programatically :
+Phinx can be used within your unit tests to prepare the database. You can use it programatically :
 
 .. code-block:: php
 
@@ -263,38 +232,4 @@ Phinx can be used within your unit tests to prepare or seed the database. You ca
           $app = new PhinxApplication();
           $app->setAutoExit(false);
           $app->run(new StringInput('migrate'), new NullOutput());
-        }
-
-If you use a memory database, you'll need to give Phinx a specific PDO instance. You can interact with Phinx directly using the Manager class :
-
-.. code-block:: php
-
-        use PDO;
-        use Phinx\Config\Config;
-        use Phinx\Migration\Manager;
-        use PHPUnit\Framework\TestCase;
-        use Symfony\Component\Console\Input\StringInput;
-        use Symfony\Component\Console\Output\NullOutput;
-
-        class DatabaseTestCase extends TestCase {
-
-            public function setUp ()
-            {
-                $pdo = new PDO('sqlite::memory:', null, null, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-                ]);
-                $configArray = require('phinx.php');
-                $configArray['environments']['test'] = [
-                    'adapter'    => 'sqlite',
-                    'connection' => $pdo
-                ];
-                $config = new Config($configArray);
-                $manager = new Manager($config, new StringInput(' '), new NullOutput());
-                $manager->migrate('test');
-                $manager->seed('test');
-                // You can change default fetch mode after the seeding
-                $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
-                $this->pdo = $pdo;
-            }
-
         }

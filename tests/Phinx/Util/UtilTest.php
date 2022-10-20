@@ -77,7 +77,6 @@ class UtilTest extends TestCase
         $expectedResults = [
             'CAmelCase' => false,
             'CreateUserTable' => true,
-            'UserSeeder' => true,
             'Test' => true,
             'test' => false
         ];
