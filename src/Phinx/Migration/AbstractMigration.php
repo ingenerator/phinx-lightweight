@@ -115,9 +115,7 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      */
-    public function up()
-    {
-    }
+    abstract public function up();
 
     /**
      * {@inheritdoc}
