@@ -176,24 +176,6 @@ file:
     export PHINX_ENVIRONMENT=dev-`whoami`-`hostname`
 
 
-Table Prefix and Suffix
------------------------
-
-You can define a table prefix and table suffix:
-
-.. code-block:: yaml
-
-    environments:
-        development:
-            ....
-            table_prefix: dev_
-            table_suffix: _v1
-        testing:
-            ....
-            table_prefix: test_
-            table_suffix: _v2
-
-
 Socket Connections
 ------------------
 
@@ -303,7 +285,7 @@ The aliased classes will still be required to implement the ``Phinx\Migration\Cr
 Version Order
 ------
 
-When rolling back or printing the status of migrations, Phinx orders the executed migrations according to the 
+When rolling back or printing the status of migrations, Phinx orders the executed migrations according to the
 ``version_order`` option, which can have the following values:
 
 * ``creation`` (the default): migrations are ordered by their creation time, which is also part of their filename.

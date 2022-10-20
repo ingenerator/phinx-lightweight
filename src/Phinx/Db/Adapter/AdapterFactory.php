@@ -71,7 +71,6 @@ class AdapterFactory
      * @var array
      */
     protected $wrappers = [
-        'prefix' => 'Phinx\Db\Adapter\TablePrefixAdapter',
         'timed' => 'Phinx\Db\Adapter\TimedOutputAdapter',
     ];
 

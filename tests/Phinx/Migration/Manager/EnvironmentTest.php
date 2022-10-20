@@ -99,13 +99,16 @@ class EnvironmentTest extends TestCase
         $this->environment->getAdapter();
     }
 
-    public function testTablePrefixAdapter()
+    /**
+     * @testWith [{"table_prefix": "tbl_"}]
+     *           [{"table_suffix": "_dev"}]
+     */
+    public function testTablePrefixAdapter($opts)
     {
-        $this->environment->setOptions(['table_prefix' => 'tbl_', 'adapter' => 'mysql']);
-        $this->assertInstanceOf('Phinx\Db\Adapter\TablePrefixAdapter', $this->environment->getAdapter());
-
-        $tablePrefixAdapter = $this->environment->getAdapter();
-        $this->assertInstanceOf('Phinx\Db\Adapter\MysqlAdapter', $tablePrefixAdapter->getAdapter()->getAdapter());
+        $this->environment->setOptions(array_merge(['adapter' => 'mysql'], $opts));
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Automatic table prefix/suffix option is no longer supported');
+        $this->environment->getAdapter();
     }
 
     public function testSchemaName()

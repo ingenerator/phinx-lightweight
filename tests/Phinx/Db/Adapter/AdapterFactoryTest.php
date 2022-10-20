@@ -3,6 +3,7 @@
 namespace Test\Phinx\Db\Adapter;
 
 use Phinx\Db\Adapter\AdapterFactory;
+use Phinx\Db\Adapter\TimedOutputAdapter;
 use PHPUnit\Framework\TestCase;
 
 class AdapterFactoryTest extends TestCase
@@ -90,9 +91,9 @@ class AdapterFactoryTest extends TestCase
 
     public function testGetWrapper()
     {
-        $wrapper = $this->factory->getWrapper('prefix', $this->getAdapterMock());
+        $wrapper = $this->factory->getWrapper('timed', $this->getAdapterMock());
 
-        $this->assertInstanceOf('Phinx\Db\Adapter\TablePrefixAdapter', $wrapper);
+        $this->assertInstanceOf(TimedOutputAdapter::class, $wrapper);
     }
 
     public function testGetWrapperFailure()

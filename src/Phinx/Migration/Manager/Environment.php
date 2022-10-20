@@ -344,8 +344,16 @@ class Environment
 
         // Use the TablePrefixAdapter if table prefix/suffixes are in use
         if ($adapter->hasOption('table_prefix') || $adapter->hasOption('table_suffix')) {
-            $adapter = AdapterFactory::instance()
-                ->getWrapper('prefix', $adapter);
+            throw new \InvalidArgumentException(
+                <<<TEXT
+                Automatic table prefix/suffix option is no longer supported.
+
+                We advise against automagically modifying table names (this never worked with raw sql statements
+                anyway). Specify the explicit table names you need in your migration files. If you absolutely
+                need to apply a variation based on environment, you should implement this yourself e.g. by setting
+                a process environment variable and reading it in your migration files as required.
+                TEXT
+            );
         }
 
         $this->setAdapter($adapter);
