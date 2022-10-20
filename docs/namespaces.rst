@@ -106,10 +106,9 @@ The non-namespaced file in <project-root>/db/migrations may look like the follow
 
         class CreateUserTable extends AbstractMigration
         {
-            public function change()
+            public function up()
             {
-                $table = $this->table('users');
-                $table->addColumn('name', 'string')->create();
+                // Do something
             }
         }
 
@@ -126,10 +125,9 @@ Whereas the namespaced file will be found in <project-root>/src/FoorBar/db/migra
 
         class CreateUserTable extends AbstractMigration
         {
-            public function change()
+            public function up()
             {
-                $table = $this->table('users');
-                $table->addColumn('name', 'string')->create();
+                // Do something
             }
         }
 
