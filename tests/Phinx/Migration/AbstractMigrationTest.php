@@ -2,6 +2,7 @@
 
 namespace Test\Phinx\Migration;
 
+use Phinx\Db\Adapter\MysqlAdapter;
 use PHPUnit\Framework\TestCase;
 
 class AbstractMigrationTest extends TestCase
@@ -210,6 +211,37 @@ class AbstractMigrationTest extends TestCase
                 ['id' => 3, 'different_column' => 'foo'],
             ]
         );
+    }
+
+    public function testPrepareAndExecute()
+    {
+        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
+
+        $pdoStub = $this->getMockBuilder(\PDO::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $statementStub = $this->getMockBuilder(\PDOStatement::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+
+        $pdoStub->expects($this->once())
+            ->method('prepare')
+            ->with('UPDATE foo SET bar = :bax WHERE id=:id')
+            ->willReturn($statementStub);
+
+        $statementStub->expects($this->once())
+            ->method('execute')
+            ->with(['bax' => 'any', 'id' => 15]);
+
+        $migrationStub->setAdapter(
+            new class ($pdoStub) extends MysqlAdapter {
+                public function __construct(\PDO $connection) { $this->connection = $connection; }
+            }
+        );
+
+        $migrationStub->prepareAndExecute('UPDATE foo SET bar = :bax WHERE id=:id', ['bax' => 'any', 'id' => 15]);
     }
 
 }

@@ -272,4 +272,9 @@ abstract class AbstractMigration implements MigrationInterface
         $this->getAdapter()->bulkinsert($table, $rows);
     }
 
+    public function prepareAndExecute(string $sql, array $params): void
+    {
+        $this->getAdapter()->getConnection()->prepare($sql)->execute($params);
+    }
+
 }

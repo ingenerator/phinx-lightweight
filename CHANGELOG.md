@@ -18,6 +18,7 @@
   end-user autocompletion. Note that these now tie to PDO objects/interfaces in many cases.
 * `fetchAll` and `fetchRow` now always return query results as **associative** arrays, not PDO::FETCH_BOTH which was the
   old default.
+* Added `->prepareAndExecute` method for migrations to simplify using prepared statements.
 
 **0.9.2** (Saturday, 23 December 2017)
 * Pull requests
