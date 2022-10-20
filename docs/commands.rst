@@ -6,33 +6,6 @@ Commands
 
 Phinx is run using a number of commands.
 
-The Breakpoint Command
-----------------------
-
-The Breakpoint command is used to set breakpoints, allowing you to limit
-rollbacks. You can toggle the breakpoint of the most recent migration by
-not supplying any parameters.
-
-.. code-block:: bash
-
-        $ phinx breakpoint -e development
-
-To toggle a breakpoint on a specific version then use the ``--target``
-parameter or ``-t`` for short.
-
-.. code-block:: bash
-
-        $ phinx breakpoint -e development -t 20120103083322
-
-You can remove all the breakpoints by using the ``--remove-all`` parameter
-or ``-r`` for short.
-
-.. code-block:: bash
-
-        $ phinx breakpoint -e development -r
-
-Breakpoints are visible when you run the ``status`` command.
-
 The Create Command
 ------------------
 
@@ -145,13 +118,6 @@ parameter or ``-d`` for short.
         $ phinx rollback -e development -d 201201031205
         $ phinx rollback -e development -d 20120103120530
 
-If a breakpoint is set, blocking further rollbacks, you can override the
-breakpoint using the ``--force`` parameter or ``-f`` for short.
-
-.. code-block:: bash
-
-        $ phinx rollback -e development -t 0 -f
-
 Use ``--dry-run`` to print the queries to standard output without executing them
 
 .. code-block:: bash
@@ -160,8 +126,8 @@ Use ``--dry-run`` to print the queries to standard output without executing them
 
 .. note::
 
-        When rolling back, Phinx orders the executed migrations using 
-        the order specified in the ``version_order`` option of your 
+        When rolling back, Phinx orders the executed migrations using
+        the order specified in the ``version_order`` option of your
         ``phinx.yml`` file.
         Please see the :doc:`Configuration <configuration>` chapter for more information.
 
@@ -299,7 +265,7 @@ Phinx can be used within your unit tests to prepare or seed the database. You ca
           $app->run(new StringInput('migrate'), new NullOutput());
         }
 
-If you use a memory database, you'll need to give Phinx a specific PDO instance. You can interact with Phinx directly using the Manager class : 
+If you use a memory database, you'll need to give Phinx a specific PDO instance. You can interact with Phinx directly using the Manager class :
 
 .. code-block:: php
 
@@ -311,7 +277,7 @@ If you use a memory database, you'll need to give Phinx a specific PDO instance.
         use Symfony\Component\Console\Output\NullOutput;
 
         class DatabaseTestCase extends TestCase {
-                
+
             public function setUp ()
             {
                 $pdo = new PDO('sqlite::memory:', null, null, [

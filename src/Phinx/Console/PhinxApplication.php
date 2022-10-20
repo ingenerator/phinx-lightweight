@@ -59,7 +59,6 @@ class PhinxApplication extends Application
             new Command\Create(),
             new Command\Migrate(),
             new Command\Status(),
-            new Command\Breakpoint(),
             new Command\Test(),
             new Command\SeedCreate(),
             new Command\SeedRun(),

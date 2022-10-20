@@ -202,10 +202,6 @@ class Manager
                     $migration->getName()
                 ));
 
-                if ($version && $version['breakpoint']) {
-                    $output->writeln('         <error>BREAKPOINT SET</error>');
-                }
-
                 $migrations[] = ['migration_status' => trim(strip_tags($status)), 'migration_id' => sprintf('%14.0f', $migration->getVersion()), 'migration_name' => $migration->getName()];
                 unset($versions[$migration->getVersion()]);
             }
@@ -264,9 +260,6 @@ class Manager
             str_pad($version['migration_name'], $maxNameLength, ' ')
         ));
 
-        if ($version && $version['breakpoint']) {
-            $this->getOutput()->writeln('         <error>BREAKPOINT SET</error>');
-        }
     }
 
     /**
@@ -807,60 +800,4 @@ class Manager
         return $this->config;
     }
 
-    /**
-     * Toggles the breakpoint for a specific version.
-     *
-     * @param string $environment
-     * @param int $version
-     * @return void
-     */
-    public function toggleBreakpoint($environment, $version)
-    {
-        $migrations = $this->getMigrations();
-        $this->getMigrations();
-        $env = $this->getEnvironment($environment);
-        $versions = $env->getVersionLog();
-
-        if (empty($versions) || empty($migrations)) {
-            return;
-        }
-
-        if ($version === null) {
-            $lastVersion = end($versions);
-            $version = $lastVersion['version'];
-        }
-
-        if (0 != $version && !isset($migrations[$version])) {
-            $this->output->writeln(sprintf(
-                '<comment>warning</comment> %s is not a valid version',
-                $version
-            ));
-
-            return;
-        }
-
-        $env->getAdapter()->toggleBreakpoint($migrations[$version]);
-
-        $versions = $env->getVersionLog();
-
-        $this->getOutput()->writeln(
-            ' Breakpoint ' . ($versions[$version]['breakpoint'] ? 'set' : 'cleared') .
-            ' for <info>' . $version . '</info>' .
-            ' <comment>' . $migrations[$version]->getName() . '</comment>'
-        );
-    }
-
-    /**
-     * Remove all breakpoints
-     *
-     * @param string $environment
-     * @return void
-     */
-    public function removeBreakpoints($environment)
-    {
-        $this->getOutput()->writeln(sprintf(
-            ' %d breakpoints cleared.',
-            $this->getEnvironment($environment)->getAdapter()->resetAllBreakpoints()
-        ));
-    }
 }

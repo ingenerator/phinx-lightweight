@@ -288,45 +288,6 @@ class ManagerTest extends TestCase
         $this->assertMatchesRegularExpression('/up  20160116183504  2016-01-16 18:35:40  2016-01-16 18:35:41  Foo\\\\Bar\\\\TestMigration2/', $outputStr);
     }
 
-    public function testPrintStatusMethodWithBreakpointSet()
-    {
-        // stub environment
-        $envStub = $this->getMockBuilder('\Phinx\Migration\Manager\Environment')
-            ->setConstructorArgs(['mockenv', []])
-            ->getMock();
-        $envStub->expects($this->once())
-                ->method('getVersionLog')
-                ->will($this->returnValue(
-                    [
-                        '20120111235330' =>
-                            [
-                                'version' => '20120111235330',
-                                'start_time' => '2012-01-11 23:53:36',
-                                'end_time' => '2012-01-11 23:53:37',
-                                'migration_name' => '',
-                                'breakpoint' => '1',
-                            ],
-                        '20120116183504' =>
-                            [
-                                'version' => '20120116183504',
-                                'start_time' => '2012-01-16 18:35:40',
-                                'end_time' => '2012-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                    ]
-                ));
-
-        $this->manager->setEnvironments(['mockenv' => $envStub]);
-        $this->manager->getOutput()->setDecorated(false);
-        $return = $this->manager->printStatus('mockenv');
-        $this->assertEquals(0, $return);
-
-        rewind($this->manager->getOutput()->getStream());
-        $outputStr = stream_get_contents($this->manager->getOutput()->getStream());
-        $this->assertMatchesRegularExpression('/BREAKPOINT SET/', $outputStr);
-    }
-
     public function testPrintStatusMethodWithNoMigrations()
     {
         // stub environment
@@ -682,46 +643,6 @@ class ManagerTest extends TestCase
         );
     }
 
-    public function testPrintStatusMethodWithMissingMigrationsAndBreakpointSet()
-    {
-        // stub environment
-        $envStub = $this->getMockBuilder('\Phinx\Migration\Manager\Environment')
-            ->setConstructorArgs(['mockenv', []])
-            ->getMock();
-        $envStub->expects($this->once())
-                ->method('getVersionLog')
-                ->will($this->returnValue(
-                    [
-                        '20120103083300' =>
-                            [
-                                'version' => '20120103083300',
-                                'start_time' => '2012-01-11 23:53:36',
-                                'end_time' => '2012-01-11 23:53:37',
-                                'migration_name' => '',
-                                'breakpoint' => '1',
-                            ],
-                        '20120815145812' =>
-                            [
-                                'version' => '20120815145812',
-                                'start_time' => '2012-01-16 18:35:40',
-                                'end_time' => '2012-01-16 18:35:41',
-                                'migration_name' => 'Example',
-                                'breakpoint' => '0',
-                            ],
-                    ]
-                ));
-
-        $this->manager->setEnvironments(['mockenv' => $envStub]);
-        $this->manager->getOutput()->setDecorated(false);
-        $return = $this->manager->printStatus('mockenv');
-        $this->assertEquals(Manager::EXIT_STATUS_MISSING, $return);
-
-        rewind($this->manager->getOutput()->getStream());
-        $outputStr = stream_get_contents($this->manager->getOutput()->getStream());
-        $this->assertMatchesRegularExpression('/up  20120103083300  2012-01-11 23:53:36  2012-01-11 23:53:37  *\*\* MISSING \*\*/', $outputStr);
-        $this->assertMatchesRegularExpression('/BREAKPOINT SET/', $outputStr);
-        $this->assertMatchesRegularExpression('/up  20120815145812  2012-01-16 18:35:40  2012-01-16 18:35:41  Example   *\*\* MISSING \*\*/', $outputStr);
-    }
 
     public function testPrintStatusMethodWithDownMigrations()
     {
@@ -1419,97 +1340,6 @@ class ManagerTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The environment "invalidenv" does not exist');
         $this->manager->getEnvironment('invalidenv');
-    }
-
-    public function testBreakpointsOperateAsExpected()
-    {
-        if (!defined('MYSQL_DB_CONFIG')) {
-            $this->markTestSkipped('Mysql tests disabled. See MYSQL_DB_CONFIG constant.');
-        }
-        $configArray = $this->getConfigArray();
-        $adapter = $this->manager->getEnvironment('production')->getAdapter();
-
-        $config = new Config($configArray);
-
-        // ensure the database is empty
-        $adapter->dropDatabase(MYSQL_DB_CONFIG['name']);
-        $adapter->createDatabase(MYSQL_DB_CONFIG['name']);
-        $adapter->disconnect();
-
-        // migrate to the latest version
-        $this->manager->setConfig($config);
-        $this->manager->migrate('production');
-
-        $versions = $this->manager->getEnvironment('production')->getVersionLog();
-        $lastVersion = end($versions);
-
-        // Wait until the second has changed.
-        $now = time();
-        while ($now == time()) {
-        }
-
-        // set breakpoint on most recent migration
-        $this->manager->toggleBreakpoint('production', null);
-
-        // ensure breakpoint is set
-        $versions = $this->manager->getEnvironment('production')->getVersionLog();
-        $currentVersion = end($versions);
-        $this->assertEquals(1, $currentVersion['breakpoint']);
-
-        // ensure no other data has changed.
-        foreach ($lastVersion as $key => $value) {
-            if (!is_numeric($key) && $key != 'breakpoint') {
-                $this->assertEquals($value, $currentVersion[$key]);
-            }
-        }
-
-        // Wait until the second has changed.
-        $now = time();
-        while ($now == time()) {
-        }
-
-        // reset all breakpoints
-        $this->manager->removeBreakpoints('production');
-
-        // ensure breakpoint is not set
-        $versions = $this->manager->getEnvironment('production')->getVersionLog();
-        $this->assertEquals(0, end($versions)['breakpoint']);
-
-        // ensure no other data has changed.
-        foreach ($lastVersion as $key => $value) {
-            if (!is_numeric($key) && $key != 'breakpoint') {
-                $this->assertEquals($value, $currentVersion[$key]);
-            }
-        }
-    }
-
-    public function testBreakpointWithInvalidVersion()
-    {
-        if (!defined('MYSQL_DB_CONFIG')) {
-            $this->markTestSkipped('Mysql tests disabled. See MYSQL_DB_CONFIG constant.');
-        }
-        $configArray = $this->getConfigArray();
-        $adapter = $this->manager->getEnvironment('production')->getAdapter();
-
-        $config = new Config($configArray);
-
-        // ensure the database is empty
-        $adapter->dropDatabase(MYSQL_DB_CONFIG['name']);
-        $adapter->createDatabase(MYSQL_DB_CONFIG['name']);
-        $adapter->disconnect();
-
-        // migrate to the latest version
-        $this->manager->setConfig($config);
-        $this->manager->migrate('production');
-        $this->manager->getOutput()->setDecorated(false);
-
-        // set breakpoint on most recent migration
-        $this->manager->toggleBreakpoint('production', 999);
-
-        rewind($this->manager->getOutput()->getStream());
-        $output = stream_get_contents($this->manager->getOutput()->getStream());
-
-        $this->assertStringContainsString('is not a valid version', $output);
     }
 
     public function setExpectedException($exceptionName, $exceptionMessage = '', $exceptionCode = null)
