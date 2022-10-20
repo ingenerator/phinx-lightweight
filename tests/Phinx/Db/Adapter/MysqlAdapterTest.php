@@ -24,8 +24,9 @@ class MysqlAdapterTest extends TestCase
         $this->adapter = new MysqlAdapter(MYSQL_DB_CONFIG, new ArrayInput([]), new NullOutput());
 
         // ensure the database is empty for each test
-        $this->adapter->dropDatabase(MYSQL_DB_CONFIG['name']);
-        $this->adapter->createDatabase(MYSQL_DB_CONFIG['name']);
+        $database_name = MYSQL_DB_CONFIG['name'];
+        $this->adapter->execute("DROP DATABASE IF EXISTS `$database_name`;");
+        $this->adapter->execute("CREATE DATABASE `$database_name`;");
 
         // leave the adapter in a disconnected state for each test
         $this->adapter->disconnect();
@@ -93,9 +94,10 @@ class MysqlAdapterTest extends TestCase
 
     public function testCreatingTheSchemaTableOnConnect()
     {
+        $schema_table_name = $this->adapter->getSchemaTableName();
         $this->adapter->connect();
         $this->assertTrue($this->adapter->hasTable($this->adapter->getSchemaTableName()));
-        $this->adapter->dropTable($this->adapter->getSchemaTableName());
+        $this->adapter->execute("DROP TABLE `$schema_table_name`;");
         $this->assertFalse($this->adapter->hasTable($this->adapter->getSchemaTableName()));
         $this->adapter->disconnect();
         $this->adapter->connect();
@@ -121,6 +123,14 @@ class MysqlAdapterTest extends TestCase
 
     public function testBulkInsertData()
     {
+        $this->adapter->execute(<<<SQL
+            CREATE TABLE `table1`(
+                `column1` VARCHAR(255),
+                `column2` INT,
+                `column3` VARCHAR(255) NOT NULL DEFAULT 'test'
+            );
+            SQL
+        );
         $data = [
             [
                 'column1' => 'value1',
@@ -135,14 +145,8 @@ class MysqlAdapterTest extends TestCase
                 'column2' => 3,
             ]
         ];
-        $table = new \Phinx\Db\Table('table1', [], $this->adapter);
-        $table->addColumn('column1', 'string')
-            ->addColumn('column2', 'integer')
-            ->addColumn('column3', 'string', ['default' => 'test'])
-            ->insert($data);
-        $this->adapter->createTable($table);
-        $this->adapter->bulkinsert($table, $table->getData());
-        $table->reset();
+
+        $this->adapter->bulkinsert('table1', $data);
 
         $rows = $this->adapter->fetchAll('SELECT * FROM table1');
         $this->assertEquals('value1', $rows[0]['column1']);
@@ -157,6 +161,15 @@ class MysqlAdapterTest extends TestCase
 
     public function testInsertData()
     {
+        $this->adapter->execute(<<<SQL
+            CREATE TABLE `table1`(
+                `column1` VARCHAR(255),
+                `column2` INT,
+                `column3` VARCHAR(255) NOT NULL DEFAULT 'test'
+            );
+            SQL
+        );
+
         $data = [
             [
                 'column1' => 'value1',
@@ -172,12 +185,10 @@ class MysqlAdapterTest extends TestCase
                 'column3' => 'foo',
             ]
         ];
-        $table = new \Phinx\Db\Table('table1', [], $this->adapter);
-        $table->addColumn('column1', 'string')
-            ->addColumn('column2', 'integer')
-            ->addColumn('column3', 'string', ['default' => 'test'])
-            ->insert($data)
-            ->save();
+
+        $this->adapter->insert('table1', $data[0]);
+        $this->adapter->insert('table1', $data[1]);
+        $this->adapter->insert('table1', $data[2]);
 
         $rows = $this->adapter->fetchAll('SELECT * FROM table1');
         $this->assertEquals('value1', $rows[0]['column1']);
