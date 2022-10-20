@@ -8,6 +8,6 @@ class $className extends $baseClassName
 
     public function up()
     {
-
+        throw new \BadMethodCallException('Implement '.__METHOD__);
     }
 }
