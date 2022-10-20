@@ -8,6 +8,11 @@ class $className extends $baseClassName
 
     public function up()
     {
+        $this->execute(
+            <<<SQL
+            /* Write your SQL here. One SQL statement per ->execute() call! */
+            SQL
+        );
         throw new \BadMethodCallException('Implement '.__METHOD__);
     }
 }
