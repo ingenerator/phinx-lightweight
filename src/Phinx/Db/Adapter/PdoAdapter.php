@@ -28,7 +28,6 @@
  */
 namespace Phinx\Db\Adapter;
 
-use BadMethodCallException;
 use Phinx\Db\Table;
 use Phinx\Migration\MigrationInterface;
 
@@ -315,22 +314,6 @@ abstract class PdoAdapter extends AbstractAdapter
                 $this->quoteColumnName('start_time')
             )
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSchema($schemaName = 'public')
-    {
-        throw new BadMethodCallException('Creating a schema is not supported');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropSchema($name)
-    {
-        throw new BadMethodCallException('Dropping a schema is not supported');
     }
 
     /**
