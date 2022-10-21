@@ -66,15 +66,6 @@ class AdapterFactory
     ];
 
     /**
-     * Class map of adapters wrappers, indexed by name.
-     *
-     * @var array
-     */
-    protected $wrappers = [
-        'timed' => 'Phinx\Db\Adapter\TimedOutputAdapter',
-    ];
-
-    /**
      * Add or replace an adapter with a fully qualified class name.
      *
      * @throws \RuntimeException
@@ -128,45 +119,6 @@ class AdapterFactory
         return new $class($options);
     }
 
-    /**
-     * Add or replace a wrapper with a fully qualified class name.
-     *
-     * @throws \RuntimeException
-     * @param  string $name
-     * @param  string $class
-     * @return $this
-     */
-    public function registerWrapper($name, $class)
-    {
-        if (!is_subclass_of($class, 'Phinx\Db\Adapter\WrapperInterface')) {
-            throw new \RuntimeException(sprintf(
-                'Wrapper class "%s" must be implement Phinx\\Db\\Adapter\\WrapperInterface',
-                $class
-            ));
-        }
-        $this->wrappers[$name] = $class;
-
-        return $this;
-    }
-
-    /**
-     * Get a wrapper class by name.
-     *
-     * @throws \RuntimeException
-     * @param  string $name
-     * @return string
-     */
-    protected function getWrapperClass($name)
-    {
-        if (empty($this->wrappers[$name])) {
-            throw new \RuntimeException(sprintf(
-                'Wrapper "%s" has not been registered',
-                $name
-            ));
-        }
-
-        return $this->wrappers[$name];
-    }
 
     /**
      * Get a wrapper instance by name.

@@ -3,7 +3,6 @@
 namespace Test\Phinx\Db\Adapter;
 
 use Phinx\Db\Adapter\AdapterFactory;
-use Phinx\Db\Adapter\TimedOutputAdapter;
 use PHPUnit\Framework\TestCase;
 
 class AdapterFactoryTest extends TestCase
@@ -63,43 +62,4 @@ class AdapterFactoryTest extends TestCase
         $this->factory->getAdapter('bad', []);
     }
 
-    public function testRegisterWrapper()
-    {
-        // WrapperFactory::getClass is protected, work around it to avoid
-        // creating unnecessary instances and making the test more complex.
-        $method = new \ReflectionMethod(get_class($this->factory), 'getWrapperClass');
-        $method->setAccessible(true);
-
-        $wrapper = $method->invoke($this->factory, 'timed');
-        $this->factory->registerWrapper('test', $wrapper);
-
-        $this->assertEquals($wrapper, $method->invoke($this->factory, 'test'));
-    }
-
-    public function testRegisterWrapperFailure()
-    {
-        $wrapper = get_class($this);
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Wrapper class "Test\Phinx\Db\Adapter\AdapterFactoryTest" must be implement Phinx\Db\Adapter\WrapperInterface');
-        $this->factory->registerWrapper('test', $wrapper);
-    }
-
-    private function getAdapterMock()
-    {
-        return $this->getMockBuilder('Phinx\Db\Adapter\AdapterInterface')->getMock();
-    }
-
-    public function testGetWrapper()
-    {
-        $wrapper = $this->factory->getWrapper('timed', $this->getAdapterMock());
-
-        $this->assertInstanceOf(TimedOutputAdapter::class, $wrapper);
-    }
-
-    public function testGetWrapperFailure()
-    {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Wrapper "nope" has not been registered');
-        $this->factory->getWrapper('nope', $this->getAdapterMock());
-    }
 }

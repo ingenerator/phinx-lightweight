@@ -1,6 +1,14 @@
 # Version History
 
-**1.0.0** (DATE DATE DATE)
+** UNRELEASED **
+
+* Remove support for 'wrapping' database adapters, and the `TimedOutputAdapter`. The timed adapter was the only
+  remaining implementation of this proxy pattern, and was only actually printing statistics for `insert()` operations.
+  This was not that useful, and the overhead (e.g. on identifying dead code / improving type safety / adding to
+  adapters in future) of the proxy pattern was quite high relative to the benefit. You can, of course, implement and
+  register your own adapter class as a proxy if you need it.
+
+**1.0.0 BETA** (2022-10-21)
 
 * First release of the phinx-lightweight forked library
 * Removed support for all database platforms/drivers other than MySQL over PDO
