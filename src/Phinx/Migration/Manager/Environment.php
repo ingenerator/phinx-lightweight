@@ -299,12 +299,8 @@ class Environment
         $adapter = $factory
             ->getAdapter($this->options['adapter'], $this->options);
 
-        // Automatically time the executed commands
-        $adapter = $factory->getWrapper('timed', $adapter);
-
         if (isset($this->options['wrapper'])) {
-            $adapter = $factory
-                ->getWrapper($this->options['wrapper'], $adapter);
+            throw new \InvalidArgumentException('The `wrapper` option has been removed');
         }
 
         if ($this->getInput()) {
