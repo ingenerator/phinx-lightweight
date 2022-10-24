@@ -1,6 +1,6 @@
 # Version History
 
-** UNRELEASED **
+** 1.0.0 ** (2022-10-24)
 
 * Add a `SqlDumpImporter` utility class to have a migration load in statements from a standard SQL dump file.
 * Remove support for 'wrapping' database adapters, and the `TimedOutputAdapter`. The timed adapter was the only
