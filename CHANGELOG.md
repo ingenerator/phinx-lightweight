@@ -1,7 +1,8 @@
 # Version History
 
-** UNRELEASED **
+** 1.0.0 ** (2022-10-24)
 
+* Add a `SqlDumpImporter` utility class to have a migration load in statements from a standard SQL dump file.
 * Remove support for 'wrapping' database adapters, and the `TimedOutputAdapter`. The timed adapter was the only
   remaining implementation of this proxy pattern, and was only actually printing statistics for `insert()` operations.
   This was not that useful, and the overhead (e.g. on identifying dead code / improving type safety / adding to
