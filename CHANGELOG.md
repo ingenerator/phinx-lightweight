@@ -1,5 +1,9 @@
 # Version History
 
+** 1.0.1 ** (2023-07-27)
+
+* Upgrade to symfony console v5.4
+
 ** 1.0.0 ** (2022-10-24)
 
 * Add a `SqlDumpImporter` utility class to have a migration load in statements from a standard SQL dump file.
