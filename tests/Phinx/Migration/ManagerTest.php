@@ -7,6 +7,7 @@ use Phinx\Migration\Manager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use function defined;
@@ -922,7 +923,7 @@ class ManagerTest extends TestCase
  */
 class RawBufferedOutput extends \Symfony\Component\Console\Output\BufferedOutput
 {
-    public function writeln($messages, $options = self::OUTPUT_RAW)
+    public function writeln($messages, $options = self::OUTPUT_RAW): void
     {
         $this->write($messages, true, $options);
     }
