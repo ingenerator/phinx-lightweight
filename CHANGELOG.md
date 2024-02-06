@@ -1,5 +1,11 @@
 # Version History
 
+** 1.1.0 ** (2024-02-05)
+
+* Support symfony/console, symfony/config and symfony/yaml at ^7.0. Not advertising support for intermediate versions
+  at this point as we'd really need then to run a matrix build with every symfony series and it will be much simpler to
+  bump past unless required.
+
 ** 1.0.1 ** (2023-07-27)
 
 * Upgrade to symfony console v5.4
