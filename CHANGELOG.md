@@ -1,5 +1,9 @@
 # Version History
 
+** 1.2.0 ** (2024-09-25)
+
+* Support PHP 8.3
+
 ** 1.1.0 ** (2024-02-05)
 
 * Support symfony/console, symfony/config and symfony/yaml at ^7.0. Not advertising support for intermediate versions
