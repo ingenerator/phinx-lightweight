@@ -1,5 +1,9 @@
 # Version History
 
+** UNRELEASED **
+
+* Support PHP 8.4
+
 ** 1.2.0 ** (2024-09-25)
 
 * Support PHP 8.3
