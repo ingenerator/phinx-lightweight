@@ -72,7 +72,7 @@ abstract class AbstractMigration implements MigrationInterface
      * @param \Symfony\Component\Console\Input\InputInterface|null   $input
      * @param \Symfony\Component\Console\Output\OutputInterface|null $output
      */
-    final public function __construct($version, InputInterface $input = NULL, OutputInterface $output = NULL)
+    final public function __construct($version, ?InputInterface $input = NULL, ?OutputInterface $output = NULL)
     {
         $this->version = $version;
         if ( ! is_null($input)) {
