@@ -2,6 +2,10 @@
 
 ** UNRELEASED **
 
+** 1.4.0 ** (2026-02-11)
+
+* Support PHP 8.5 by @skydiablo in #9
+
 ** 1.3.1 ** (2025-07-23)
 
 * Fix deprecated implicit nullable parameters
