@@ -2,6 +2,7 @@
 
 ** UNRELEASED **
 
+* Update to PHPUnit 13
 * Drop support for PHP 8.2 and PHP 8.3
 
 ** 1.4.0 ** (2026-02-11)

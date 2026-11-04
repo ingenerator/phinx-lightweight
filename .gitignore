@@ -32,7 +32,6 @@ docs/_build
 vendor
 
 # this is user specific settings for running phpunit to override the defaults in phpunit.xml.dist
-phpunit.xml
 .phpunit.result.cache
 
 # sqlite test database

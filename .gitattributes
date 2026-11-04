@@ -18,4 +18,4 @@
 /Dockerfile export-ignore
 /phpcs.xml.dist export-ignore
 /phpstan.neon export-ignore
-/phpunit.xml.dist export-ignore
+/phpunit.xml export-ignore
