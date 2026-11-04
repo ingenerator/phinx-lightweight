@@ -2,47 +2,41 @@
 
 namespace Test\Phinx\Config;
 
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\Group;
+use RuntimeException;
 use Phinx\Config\Config;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class ConfigYamlTest
  * @package Test\Phinx\Config
- * @group config
  */
+#[CoversMethod(\Phinx\Config\Config::class, 'fromYaml')]
+#[CoversMethod(\Phinx\Config\Config::class, 'getDefaultEnvironment')]
+#[Group('config')]
 class ConfigYamlTest extends TestCase
 {
-    /**
-     * @covers \Phinx\Config\Config::fromYaml
-     * @covers \Phinx\Config\Config::getDefaultEnvironment
-     */
     public function testGetDefaultEnvironmentWithAnEmptyYamlFile()
     {
         // test using a Yaml file with no key or entries
         $path = __DIR__ . '/_files';
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $config = Config::fromYaml($path . '/empty.yml');
         $config->getDefaultEnvironment();
     }
 
-    /**
-     * @covers \Phinx\Config\Config::fromYaml
-     * @covers \Phinx\Config\Config::getDefaultEnvironment
-     */
     public function testGetDefaultEnvironmentWithAMissingEnvironmentEntry()
     {
         // test using a Yaml file with a 'default_database' key, but without a
         // corresponding entry
         $path = __DIR__ . '/_files';
         $config = Config::fromYaml($path . '/missing_environment_entry.yml');
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage("The environment configuration for 'staging' is missing");
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIsOrContains("The environment configuration for 'staging' is missing");
         $config->getDefaultEnvironment();
     }
 
-    /**
-     * @covers \Phinx\Config\Config::getDefaultEnvironment
-     */
     public function testGetDefaultEnvironmentMethod()
     {
         $path = __DIR__ . '/_files';

@@ -2,12 +2,16 @@
 
 namespace Test\Phinx\Migration;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use RuntimeException;
+use DateTime;
+use InvalidArgumentException;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Phinx\Config\Config;
 use Phinx\Migration\Manager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use function defined;
@@ -130,26 +134,24 @@ class ManagerTest extends TestCase
             ->getMock();
         $envStub->expects($this->once())
                 ->method('getVersionLog')
-                ->will($this->returnValue(
-                    [
-                        '20120111235330' =>
-                            [
-                                'version' => '20120111235330',
-                                'start_time' => '2012-01-11 23:53:36',
-                                'end_time' => '2012-01-11 23:53:37',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20120116183504' =>
-                            [
-                                'version' => '20120116183504',
-                                'start_time' => '2012-01-16 18:35:40',
-                                'end_time' => '2012-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                    ]
-                ));
+                ->willReturn([
+                    '20120111235330' =>
+                        [
+                            'version' => '20120111235330',
+                            'start_time' => '2012-01-11 23:53:36',
+                            'end_time' => '2012-01-11 23:53:37',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20120116183504' =>
+                        [
+                            'version' => '20120116183504',
+                            'start_time' => '2012-01-16 18:35:40',
+                            'end_time' => '2012-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                ]);
 
         $this->manager->setEnvironments(['mockenv' => $envStub]);
         $this->manager->getOutput()->setDecorated(false);
@@ -170,26 +172,24 @@ class ManagerTest extends TestCase
             ->getMock();
         $envStub->expects($this->once())
                 ->method('getVersionLog')
-                ->will($this->returnValue(
-                    [
-                        '20160111235330' =>
-                            [
-                                'version' => '20160111235330',
-                                'start_time' => '2016-01-11 23:53:36',
-                                'end_time' => '2016-01-11 23:53:37',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20160116183504' =>
-                            [
-                                'version' => '20160116183504',
-                                'start_time' => '2016-01-16 18:35:40',
-                                'end_time' => '2016-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                    ]
-                ));
+                ->willReturn([
+                    '20160111235330' =>
+                        [
+                            'version' => '20160111235330',
+                            'start_time' => '2016-01-11 23:53:36',
+                            'end_time' => '2016-01-11 23:53:37',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20160116183504' =>
+                        [
+                            'version' => '20160116183504',
+                            'start_time' => '2016-01-16 18:35:40',
+                            'end_time' => '2016-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                ]);
 
         $this->manager->setEnvironments(['mockenv' => $envStub]);
         $this->manager->getOutput()->setDecorated(false);
@@ -211,58 +211,56 @@ class ManagerTest extends TestCase
             ->getMock();
         $envStub->expects($this->once())
                 ->method('getVersionLog')
-                ->will($this->returnValue(
-                    [
-                        '20120111235330' =>
-                            [
-                                'version' => '20120111235330',
-                                'start_time' => '2012-01-11 23:53:36',
-                                'end_time' => '2012-01-11 23:53:37',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20120116183504' =>
-                            [
-                                'version' => '20120116183504',
-                                'start_time' => '2012-01-16 18:35:40',
-                                'end_time' => '2012-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20150111235330' =>
-                            [
-                                'version' => '20150111235330',
-                                'start_time' => '2015-01-11 23:53:36',
-                                'end_time' => '2015-01-11 23:53:37',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20150116183504' =>
-                            [
-                                'version' => '20150116183504',
-                                'start_time' => '2015-01-16 18:35:40',
-                                'end_time' => '2015-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20160111235330' =>
-                            [
-                                'version' => '20160111235330',
-                                'start_time' => '2016-01-11 23:53:36',
-                                'end_time' => '2016-01-11 23:53:37',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20160116183504' =>
-                            [
-                                'version' => '20160116183504',
-                                'start_time' => '2016-01-16 18:35:40',
-                                'end_time' => '2016-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                    ]
-                ));
+                ->willReturn([
+                    '20120111235330' =>
+                        [
+                            'version' => '20120111235330',
+                            'start_time' => '2012-01-11 23:53:36',
+                            'end_time' => '2012-01-11 23:53:37',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20120116183504' =>
+                        [
+                            'version' => '20120116183504',
+                            'start_time' => '2012-01-16 18:35:40',
+                            'end_time' => '2012-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20150111235330' =>
+                        [
+                            'version' => '20150111235330',
+                            'start_time' => '2015-01-11 23:53:36',
+                            'end_time' => '2015-01-11 23:53:37',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20150116183504' =>
+                        [
+                            'version' => '20150116183504',
+                            'start_time' => '2015-01-16 18:35:40',
+                            'end_time' => '2015-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20160111235330' =>
+                        [
+                            'version' => '20160111235330',
+                            'start_time' => '2016-01-11 23:53:36',
+                            'end_time' => '2016-01-11 23:53:37',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20160116183504' =>
+                        [
+                            'version' => '20160116183504',
+                            'start_time' => '2016-01-16 18:35:40',
+                            'end_time' => '2016-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                ]);
 
         $this->manager->setEnvironments(['mockenv' => $envStub]);
         $this->manager->getOutput()->setDecorated(false);
@@ -311,26 +309,24 @@ class ManagerTest extends TestCase
             ->getMock();
         $envStub->expects($this->once())
                 ->method('getVersionLog')
-                ->will($this->returnValue(
-                    [
-                        '20120103083300' =>
-                            [
-                                'version' => '20120103083300',
-                                'start_time' => '2012-01-11 23:53:36',
-                                'end_time' => '2012-01-11 23:53:37',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20120815145812' =>
-                            [
-                                'version' => '20120815145812',
-                                'start_time' => '2012-01-16 18:35:40',
-                                'end_time' => '2012-01-16 18:35:41',
-                                'migration_name' => 'Example',
-                                'breakpoint' => '0',
-                            ],
-                    ]
-                ));
+                ->willReturn([
+                    '20120103083300' =>
+                        [
+                            'version' => '20120103083300',
+                            'start_time' => '2012-01-11 23:53:36',
+                            'end_time' => '2012-01-11 23:53:37',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20120815145812' =>
+                        [
+                            'version' => '20120815145812',
+                            'start_time' => '2012-01-16 18:35:40',
+                            'end_time' => '2012-01-16 18:35:41',
+                            'migration_name' => 'Example',
+                            'breakpoint' => '0',
+                        ],
+                ]);
 
         $this->manager->setEnvironments(['mockenv' => $envStub]);
         $this->manager->getOutput()->setDecorated(false);
@@ -355,26 +351,24 @@ class ManagerTest extends TestCase
             ->getMock();
         $envStub->expects($this->once())
                 ->method('getVersionLog')
-                ->will($this->returnValue(
-                    [
-                        '20160103083300' =>
-                            [
-                                'version' => '20160103083300',
-                                'start_time' => '2016-01-11 23:53:36',
-                                'end_time' => '2016-01-11 23:53:37',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20160815145812' =>
-                            [
-                                'version' => '20160815145812',
-                                'start_time' => '2016-01-16 18:35:40',
-                                'end_time' => '2016-01-16 18:35:41',
-                                'migration_name' => 'Example',
-                                'breakpoint' => '0',
-                            ],
-                    ]
-                ));
+                ->willReturn([
+                    '20160103083300' =>
+                        [
+                            'version' => '20160103083300',
+                            'start_time' => '2016-01-11 23:53:36',
+                            'end_time' => '2016-01-11 23:53:37',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20160815145812' =>
+                        [
+                            'version' => '20160815145812',
+                            'start_time' => '2016-01-16 18:35:40',
+                            'end_time' => '2016-01-16 18:35:41',
+                            'migration_name' => 'Example',
+                            'breakpoint' => '0',
+                        ],
+                ]);
 
         $this->manager->setEnvironments(['mockenv' => $envStub]);
         $this->manager->getOutput()->setDecorated(false);
@@ -400,26 +394,24 @@ class ManagerTest extends TestCase
             ->getMock();
         $envStub->expects($this->once())
                 ->method('getVersionLog')
-                ->will($this->returnValue(
-                    [
-                        '20160103083300' =>
-                            [
-                                'version' => '20160103083300',
-                                'start_time' => '2016-01-11 23:53:36',
-                                'end_time' => '2016-01-11 23:53:37',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20160815145812' =>
-                            [
-                                'version' => '20160815145812',
-                                'start_time' => '2016-01-16 18:35:40',
-                                'end_time' => '2016-01-16 18:35:41',
-                                'migration_name' => 'Example',
-                                'breakpoint' => '0',
-                            ],
-                    ]
-                ));
+                ->willReturn([
+                    '20160103083300' =>
+                        [
+                            'version' => '20160103083300',
+                            'start_time' => '2016-01-11 23:53:36',
+                            'end_time' => '2016-01-11 23:53:37',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20160815145812' =>
+                        [
+                            'version' => '20160815145812',
+                            'start_time' => '2016-01-16 18:35:40',
+                            'end_time' => '2016-01-16 18:35:41',
+                            'migration_name' => 'Example',
+                            'breakpoint' => '0',
+                        ],
+                ]);
 
         $this->manager->setEnvironments(['mockenv' => $envStub]);
         $this->manager->getOutput()->setDecorated(false);
@@ -449,34 +441,32 @@ class ManagerTest extends TestCase
             ->getMock();
         $envStub->expects($this->once())
                 ->method('getVersionLog')
-                ->will($this->returnValue(
-                    [
-                        '20120111235330' =>
-                            [
-                                'version' => '20120111235330',
-                                'start_time' => '2012-01-16 18:35:40',
-                                'end_time' => '2012-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => 0
-                            ],
-                        '20120116183504' =>
-                            [
-                                'version' => '20120116183504',
-                                'start_time' => '2012-01-16 18:35:40',
-                                'end_time' => '2012-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20120120145114' =>
-                            [
-                                'version' => '20120120145114',
-                                'start_time' => '2012-01-20 14:51:14',
-                                'end_time' => '2012-01-20 14:51:14',
-                                'migration_name' => 'Example',
-                                'breakpoint' => '0',
-                            ],
-                    ]
-                ));
+                ->willReturn([
+                    '20120111235330' =>
+                        [
+                            'version' => '20120111235330',
+                            'start_time' => '2012-01-16 18:35:40',
+                            'end_time' => '2012-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => 0
+                        ],
+                    '20120116183504' =>
+                        [
+                            'version' => '20120116183504',
+                            'start_time' => '2012-01-16 18:35:40',
+                            'end_time' => '2012-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20120120145114' =>
+                        [
+                            'version' => '20120120145114',
+                            'start_time' => '2012-01-20 14:51:14',
+                            'end_time' => '2012-01-20 14:51:14',
+                            'migration_name' => 'Example',
+                            'breakpoint' => '0',
+                        ],
+                ]);
 
         $this->manager->setEnvironments(['mockenv' => $envStub]);
         $this->manager->getOutput()->setDecorated(false);
@@ -500,34 +490,32 @@ class ManagerTest extends TestCase
             ->getMock();
         $envStub->expects($this->once())
                 ->method('getVersionLog')
-                ->will($this->returnValue(
-                    [
-                        '20160111235330' =>
-                            [
-                                'version' => '20160111235330',
-                                'start_time' => '2016-01-16 18:35:40',
-                                'end_time' => '2016-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => 0
-                            ],
-                        '20160116183504' =>
-                            [
-                                'version' => '20160116183504',
-                                'start_time' => '2016-01-16 18:35:40',
-                                'end_time' => '2016-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20160120145114' =>
-                            [
-                                'version' => '20160120145114',
-                                'start_time' => '2016-01-20 14:51:14',
-                                'end_time' => '2016-01-20 14:51:14',
-                                'migration_name' => 'Example',
-                                'breakpoint' => '0',
-                            ],
-                    ]
-                ));
+                ->willReturn([
+                    '20160111235330' =>
+                        [
+                            'version' => '20160111235330',
+                            'start_time' => '2016-01-16 18:35:40',
+                            'end_time' => '2016-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => 0
+                        ],
+                    '20160116183504' =>
+                        [
+                            'version' => '20160116183504',
+                            'start_time' => '2016-01-16 18:35:40',
+                            'end_time' => '2016-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20160120145114' =>
+                        [
+                            'version' => '20160120145114',
+                            'start_time' => '2016-01-20 14:51:14',
+                            'end_time' => '2016-01-20 14:51:14',
+                            'migration_name' => 'Example',
+                            'breakpoint' => '0',
+                        ],
+                ]);
 
         $this->manager->setEnvironments(['mockenv' => $envStub]);
         $this->manager->getOutput()->setDecorated(false);
@@ -552,66 +540,64 @@ class ManagerTest extends TestCase
             ->getMock();
         $envStub->expects($this->once())
                 ->method('getVersionLog')
-                ->will($this->returnValue(
-                    [
-                        '20120111235330' =>
-                            [
-                                'version' => '20120111235330',
-                                'start_time' => '2012-01-16 18:35:40',
-                                'end_time' => '2012-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => 0
-                            ],
-                        '20120116183504' =>
-                            [
-                                'version' => '20120116183504',
-                                'start_time' => '2012-01-16 18:35:40',
-                                'end_time' => '2012-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20150111235330' =>
-                            [
-                                'version' => '20150111235330',
-                                'start_time' => '2015-01-16 18:35:40',
-                                'end_time' => '2015-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => 0
-                            ],
-                        '20150116183504' =>
-                            [
-                                'version' => '20150116183504',
-                                'start_time' => '2015-01-16 18:35:40',
-                                'end_time' => '2015-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20160111235330' =>
-                            [
-                                'version' => '20160111235330',
-                                'start_time' => '2016-01-16 18:35:40',
-                                'end_time' => '2016-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => 0
-                            ],
-                        '20160116183504' =>
-                            [
-                                'version' => '20160116183504',
-                                'start_time' => '2016-01-16 18:35:40',
-                                'end_time' => '2016-01-16 18:35:41',
-                                'migration_name' => '',
-                                'breakpoint' => '0',
-                            ],
-                        '20170120145114' =>
-                            [
-                                'version' => '20170120145114',
-                                'start_time' => '2017-01-20 14:51:14',
-                                'end_time' => '2017-01-20 14:51:14',
-                                'migration_name' => 'Example',
-                                'breakpoint' => '0',
-                            ],
-                    ]
-                ));
+                ->willReturn([
+                    '20120111235330' =>
+                        [
+                            'version' => '20120111235330',
+                            'start_time' => '2012-01-16 18:35:40',
+                            'end_time' => '2012-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => 0
+                        ],
+                    '20120116183504' =>
+                        [
+                            'version' => '20120116183504',
+                            'start_time' => '2012-01-16 18:35:40',
+                            'end_time' => '2012-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20150111235330' =>
+                        [
+                            'version' => '20150111235330',
+                            'start_time' => '2015-01-16 18:35:40',
+                            'end_time' => '2015-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => 0
+                        ],
+                    '20150116183504' =>
+                        [
+                            'version' => '20150116183504',
+                            'start_time' => '2015-01-16 18:35:40',
+                            'end_time' => '2015-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20160111235330' =>
+                        [
+                            'version' => '20160111235330',
+                            'start_time' => '2016-01-16 18:35:40',
+                            'end_time' => '2016-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => 0
+                        ],
+                    '20160116183504' =>
+                        [
+                            'version' => '20160116183504',
+                            'start_time' => '2016-01-16 18:35:40',
+                            'end_time' => '2016-01-16 18:35:41',
+                            'migration_name' => '',
+                            'breakpoint' => '0',
+                        ],
+                    '20170120145114' =>
+                        [
+                            'version' => '20170120145114',
+                            'start_time' => '2017-01-20 14:51:14',
+                            'end_time' => '2017-01-20 14:51:14',
+                            'migration_name' => 'Example',
+                            'breakpoint' => '0',
+                        ],
+                ]);
 
         $this->manager->setEnvironments(['mockenv' => $envStub]);
         $this->manager->getOutput()->setDecorated(false);
@@ -638,11 +624,11 @@ class ManagerTest extends TestCase
     /**
      * Test that ensures the status header is correctly printed with regards to the version order
      *
-     * @dataProvider statusVersionOrderProvider
      *
      * @param array  $config
      * @param string $expectedStatusHeader
      */
+    #[DataProvider('statusVersionOrderProvider')]
     public function testPrintStatusMethodVersionOrderHeader($config, $expectedStatusHeader)
     {
         // stub environment
@@ -651,7 +637,7 @@ class ManagerTest extends TestCase
             ->getMock();
         $envStub->expects($this->once())
                 ->method('getVersionLog')
-                ->will($this->returnValue([]));
+                ->willReturn([]);
 
         $output = new RawBufferedOutput();
         $this->manager = new Manager($config, $this->input, $output);
@@ -707,8 +693,8 @@ class ManagerTest extends TestCase
         $this->manager = new Manager($config, $this->input, $this->output);
 
         $this->manager->setEnvironments(['mockenv' => $envStub]);
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Invalid version_order configuration option');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIsOrContains('Invalid version_order configuration option');
         $this->manager->printStatus('mockenv');
     }
 
@@ -828,13 +814,13 @@ class ManagerTest extends TestCase
      * Test that migrating by date chooses the correct
      * migration to point to.
      *
-     * @dataProvider migrateDateDataProvider
      *
      * @param array  $availableMigrations
      * @param string $dateString
      * @param string $expectedMigration
      * @param string $message
      */
+    #[DataProvider('migrateDateDataProvider')]
     public function testMigrationsByDate(array $availableMigrations, $dateString, $expectedMigration, $message)
     {
         // stub environment
@@ -847,10 +833,10 @@ class ManagerTest extends TestCase
         } else {
             $envStub->expects($this->once())
                     ->method('getVersions')
-                    ->will($this->returnValue($availableMigrations));
+                    ->willReturn($availableMigrations);
         }
         $this->manager->setEnvironments(['mockenv' => $envStub]);
-        $this->manager->migrateToDateTime('mockenv', new \DateTime($dateString));
+        $this->manager->migrateToDateTime('mockenv', new DateTime($dateString));
         rewind($this->manager->getOutput()->getStream());
         $output = stream_get_contents($this->manager->getOutput()->getStream());
         if (is_null($expectedMigration)) {
@@ -865,7 +851,7 @@ class ManagerTest extends TestCase
      *
      * @return array
      */
-    public function migrateDateDataProvider()
+    public static function migrateDateDataProvider()
     {
         return [
             [['20120111235330', '20120116183504'], '20120118', '20120116183504', 'Failed to migrate all migrations when migrate to date is later than all the migrations'],
@@ -899,8 +885,8 @@ class ManagerTest extends TestCase
 
     public function testGettingAnInvalidEnvironment()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The environment "invalidenv" does not exist');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageIsOrContains('The environment "invalidenv" does not exist');
         $this->manager->getEnvironment('invalidenv');
     }
 
@@ -909,7 +895,7 @@ class ManagerTest extends TestCase
         //PHPUnit 5+
         $this->expectException($exceptionName);
         if ($exceptionMessage !== '') {
-            $this->expectExceptionMessage($exceptionMessage);
+            $this->expectExceptionMessageIsOrContains($exceptionMessage);
         }
         if ($exceptionCode !== null) {
             $this->expectExceptionCode($exceptionCode);
@@ -921,7 +907,7 @@ class ManagerTest extends TestCase
  * RawBufferedOutput is a specialized BufferedOutput that outputs raw "writeln" calls (ie. it doesn't replace the
  * tags like <info>message</info>.
  */
-class RawBufferedOutput extends \Symfony\Component\Console\Output\BufferedOutput
+class RawBufferedOutput extends BufferedOutput
 {
     public function writeln($messages, $options = self::OUTPUT_RAW): void
     {

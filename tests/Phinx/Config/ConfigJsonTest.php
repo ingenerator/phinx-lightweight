@@ -2,19 +2,20 @@
 
 namespace Test\Phinx\Config;
 
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\Group;
+use RuntimeException;
 use Phinx\Config\Config;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class ConfigJsonTest
  * @package Test\Phinx\Config
- * @group config
  */
+#[CoversMethod(\Phinx\Config\Config::class, 'fromJson')]
+#[Group('config')]
 class ConfigJsonTest extends TestCase
 {
-    /**
-     * @covers \Phinx\Config\Config::fromJson
-     */
     public function testFromJSONMethod()
     {
         $path = __DIR__ . '/_files';
@@ -22,13 +23,10 @@ class ConfigJsonTest extends TestCase
         $this->assertEquals('dev', $config->getDefaultEnvironment());
     }
 
-    /**
-     * @covers \Phinx\Config\Config::fromJson
-     */
     public function testFromJSONInvalidJson()
     {
         $path = __DIR__ . '/_files';
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         Config::fromJson($path . '/invalid.json');
     }
 }

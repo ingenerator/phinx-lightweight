@@ -2,6 +2,10 @@
 
 namespace Test\Phinx\Util;
 
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\Attributes\DataProvider;
+use RuntimeException;
+use Exception;
 use org\bovigo\vfs\vfsStream;
 use Phinx\Db\Adapter\AdapterInterface;
 use Phinx\Db\Adapter\MysqlAdapter;
@@ -14,11 +18,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 class SqlDumpImporterTest extends TestCase
 {
 
-    private AdapterInterface $adapter;
+    /**
+     * @var Stub&AdapterInterface
+     */
+    private Stub $adapter;
 
     private OutputInterface $output;
 
-    public function providerStatements()
+    public static function providerStatements()
     {
         return [
             'single statement, no terminator'                                => [
@@ -96,9 +103,7 @@ class SqlDumpImporterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerStatements
-     */
+    #[DataProvider('providerStatements')]
     public function testItExecutesEachStatementIndividually($content, $expectStatements)
     {
         $path          = $this->givenSqlFileWithContent($content);
@@ -144,9 +149,9 @@ class SqlDumpImporterTest extends TestCase
             /*!40101 SET character_set_client = utf8 */;
             SQL
         );
-        $mockException = new \RuntimeException('SQLSTATE Whatever');
+        $mockException = new RuntimeException('SQLSTATE Whatever');
         $this->adapter = new class($mockException) extends MysqlAdapter {
-            public function __construct(private \Exception $exception) { }
+            public function __construct(private Exception $exception) { }
 
             public function execute(string $sql): false|int
             {
@@ -162,7 +167,7 @@ class SqlDumpImporterTest extends TestCase
         try {
             $this->newSubject()->import($path);
             $this->fail('Expected exception, none got');
-        } catch (\RuntimeException$e) {
+        } catch (RuntimeException$e) {
             $this->assertSame($e, $mockException, 'Expected exception to be rethrown');
         }
 
@@ -183,8 +188,8 @@ class SqlDumpImporterTest extends TestCase
     {
         $path = $this->givenSqlFileWithContent('');
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('is empty');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIsOrContains('is empty');
 
         $this->newSubject()->import($path);
     }
@@ -205,15 +210,15 @@ class SqlDumpImporterTest extends TestCase
         $missing_file_path = $vfs->url().'/some-file.sql';
         $subject           = $this->newSubject();
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('some-file.sql');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIsOrContains('some-file.sql');
         $subject->import($missing_file_path);
     }
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->adapter = $this->getMockBuilder(AdapterInterface::class)->getMock();
+        $this->adapter = $this->createStub(AdapterInterface::class);
         $this->output  = new NullOutput;
     }
 
@@ -236,8 +241,8 @@ class SqlDumpImporterTest extends TestCase
             SQL
         );
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage(
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIsOrContains(
             'Statement 3 was exactly the buffer size (110 bytes) - most likely it was truncated'
         );
 

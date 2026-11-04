@@ -2,9 +2,13 @@
 
 namespace Test\Phinx\Db\Adapter;
 
+use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Phinx\Config\Config;
+use RuntimeException;
 use PHPUnit\Framework\TestCase;
 
-class PdoAdapterTestPDOMock extends \PDO
+class PdoAdapterTestPDOMock extends PDO
 {
     public function __construct()
     {
@@ -77,9 +81,7 @@ class PdoAdapterTest extends TestCase
         $this->assertEquals('schema_table_test', $this->adapter->getSchemaTableName());
     }
 
-    /**
-     * @dataProvider getVersionLogDataProvider
-     */
+    #[DataProvider('getVersionLogDataProvider')]
     public function testGetVersionLog($versionOrder, $expectedOrderBy)
     {
         $adapter = $this->getMockForAbstractClass(
@@ -95,7 +97,7 @@ class PdoAdapterTest extends TestCase
         $schemaTableName = 'log';
         $adapter->expects($this->once())
             ->method('getSchemaTableName')
-            ->will($this->returnValue($schemaTableName));
+            ->willReturn($schemaTableName);
 
         $mockRows = [
             [
@@ -111,7 +113,7 @@ class PdoAdapterTest extends TestCase
         $adapter->expects($this->once())
             ->method('fetchAll')
             ->with("SELECT * FROM $schemaTableName ORDER BY $expectedOrderBy")
-            ->will($this->returnValue($mockRows));
+            ->willReturn($mockRows);
 
         // we expect the mock rows but indexed by version creation time
         $expected = [
@@ -128,14 +130,14 @@ class PdoAdapterTest extends TestCase
         $this->assertEquals($expected, $adapter->getVersionLog());
     }
 
-    public function getVersionLogDataProvider()
+    public static function getVersionLogDataProvider()
     {
         return [
             'With Creation Time Version Order' => [
-                \Phinx\Config\Config::VERSION_ORDER_CREATION_TIME, 'version ASC'
+                Config::VERSION_ORDER_CREATION_TIME, 'version ASC'
             ],
             'With Execution Time Version Order' => [
-                \Phinx\Config\Config::VERSION_ORDER_EXECUTION_TIME, 'start_time ASC, version ASC'
+                Config::VERSION_ORDER_EXECUTION_TIME, 'start_time ASC, version ASC'
             ],
         ];
     }
@@ -147,8 +149,8 @@ class PdoAdapterTest extends TestCase
             [['version_order' => 'invalid']]
         );
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Invalid version_order configuration option');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIsOrContains('Invalid version_order configuration option');
         $adapter->getVersionLog();
     }
 

@@ -2,14 +2,18 @@
 
 namespace Test\Phinx\Config;
 
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\Group;
+use RuntimeException;
+use Exception;
 use Phinx\Config\Config;
 
 /**
  * Class ConfigDefaultEnvironmentTest
  * @package Test\Phinx\Config
- * @group config
- * @covers \Phinx\Config\Config::getDefaultEnvironment
  */
+#[CoversMethod(\Phinx\Config\Config::class, 'getDefaultEnvironment')]
+#[Group('config')]
 class ConfigDefaultEnvironmentTest extends AbstractConfigTest
 {
     public function testGetDefaultEnvironment()
@@ -43,12 +47,12 @@ class ConfigDefaultEnvironmentTest extends AbstractConfigTest
         $dummyEnv = 'conf-test';
         putenv('PHINX_ENVIRONMENT=' . $dummyEnv);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('The environment configuration (read from $PHINX_ENVIRONMENT) for \'conf-test\' is missing');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIsOrContains('The environment configuration (read from $PHINX_ENVIRONMENT) for \'conf-test\' is missing');
         try {
             $config = new Config([]);
             $config->getDefaultEnvironment();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // reset back to normal
             putenv('PHINX_ENVIRONMENT=');
 
@@ -63,8 +67,8 @@ class ConfigDefaultEnvironmentTest extends AbstractConfigTest
         putenv('PHINX_ENVIRONMENT=');
 
         $config = new Config([]);
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Could not find a default environment');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIsOrContains('Could not find a default environment');
         $config->getDefaultEnvironment();
     }
 }

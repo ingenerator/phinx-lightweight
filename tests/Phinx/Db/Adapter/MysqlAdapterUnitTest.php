@@ -2,15 +2,15 @@
 
 namespace Test\Phinx\Db\Adapter;
 
+use PDO;
+use PDOStatement;
 use Phinx\Db\Adapter\MysqlAdapter;
-use Phinx\Db\Table\Column;
-use Phinx\Db\Table\Index;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use function defined;
 
-class PDOMock extends \PDO
+class PDOMock extends PDO
 {
     public function __construct()
     {
@@ -24,12 +24,12 @@ class MysqlAdapterTester extends MysqlAdapter
         $this->connection = $connection;
     }
 
-    public function getConnection(): \PDO
+    public function getConnection(): PDO
     {
         return $this->connection;
     }
 
-    public function getConnectionOrNull(): ?\PDO
+    public function getConnectionOrNull(): ?PDO
     {
         return $this->connection;
     }
@@ -55,14 +55,8 @@ class MysqlAdapterUnitTest extends TestCase
 
         $this->adapter = new MysqlAdapterTester([], new ArrayInput([]), new NullOutput());
 
-        $this->conn   = $this->getMockBuilder(PDOMock::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['query', 'exec', 'quote'])
-            ->getMock();
-        $this->result = $this->getMockBuilder(\PDOStatement::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['fetch'])
-            ->getMock();
+        $this->conn   = $this->createMock(PDOMock::class);
+        $this->result = $this->createMock(PDOStatement::class);
         $this->adapter->setMockConnection($this->conn);
     }
 
@@ -81,7 +75,7 @@ class MysqlAdapterUnitTest extends TestCase
             ->method('query')
             ->with($this->equalTo($expectedSql));
         if ( ! is_null($returnValue)) {
-            $expect->will($this->returnValue($returnValue));
+            $expect->willReturn($returnValue);
         }
     }
 
@@ -89,7 +83,7 @@ class MysqlAdapterUnitTest extends TestCase
     {
         $this->result->expects($this->once())
             ->method('fetch')
-            ->will($this->returnValue($returnValue));
+            ->willReturn($returnValue);
         $this->assertQuerySql($expectedSql, $this->result);
     }
 
@@ -128,7 +122,7 @@ class MysqlAdapterUnitTest extends TestCase
         $this->adapter->setOptions(['name' => 'database_name']);
         $this->result->expects($this->once())
             ->method('fetch')
-            ->will($this->returnValue(['somecontent']));
+            ->willReturn(['somecontent']);
         $expectedSql = 'SELECT TABLE_NAME
             FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_SCHEMA = \'database_name\' AND TABLE_NAME = \'table_name\'';
@@ -141,7 +135,7 @@ class MysqlAdapterUnitTest extends TestCase
         $this->adapter->setOptions(['name' => 'database_name']);
         $this->result->expects($this->once())
             ->method('fetch')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $expectedSql = 'SELECT TABLE_NAME
             FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_SCHEMA = \'database_name\' AND TABLE_NAME = \'table_name\'';

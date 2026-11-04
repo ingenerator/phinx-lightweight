@@ -2,6 +2,10 @@
 
 namespace Test\Phinx\Console\Command;
 
+use PHPUnit\Framework\Attributes\Group;
+use InvalidArgumentException;
+use Exception;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Phinx\Config\Config;
 use Phinx\Config\ConfigInterface;
 use Phinx\Console\Command\Create;
@@ -18,8 +22,8 @@ use function usleep;
 /**
  * Class CreateTest
  * @package Test\Phinx\Console\Command
- * @group create
  */
+#[Group('create')]
 class CreateTest extends TestCase
 {
     /**
@@ -89,8 +93,8 @@ class CreateTest extends TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
         usleep(1.01 * 1_000_000); // need at least a second due to file naming scheme
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The migration class name "MyDuplicateMigration" already exists');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageIsOrContains('The migration class name "MyDuplicateMigration" already exists');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
     }
 
@@ -119,8 +123,8 @@ class CreateTest extends TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
         usleep(1.01 * 1_000_000); // need at least a second due to file naming scheme
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The migration class name "Foo\Bar\MyDuplicateMigration" already exists');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageIsOrContains('The migration class name "Foo\Bar\MyDuplicateMigration" already exists');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
     }
 
@@ -141,8 +145,8 @@ class CreateTest extends TestCase
         $command->setManager($managerStub);
 
         $commandTester = new CommandTester($command);
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Cannot use --template and --class at the same time');
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessageIsOrContains('Cannot use --template and --class at the same time');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyFailingMigration', '--template' => 'MyTemplate', '--class' => 'MyTemplateClass']);
     }
 
@@ -168,12 +172,12 @@ class CreateTest extends TestCase
         $command->setManager($managerStub);
 
         $commandTester = new CommandTester($command);
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot define template:class and template:file at the same time');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageIsOrContains('Cannot define template:class and template:file at the same time');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyFailingMigration']);
     }
 
-    public function provideFailingTemplateGenerator()
+    public static function provideFailingTemplateGenerator()
     {
         return [
             [
@@ -208,8 +212,8 @@ class CreateTest extends TestCase
      * @param array $config
      * @param array $commandLine
      * @param string $exceptionMessage
-     * @dataProvider provideFailingTemplateGenerator
      */
+    #[DataProvider('provideFailingTemplateGenerator')]
     public function testTemplateGeneratorsWithoutCorrectInterfaceThrowsException(array $config, array $commandLine, $exceptionMessage)
     {
         $application = new PhinxApplication('testing');
@@ -237,7 +241,7 @@ class CreateTest extends TestCase
         $commandTester->execute($commandLine);
     }
 
-    public function provideNullTemplateGenerator()
+    public static function provideNullTemplateGenerator()
     {
         return [
             [
@@ -272,8 +276,8 @@ class CreateTest extends TestCase
     /**
      * @param array $config
      * @param array $commandLine
-     * @dataProvider provideNullTemplateGenerator
      */
+    #[DataProvider('provideNullTemplateGenerator')]
     public function testNullTemplateGeneratorsDoNotFail(array $config, array $commandLine)
     {
         $application = new PhinxApplication('testing');
@@ -302,7 +306,7 @@ class CreateTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function provideSimpleTemplateGenerator()
+    public static function provideSimpleTemplateGenerator()
     {
         return [
             [
@@ -337,8 +341,8 @@ class CreateTest extends TestCase
     /**
      * @param array $config
      * @param array $commandLine
-     * @dataProvider provideSimpleTemplateGenerator
      */
+    #[DataProvider('provideSimpleTemplateGenerator')]
     public function testSimpleTemplateGeneratorsIsCorrectlyPopulated(array $config, array $commandLine)
     {
         $application = new PhinxApplication('testing');
@@ -380,7 +384,7 @@ class CreateTest extends TestCase
         //PHPUnit 5+
         $this->expectException($exceptionName);
         if ($exceptionMessage !== '') {
-            $this->expectExceptionMessage($exceptionMessage);
+            $this->expectExceptionMessageIsOrContains($exceptionMessage);
         }
         if ($exceptionCode !== null) {
             $this->expectExceptionCode($exceptionCode);
