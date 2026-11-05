@@ -269,7 +269,6 @@ class CreateTest extends TestCase
      * @param array $commandLine
      */
     #[DataProvider('provideNullTemplateGenerator')]
-    #[DoesNotPerformAssertions]
     public function testNullTemplateGeneratorsDoNotFail(array $config, array $commandLine)
     {
         $application = new PhinxApplication('testing');
@@ -291,7 +290,7 @@ class CreateTest extends TestCase
         $commandTester = new CommandTester($command);
 
         $commandLine = array_merge(['command' => $command->getName()], $commandLine);
-        $commandTester->execute($commandLine);
+        $this->assertSame(0, $commandTester->execute($commandLine));
     }
 
     public static function provideSimpleTemplateGenerator()
