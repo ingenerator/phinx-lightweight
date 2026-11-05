@@ -12,18 +12,15 @@ class NamespaceAwareTraitTest extends TestCase
         $config = new class {
             use NamespaceAwareTrait;
 
-            public array $paths = [];
-
             public function getMigrationPaths()
             {
-                return $this->paths;
+                return [
+                    __DIR__ . '/_files',
+                    'Baz' => __DIR__ . '/_rootDirectories/all/../OnlyPhp',
+                    'Foo\Bar' => __DIR__ . '/_rootDirectories/all',
+                ];
             }
         };
-        $config->paths = [
-            __DIR__ . '/_files',
-            'Baz' => __DIR__ . '/_rootDirectories/all/../OnlyPhp',
-            'Foo\Bar' => __DIR__ . '/_rootDirectories/all',
-        ];
         /** @var NamespaceAwareTrait $config */
         $this->assertNull($config->getMigrationNamespaceByPath(__DIR__ . '/_files'));
         $this->assertNull($config->getMigrationNamespaceByPath(__DIR__ . '/_rootDirectories/../_files'));
