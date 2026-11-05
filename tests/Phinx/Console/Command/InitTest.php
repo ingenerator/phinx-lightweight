@@ -2,6 +2,7 @@
 
 namespace Test\Phinx\Console\Command;
 
+use InvalidArgumentException;
 use Phinx\Console\Command\Init;
 use Phinx\Console\PhinxApplication;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +21,7 @@ class InitTest extends TestCase
     public function testConfigIsWritten()
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Init());
+        $application->addCommand(new Init());
 
         $command = $application->find('init');
 
@@ -47,12 +48,12 @@ class InitTest extends TestCase
     {
         touch(sys_get_temp_dir() . '/phinx.yml');
         $application = new PhinxApplication('testing');
-        $application->add(new Init());
+        $application->addCommand(new Init());
 
         $command = $application->find('init');
 
         $commandTester = new CommandTester($command);
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The file "(.*)" already exists/');
         $commandTester->execute([
             'command' => $command->getName(),

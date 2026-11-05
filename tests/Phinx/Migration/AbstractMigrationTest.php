@@ -2,27 +2,38 @@
 
 namespace Test\Phinx\Migration;
 
+use PDOStatement;
+use PHPUnit\Framework\Attributes\DataProvider;
+use InvalidArgumentException;
+use PDO;
 use Phinx\Db\Adapter\MysqlAdapter;
+use Phinx\Db\Adapter\PdoAdapter;
+use Phinx\Migration\AbstractMigration;
 use PHPUnit\Framework\TestCase;
+
+class ConcreteAbstractMigration extends AbstractMigration
+{
+    public function up(): void
+    {
+    }
+}
 
 class AbstractMigrationTest extends TestCase
 {
     public function testUp()
     {
         // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
+        $migrationStub = new ConcreteAbstractMigration(0);
         $this->assertNull($migrationStub->up());
     }
 
     public function testAdapterMethods()
     {
         // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
+        $migrationStub = new ConcreteAbstractMigration(0);
 
         // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
+        $adapterStub = $this->createStub(PdoAdapter::class);
 
         // test methods
         $this->assertNull($migrationStub->getAdapter());
@@ -36,10 +47,10 @@ class AbstractMigrationTest extends TestCase
     public function testSetOutputMethods()
     {
         // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
+        $migrationStub = new ConcreteAbstractMigration(0);
 
         // stub output
-        $outputStub = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
+        $outputStub = $this->createStub('\Symfony\Component\Console\Output\OutputInterface');
 
         // test methods
         $this->assertNull($migrationStub->getOutput());
@@ -50,10 +61,10 @@ class AbstractMigrationTest extends TestCase
     public function testGetInputMethodWithInjectedInput()
     {
         // stub input
-        $inputStub = $this->getMockBuilder('\Symfony\Component\Console\Input\InputInterface')->getMock();
+        $inputStub = $this->createStub('\Symfony\Component\Console\Input\InputInterface');
 
         // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0, $inputStub, NULL]);
+        $migrationStub = new ConcreteAbstractMigration(0, $inputStub, NULL);
 
         // test methods
         $this->assertNotNull($migrationStub->getInput());
@@ -63,10 +74,10 @@ class AbstractMigrationTest extends TestCase
     public function testGetOutputMethodWithInjectedOutput()
     {
         // stub output
-        $outputStub = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
+        $outputStub = $this->createStub('\Symfony\Component\Console\Output\OutputInterface');
 
         // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0, NULL, $outputStub]);
+        $migrationStub = new ConcreteAbstractMigration(0, NULL, $outputStub);
 
         // test methods
         $this->assertNotNull($migrationStub->getOutput());
@@ -75,13 +86,13 @@ class AbstractMigrationTest extends TestCase
 
     public function testGetName()
     {
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
+        $migrationStub = new ConcreteAbstractMigration(0);
         $this->assertStringContainsString('AbstractMigration', $migrationStub->getName());
     }
 
     public function testVersionMethods()
     {
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [20120103080000]);
+        $migrationStub = new ConcreteAbstractMigration(20120103080000);
         $this->assertEquals(20120103080000, $migrationStub->getVersion());
         $migrationStub->setVersion(20120915093312);
         $this->assertEquals(20120915093312, $migrationStub->getVersion());
@@ -90,15 +101,13 @@ class AbstractMigrationTest extends TestCase
     public function testExecute()
     {
         // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
+        $migrationStub = new ConcreteAbstractMigration(0);
 
         // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
+        $adapterStub = $this->createMock(PdoAdapter::class);
         $adapterStub->expects($this->once())
             ->method('execute')
-            ->will($this->returnValue(2));
+            ->willReturn(2);
 
         $migrationStub->setAdapter($adapterStub);
         $this->assertEquals(2, $migrationStub->execute('SELECT FOO FROM BAR'));
@@ -107,17 +116,15 @@ class AbstractMigrationTest extends TestCase
     public function testQuery()
     {
         // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
+        $migrationStub = new ConcreteAbstractMigration(0);
 
-        $queryStub = new class extends \PDOStatement {};
+        $queryStub = new class extends PDOStatement {};
 
         // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
+        $adapterStub = $this->createMock(PdoAdapter::class);
         $adapterStub->expects($this->once())
             ->method('query')
-            ->will($this->returnValue($queryStub));
+            ->willReturn($queryStub);
 
         $migrationStub->setAdapter($adapterStub);
         $this->assertEquals($queryStub, $migrationStub->query('SELECT FOO FROM BAR'));
@@ -126,15 +133,13 @@ class AbstractMigrationTest extends TestCase
     public function testFetchRow()
     {
         // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
+        $migrationStub = new ConcreteAbstractMigration(0);
 
         // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
+        $adapterStub = $this->createMock(PdoAdapter::class);
         $adapterStub->expects($this->once())
             ->method('fetchRow')
-            ->will($this->returnValue(['0' => 'bar', 'foo' => 'bar']));
+            ->willReturn(['0' => 'bar', 'foo' => 'bar']);
 
         $migrationStub->setAdapter($adapterStub);
         $this->assertEquals(['0' => 'bar', 'foo' => 'bar'], $migrationStub->fetchRow('SELECT FOO FROM BAR'));
@@ -143,21 +148,19 @@ class AbstractMigrationTest extends TestCase
     public function testFetchAll()
     {
         // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
+        $migrationStub = new ConcreteAbstractMigration(0);
 
         // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
+        $adapterStub = $this->createMock(PdoAdapter::class);
         $adapterStub->expects($this->once())
             ->method('fetchAll')
-            ->will($this->returnValue([['0' => 'bar', 'foo' => 'bar']]));
+            ->willReturn([['0' => 'bar', 'foo' => 'bar']]);
 
         $migrationStub->setAdapter($adapterStub);
         $this->assertEquals([['0' => 'bar', 'foo' => 'bar']], $migrationStub->fetchAll('SELECT FOO FROM BAR'));
     }
 
-    public function providerInsert()
+    public static function providerInsert()
     {
         $row1 = ['id' => 1, 'foo' => 'bar', 'bill' => 'baz'];
         $row2 = ['id' => 2, 'foo' => 'boop', 'bill' => 'bonk'];
@@ -177,18 +180,14 @@ class AbstractMigrationTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerInsert
-     */
+    #[DataProvider('providerInsert')]
     public function testInsertCanPerformInserts($table, $data, $expectInsertParams)
     {
         // stub migration
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
+        $migrationStub = new ConcreteAbstractMigration(0);
 
         // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
+        $adapterStub = $this->createMock(PdoAdapter::class);
         $adapterStub->expects($this->once())
             ->method('bulkinsert')
             ->with(...$expectInsertParams);
@@ -199,9 +198,9 @@ class AbstractMigrationTest extends TestCase
 
     public function testInsertThrowsWithVariableSchema()
     {
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('mixed column keys');
+        $migrationStub = new ConcreteAbstractMigration(0);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageIsOrContains('mixed column keys');
 
         $migrationStub->insert(
             'sometable',
@@ -215,15 +214,11 @@ class AbstractMigrationTest extends TestCase
 
     public function testPrepareAndExecute()
     {
-        $migrationStub = $this->getMockForAbstractClass('\Phinx\Migration\AbstractMigration', [0]);
+        $migrationStub = new ConcreteAbstractMigration(0);
 
-        $pdoStub = $this->getMockBuilder(\PDO::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $pdoStub = $this->createMock(PDO::class);
 
-        $statementStub = $this->getMockBuilder(\PDOStatement::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $statementStub = $this->createMock(PDOStatement::class);
 
 
         $pdoStub->expects($this->once())
@@ -237,7 +232,7 @@ class AbstractMigrationTest extends TestCase
 
         $migrationStub->setAdapter(
             new class ($pdoStub) extends MysqlAdapter {
-                public function __construct(\PDO $connection) { $this->connection = $connection; }
+                public function __construct(PDO $connection) { $this->connection = $connection; }
             }
         );
 

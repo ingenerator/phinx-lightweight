@@ -2,14 +2,18 @@
 
 namespace Test\Phinx\Config;
 
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\Group;
 use Phinx\Config\Config;
 
 /**
  * Class ConfigReplaceTokensTest
  * @package Test\Phinx\Config
- * @group config
  */
-class ConfigReplaceTokensTest extends AbstractConfigTest
+#[CoversMethod(Config::class, 'replaceTokens')]
+#[CoversMethod(Config::class, 'recurseArrayForTokens')]
+#[Group('config')]
+class ConfigReplaceTokensTest extends AbstractConfigTestCase
 {
     /**
      * Data to be saved to $_SERVER and checked later
@@ -41,10 +45,6 @@ class ConfigReplaceTokensTest extends AbstractConfigTest
         }
     }
 
-    /**
-     * @covers \Phinx\Config\Config::replaceTokens
-     * @covers \Phinx\Config\Config::recurseArrayForTokens
-     */
     public function testReplaceTokens()
     {
         $config = new Config([
@@ -68,10 +68,6 @@ class ConfigReplaceTokensTest extends AbstractConfigTest
         );
     }
 
-    /**
-     * @covers \Phinx\Config\Config::replaceTokens
-     * @covers \Phinx\Config\Config::recurseArrayForTokens
-     */
     public function testReplaceTokensRecursive()
     {
         $config = new Config([

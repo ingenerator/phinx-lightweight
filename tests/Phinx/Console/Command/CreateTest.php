@@ -2,6 +2,11 @@
 
 namespace Test\Phinx\Console\Command;
 
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\Group;
+use InvalidArgumentException;
+use Exception;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Phinx\Config\Config;
 use Phinx\Config\ConfigInterface;
 use Phinx\Console\Command\Create;
@@ -18,8 +23,8 @@ use function usleep;
 /**
  * Class CreateTest
  * @package Test\Phinx\Console\Command
- * @group create
  */
+#[Group('create')]
 class CreateTest extends TestCase
 {
     /**
@@ -73,15 +78,13 @@ class CreateTest extends TestCase
     public function testExecuteWithDuplicateMigrationNames()
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command */
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         $command->setConfig($this->config);
         $command->setManager($managerStub);
@@ -89,23 +92,21 @@ class CreateTest extends TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
         usleep(1.01 * 1_000_000); // need at least a second due to file naming scheme
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The migration class name "MyDuplicateMigration" already exists');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageIsOrContains('The migration class name "MyDuplicateMigration" already exists');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
     }
 
     public function testExecuteWithDuplicateMigrationNamesWithNamespace()
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command */
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         $config = clone $this->config;
         $config['paths'] = [
@@ -119,45 +120,41 @@ class CreateTest extends TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
         usleep(1.01 * 1_000_000); // need at least a second due to file naming scheme
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The migration class name "Foo\Bar\MyDuplicateMigration" already exists');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageIsOrContains('The migration class name "Foo\Bar\MyDuplicateMigration" already exists');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyDuplicateMigration']);
     }
 
     public function testSupplyingBothClassAndTemplateAtCommandLineThrowsException()
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command $command */
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         $command->setConfig($this->config);
         $command->setManager($managerStub);
 
         $commandTester = new CommandTester($command);
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Cannot use --template and --class at the same time');
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessageIsOrContains('Cannot use --template and --class at the same time');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyFailingMigration', '--template' => 'MyTemplate', '--class' => 'MyTemplateClass']);
     }
 
     public function testSupplyingBothClassAndTemplateInConfigThrowsException()
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command $command */
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         $this->config['templates'] = [
             'file' => 'MyTemplate',
@@ -168,12 +165,12 @@ class CreateTest extends TestCase
         $command->setManager($managerStub);
 
         $commandTester = new CommandTester($command);
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot define template:class and template:file at the same time');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageIsOrContains('Cannot define template:class and template:file at the same time');
         $commandTester->execute(['command' => $command->getName(), 'name' => 'MyFailingMigration']);
     }
 
-    public function provideFailingTemplateGenerator()
+    public static function provideFailingTemplateGenerator()
     {
         return [
             [
@@ -208,20 +205,18 @@ class CreateTest extends TestCase
      * @param array $config
      * @param array $commandLine
      * @param string $exceptionMessage
-     * @dataProvider provideFailingTemplateGenerator
      */
+    #[DataProvider('provideFailingTemplateGenerator')]
     public function testTemplateGeneratorsWithoutCorrectInterfaceThrowsException(array $config, array $commandLine, $exceptionMessage)
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command $command */
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         foreach ($config as $key => $value) {
             $this->config[$key] = $value;
@@ -237,7 +232,7 @@ class CreateTest extends TestCase
         $commandTester->execute($commandLine);
     }
 
-    public function provideNullTemplateGenerator()
+    public static function provideNullTemplateGenerator()
     {
         return [
             [
@@ -272,20 +267,18 @@ class CreateTest extends TestCase
     /**
      * @param array $config
      * @param array $commandLine
-     * @dataProvider provideNullTemplateGenerator
      */
+    #[DataProvider('provideNullTemplateGenerator')]
     public function testNullTemplateGeneratorsDoNotFail(array $config, array $commandLine)
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command $command */
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         foreach ($config as $key => $value) {
             $this->config[$key] = $value;
@@ -297,12 +290,10 @@ class CreateTest extends TestCase
         $commandTester = new CommandTester($command);
 
         $commandLine = array_merge(['command' => $command->getName()], $commandLine);
-        $commandTester->execute($commandLine);
-
-        $this->addToAssertionCount(1);
+        $this->assertSame(0, $commandTester->execute($commandLine));
     }
 
-    public function provideSimpleTemplateGenerator()
+    public static function provideSimpleTemplateGenerator()
     {
         return [
             [
@@ -337,20 +328,18 @@ class CreateTest extends TestCase
     /**
      * @param array $config
      * @param array $commandLine
-     * @dataProvider provideSimpleTemplateGenerator
      */
+    #[DataProvider('provideSimpleTemplateGenerator')]
     public function testSimpleTemplateGeneratorsIsCorrectlyPopulated(array $config, array $commandLine)
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command $command */
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         foreach ($config as $key => $value) {
             $this->config[$key] = $value;
@@ -380,7 +369,7 @@ class CreateTest extends TestCase
         //PHPUnit 5+
         $this->expectException($exceptionName);
         if ($exceptionMessage !== '') {
-            $this->expectExceptionMessage($exceptionMessage);
+            $this->expectExceptionMessageIsOrContains($exceptionMessage);
         }
         if ($exceptionCode !== null) {
             $this->expectExceptionCode($exceptionCode);

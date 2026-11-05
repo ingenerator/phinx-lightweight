@@ -2,15 +2,17 @@
 
 namespace Test\Phinx\Config;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class AbstractConfigTest
  * @package Test\Phinx\Config
- * @group config
- * @coversNothing
  */
-abstract class AbstractConfigTest extends TestCase
+#[Group('config')]
+#[CoversNothing]
+abstract class AbstractConfigTestCase extends TestCase
 {
     /**
      * @var string

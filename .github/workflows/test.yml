@@ -12,7 +12,7 @@ jobs:
     name: Run tests
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         ports:
           - 3306
         env:
@@ -25,10 +25,9 @@ jobs:
       fail-fast: false
       matrix:
         php_version:
-          - '8.2'
-          - '8.3'
           - '8.4'
           - '8.5'
+          - '8.6'
         dependency-versions:
           - 'lowest'
           - 'default'
@@ -41,12 +40,12 @@ jobs:
           tools: composer:v2
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           show-progress: false
 
       - name: Install composer dependencies
-        uses: ramsey/composer-install@v3
+        uses: ramsey/composer-install@v4
         with:
           dependency-versions: ${{ matrix.dependency-versions }}
 

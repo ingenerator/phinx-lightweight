@@ -2,6 +2,9 @@
 
 namespace Test\Phinx\Db\Adapter;
 
+use InvalidArgumentException;
+use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Phinx\Db\Adapter\MysqlAdapter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -13,7 +16,7 @@ class MysqlAdapterTest extends TestCase
     private const EXPECTED_SCHEMA_TABLE_STRUCTURE = [
         [
             'Field'   => 'version',
-            'Type'    => 'bigint(20)',
+            'Type'    => 'bigint',
             'Null'    => 'NO',
             'Key'     => 'PRI',
             'Default' => NULL,
@@ -55,7 +58,7 @@ class MysqlAdapterTest extends TestCase
     ];
 
     /**
-     * @var \Phinx\Db\Adapter\MysqlAdapter
+     * @var MysqlAdapter
      */
     private $adapter;
 
@@ -109,7 +112,7 @@ class MysqlAdapterTest extends TestCase
             $adapter = new MysqlAdapter($options, new ArrayInput([]), new NullOutput());
             $adapter->connect();
             $this->fail('Expected the adapter to throw an exception');
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $this->assertInstanceOf(
                 'InvalidArgumentException',
                 $e,
@@ -152,11 +155,11 @@ class MysqlAdapterTest extends TestCase
     {
         $this->adapter->setSchemaTableName('db_migrations');
         $this->adapter->connect();
-        $schema = $this->adapter->query('DESCRIBE `db_migrations`')->fetchAll(\PDO::FETCH_ASSOC);
+        $schema = $this->adapter->query('DESCRIBE `db_migrations`')->fetchAll(PDO::FETCH_ASSOC);
         $this->assertSame(self::EXPECTED_SCHEMA_TABLE_STRUCTURE, $schema);
     }
 
-    public function providerOldSchemaTablesToUpgrade()
+    public static function providerOldSchemaTablesToUpgrade()
     {
         return [
             'no breakpoint'     => [
@@ -186,9 +189,7 @@ class MysqlAdapterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerOldSchemaTablesToUpgrade
-     */
+    #[DataProvider('providerOldSchemaTablesToUpgrade')]
     public function testConnectUpgradesSchemaTableIfRequired($old_schema_create_statement)
     {
         // Create a table with the old schema
@@ -199,7 +200,7 @@ class MysqlAdapterTest extends TestCase
         $this->adapter->setSchemaTableName('old_migrations_table');
         $this->assertSame(
             self::EXPECTED_SCHEMA_TABLE_STRUCTURE,
-            $this->adapter->query('DESCRIBE `old_migrations_table`')->fetchAll(\PDO::FETCH_ASSOC)
+            $this->adapter->query('DESCRIBE `old_migrations_table`')->fetchAll(PDO::FETCH_ASSOC)
         );
     }
 

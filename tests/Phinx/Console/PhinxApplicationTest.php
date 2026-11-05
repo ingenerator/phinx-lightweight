@@ -2,6 +2,7 @@
 
 namespace Test\Phinx\Console;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Phinx\Console\Command\AbstractCommand;
 use Phinx\Console\PhinxApplication;
 use PHPUnit\Framework\TestCase;
@@ -10,11 +11,11 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 class PhinxApplicationTest extends TestCase
 {
     /**
-     * @dataProvider provider
      *
      * @param AbstractCommand $command
      * @param $result
      */
+    #[DataProvider('provider')]
     public function testRun($command, $result)
     {
         $app = new PhinxApplication('testing');
@@ -29,7 +30,7 @@ class PhinxApplicationTest extends TestCase
         $this->assertMatchesRegularExpression($result, stream_get_contents($stream));
     }
 
-    public function provider()
+    public static function provider()
     {
         return [
             ['help', '/help \[options\] \[--\] \[<command_name>\]/']

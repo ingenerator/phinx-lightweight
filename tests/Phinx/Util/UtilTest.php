@@ -2,6 +2,9 @@
 
 namespace Test\Phinx\Util;
 
+use DateTime;
+use DateTimeZone;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Phinx\Util\Util;
 use PHPUnit\Framework\TestCase;
 
@@ -35,7 +38,7 @@ class UtilTest extends TestCase
 
     public function testGetCurrentTimestamp()
     {
-        $dt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $dt = new DateTime('now', new DateTimeZone('UTC'));
         $expected = $dt->format(Util::DATE_FORMAT);
 
         $current = Util::getCurrentTimestamp();
@@ -118,7 +121,7 @@ class UtilTest extends TestCase
      *
      * @return array
      */
-    public function providerDsnStrings()
+    public static function providerDsnStrings()
     {
         return [
             [
@@ -229,9 +232,9 @@ class UtilTest extends TestCase
     /**
      * Tests parsing dsn strings.
      *
-     * @dataProvider providerDsnStrings
      * @return void
      */
+    #[DataProvider('providerDsnStrings')]
     public function testParseDsn($dsn, $expected)
     {
         $this->assertSame($expected, Util::parseDsn($dsn));

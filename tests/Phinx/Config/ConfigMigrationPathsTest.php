@@ -2,21 +2,24 @@
 
 namespace Test\Phinx\Config;
 
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\Group;
+use UnexpectedValueException;
 use Phinx\Config\Config;
 
 /**
  * Class ConfigMigrationPathsTest
  * @package Test\Phinx\Config
- * @group config
- * @covers \Phinx\Config\Config::getMigrationPaths
  */
-class ConfigMigrationPathsTest extends AbstractConfigTest
+#[CoversMethod(Config::class, 'getMigrationPaths')]
+#[Group('config')]
+class ConfigMigrationPathsTest extends AbstractConfigTestCase
 {
 
     public function testGetMigrationPathsThrowsExceptionForNoPath()
     {
         $config = new Config([]);
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $config->getMigrationPaths();
     }
 

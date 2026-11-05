@@ -17,6 +17,7 @@ dist
 
 # Don't commit composer lock file
 composer.lock
+/patches.lock.json
 
 # this is the code coverage generated when running phpunit.
 tests/log
@@ -32,7 +33,6 @@ docs/_build
 vendor
 
 # this is user specific settings for running phpunit to override the defaults in phpunit.xml.dist
-phpunit.xml
 .phpunit.result.cache
 
 # sqlite test database

@@ -2,13 +2,15 @@
 
 namespace Test\Phinx\Db\Adapter;
 
+use ReflectionMethod;
+use RuntimeException;
 use Phinx\Db\Adapter\AdapterFactory;
 use PHPUnit\Framework\TestCase;
 
 class AdapterFactoryTest extends TestCase
 {
     /**
-     * @var \Phinx\Db\Adapter\AdapterFactory
+     * @var AdapterFactory
      */
     private $factory;
 
@@ -31,8 +33,7 @@ class AdapterFactoryTest extends TestCase
     {
         // AdapterFactory::getClass is protected, work around it to avoid
         // creating unnecessary instances and making the test more complex.
-        $method = new \ReflectionMethod(get_class($this->factory), 'getClass');
-        $method->setAccessible(true);
+        $method = new ReflectionMethod(get_class($this->factory), 'getClass');
 
         $adapter = $method->invoke($this->factory, 'mysql');
         $this->factory->registerAdapter('test', $adapter);
@@ -43,8 +44,8 @@ class AdapterFactoryTest extends TestCase
     public function testRegisterAdapterFailure()
     {
         $adapter = get_class($this);
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Adapter class "Test\Phinx\Db\Adapter\AdapterFactoryTest" must implement Phinx\Db\Adapter\AdapterInterface');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIsOrContains('Adapter class "Test\Phinx\Db\Adapter\AdapterFactoryTest" must implement Phinx\Db\Adapter\AdapterInterface');
         $this->factory->registerAdapter('test', $adapter);
     }
 
@@ -57,8 +58,8 @@ class AdapterFactoryTest extends TestCase
 
     public function testGetAdapterFailure()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Adapter "bad" has not been registered');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIsOrContains('Adapter "bad" has not been registered');
         $this->factory->getAdapter('bad', []);
     }
 

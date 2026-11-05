@@ -2,13 +2,13 @@
 
 namespace Test\Phinx\Console\Command;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Phinx\Config\Config;
 use Phinx\Config\ConfigInterface;
 use Phinx\Console\Command\Migrate;
 use Phinx\Console\PhinxApplication;
 use Phinx\Migration\Manager;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -59,13 +59,13 @@ class MigrateTest extends TestCase
     public function testExecute()
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Migrate());
+        $application->addCommand(new Migrate());
 
         /** @var Migrate $command */
         $command = $application->find('migrate');
 
         // mock the manager class
-        /** @var Manager|PHPUnit_Framework_MockObject_MockObject $managerStub */
+        /** @var Manager|MockObject $managerStub */
         $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
             ->setConstructorArgs([$this->config, $this->input, $this->output])
             ->getMock();
@@ -85,18 +85,13 @@ class MigrateTest extends TestCase
     public function testExecuteWithEnvironmentOption()
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Migrate());
+        $application->addCommand(new Migrate());
 
         /** @var Migrate $command */
         $command = $application->find('migrate');
 
-        // mock the manager class
-        /** @var Manager|PHPUnit_Framework_MockObject_MockObject $managerStub */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
-        $managerStub->expects($this->any())
-                    ->method('migrate');
+        // stub the manager class
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         $command->setConfig($this->config);
         $command->setManager($managerStub);
@@ -111,13 +106,13 @@ class MigrateTest extends TestCase
     public function testDatabaseNameSpecified()
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Migrate());
+        $application->addCommand(new Migrate());
 
         /** @var Migrate $command */
         $command = $application->find('migrate');
 
         // mock the manager class
-        /** @var Manager|PHPUnit_Framework_MockObject_MockObject $managerStub */
+        /** @var Manager|MockObject $managerStub */
         $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
             ->setConstructorArgs([$this->config, $this->input, $this->output])
             ->getMock();

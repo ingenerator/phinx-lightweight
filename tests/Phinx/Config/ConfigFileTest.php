@@ -2,6 +2,8 @@
 
 namespace Test\Phinx\Config;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use InvalidArgumentException;
 use Phinx\Console\Command\AbstractCommand;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -29,12 +31,12 @@ class ConfigFileTest extends TestCase
     /**
      * Test workingContext
      *
-     * @dataProvider workingProvider
      *
      * @param $input
      * @param $dir
      * @param $expectedFile
      */
+    #[DataProvider('workingProvider')]
     public function testWorkingGetConfigFile($input, $dir, $expectedFile)
     {
         $foundPath = $this->runLocateFile($input, $dir);
@@ -46,14 +48,14 @@ class ConfigFileTest extends TestCase
     /**
      * Test workingContext
      *
-     * @dataProvider notWorkingProvider
      *
      * @param $input
      * @param $dir
      */
+    #[DataProvider('notWorkingProvider')]
     public function testNotWorkingGetConfigFile($input, $dir)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->runLocateFile($input, $dir);
     }
 
@@ -83,7 +85,7 @@ class ConfigFileTest extends TestCase
      *
      * @return array
      */
-    public function workingProvider()
+    public static function workingProvider()
     {
         return [
             //explicit yaml
@@ -106,7 +108,7 @@ class ConfigFileTest extends TestCase
      *
      * @return array
      */
-    public function notWorkingProvider()
+    public static function notWorkingProvider()
     {
         return [
             //no valid file available

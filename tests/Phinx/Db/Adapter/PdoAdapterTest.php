@@ -2,9 +2,14 @@
 
 namespace Test\Phinx\Db\Adapter;
 
+use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Phinx\Config\Config;
+use Phinx\Db\Adapter\PdoAdapter;
+use RuntimeException;
 use PHPUnit\Framework\TestCase;
 
-class PdoAdapterTestPDOMock extends \PDO
+class PdoAdapterTestPDOMock extends PDO
 {
     public function __construct()
     {
@@ -34,13 +39,52 @@ class PdoAdapterTestPDOMockWithExecChecks extends PdoAdapterTestPDOMock
     }
 }
 
+class ConcretePdoAdapter extends PdoAdapter
+{
+    protected function ensureSchemaTableExistsAndCorrect(): void
+    {
+    }
+
+    public function getAdapterType()
+    {
+        return 'concrete';
+    }
+
+    public function hasTransactions()
+    {
+        return true;
+    }
+
+    public function beginTransaction()
+    {
+    }
+
+    public function commitTransaction()
+    {
+    }
+
+    public function rollbackTransaction()
+    {
+    }
+
+    public function quoteTableName($tableName)
+    {
+        return '`' . $tableName . '`';
+    }
+
+    public function quoteColumnName($columnName)
+    {
+        return '`' . $columnName . '`';
+    }
+}
+
 class PdoAdapterTest extends TestCase
 {
     private $adapter;
 
     public function setUp(): void
     {
-        $this->adapter = $this->getMockForAbstractClass('\Phinx\Db\Adapter\PdoAdapter', [['foo' => 'bar']]);
+        $this->adapter = new ConcretePdoAdapter(['foo' => 'bar']);
     }
 
     public function tearDown(): void
@@ -77,25 +121,18 @@ class PdoAdapterTest extends TestCase
         $this->assertEquals('schema_table_test', $this->adapter->getSchemaTableName());
     }
 
-    /**
-     * @dataProvider getVersionLogDataProvider
-     */
+    #[DataProvider('getVersionLogDataProvider')]
     public function testGetVersionLog($versionOrder, $expectedOrderBy)
     {
-        $adapter = $this->getMockForAbstractClass(
-            '\Phinx\Db\Adapter\PdoAdapter',
-            [['version_order' => $versionOrder]],
-            '',
-            true,
-            true,
-            true,
-            ['fetchAll', 'getSchemaTableName']
-        );
+        $adapter = $this->getMockBuilder(ConcretePdoAdapter::class)
+            ->setConstructorArgs([['version_order' => $versionOrder]])
+            ->onlyMethods(['fetchAll', 'getSchemaTableName'])
+            ->getMock();
 
         $schemaTableName = 'log';
         $adapter->expects($this->once())
             ->method('getSchemaTableName')
-            ->will($this->returnValue($schemaTableName));
+            ->willReturn($schemaTableName);
 
         $mockRows = [
             [
@@ -111,7 +148,7 @@ class PdoAdapterTest extends TestCase
         $adapter->expects($this->once())
             ->method('fetchAll')
             ->with("SELECT * FROM $schemaTableName ORDER BY $expectedOrderBy")
-            ->will($this->returnValue($mockRows));
+            ->willReturn($mockRows);
 
         // we expect the mock rows but indexed by version creation time
         $expected = [
@@ -128,27 +165,24 @@ class PdoAdapterTest extends TestCase
         $this->assertEquals($expected, $adapter->getVersionLog());
     }
 
-    public function getVersionLogDataProvider()
+    public static function getVersionLogDataProvider()
     {
         return [
             'With Creation Time Version Order' => [
-                \Phinx\Config\Config::VERSION_ORDER_CREATION_TIME, 'version ASC'
+                Config::VERSION_ORDER_CREATION_TIME, 'version ASC'
             ],
             'With Execution Time Version Order' => [
-                \Phinx\Config\Config::VERSION_ORDER_EXECUTION_TIME, 'start_time ASC, version ASC'
+                Config::VERSION_ORDER_EXECUTION_TIME, 'start_time ASC, version ASC'
             ],
         ];
     }
 
     public function testGetVersionLogInvalidVersionOrderKO()
     {
-        $adapter = $this->getMockForAbstractClass(
-            '\Phinx\Db\Adapter\PdoAdapter',
-            [['version_order' => 'invalid']]
-        );
+        $adapter = new ConcretePdoAdapter(['version_order' => 'invalid']);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Invalid version_order configuration option');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageIsOrContains('Invalid version_order configuration option');
         $adapter->getVersionLog();
     }
 

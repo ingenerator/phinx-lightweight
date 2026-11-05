@@ -2,15 +2,15 @@
 
 namespace Test\Phinx\Db\Adapter;
 
+use PDO;
+use PDOStatement;
 use Phinx\Db\Adapter\MysqlAdapter;
-use Phinx\Db\Table\Column;
-use Phinx\Db\Table\Index;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use function defined;
 
-class PDOMock extends \PDO
+class PDOMock extends PDO
 {
     public function __construct()
     {
@@ -24,12 +24,12 @@ class MysqlAdapterTester extends MysqlAdapter
         $this->connection = $connection;
     }
 
-    public function getConnection(): \PDO
+    public function getConnection(): PDO
     {
         return $this->connection;
     }
 
-    public function getConnectionOrNull(): ?\PDO
+    public function getConnectionOrNull(): ?PDO
     {
         return $this->connection;
     }
@@ -54,22 +54,31 @@ class MysqlAdapterUnitTest extends TestCase
         }
 
         $this->adapter = new MysqlAdapterTester([], new ArrayInput([]), new NullOutput());
+    }
 
-        $this->conn   = $this->getMockBuilder(PDOMock::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['query', 'exec', 'quote'])
-            ->getMock();
-        $this->result = $this->getMockBuilder(\PDOStatement::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['fetch'])
-            ->getMock();
-        $this->adapter->setMockConnection($this->conn);
+    private function getConn(): PDOMock
+    {
+        if ($this->conn === null) {
+            $this->conn = $this->createMock(PDOMock::class);
+            $this->adapter->setMockConnection($this->conn);
+        }
+
+        return $this->conn;
+    }
+
+    private function getResult(): PDOStatement
+    {
+        if ($this->result === null) {
+            $this->result = $this->createMock(PDOStatement::class);
+        }
+
+        return $this->result;
     }
 
     // helper methods for easy mocking
     private function assertExecuteSql($expected_sql)
     {
-        $this->conn->expects($this->once())
+        $this->getConn()->expects($this->once())
             ->method('exec')
             ->with($this->equalTo($expected_sql))
             ->willReturn(1);
@@ -77,24 +86,25 @@ class MysqlAdapterUnitTest extends TestCase
 
     private function assertQuerySql($expectedSql, $returnValue = NULL)
     {
-        $expect = $this->conn->expects($this->once())
+        $expect = $this->getConn()->expects($this->once())
             ->method('query')
             ->with($this->equalTo($expectedSql));
         if ( ! is_null($returnValue)) {
-            $expect->will($this->returnValue($returnValue));
+            $expect->willReturn($returnValue);
         }
     }
 
     private function assertFetchRowSql($expectedSql, $returnValue)
     {
-        $this->result->expects($this->once())
+        $this->getResult()->expects($this->once())
             ->method('fetch')
-            ->will($this->returnValue($returnValue));
-        $this->assertQuerySql($expectedSql, $this->result);
+            ->willReturn($returnValue);
+        $this->assertQuerySql($expectedSql, $this->getResult());
     }
 
     public function testDisconnect()
     {
+        $this->adapter->setMockConnection($this->createStub(PDOMock::class));
         $this->assertNotNull($this->adapter->getConnection());
         $this->adapter->disconnect();
         $this->assertNull($this->adapter->getConnectionOrNull());
@@ -126,26 +136,26 @@ class MysqlAdapterUnitTest extends TestCase
     public function testHasTableExists()
     {
         $this->adapter->setOptions(['name' => 'database_name']);
-        $this->result->expects($this->once())
+        $this->getResult()->expects($this->once())
             ->method('fetch')
-            ->will($this->returnValue(['somecontent']));
+            ->willReturn(['somecontent']);
         $expectedSql = 'SELECT TABLE_NAME
             FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_SCHEMA = \'database_name\' AND TABLE_NAME = \'table_name\'';
-        $this->assertQuerySql($expectedSql, $this->result);
+        $this->assertQuerySql($expectedSql, $this->getResult());
         $this->assertTrue($this->adapter->hasTable("table_name"));
     }
 
     public function testHasTableNotExists()
     {
         $this->adapter->setOptions(['name' => 'database_name']);
-        $this->result->expects($this->once())
+        $this->getResult()->expects($this->once())
             ->method('fetch')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $expectedSql = 'SELECT TABLE_NAME
             FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_SCHEMA = \'database_name\' AND TABLE_NAME = \'table_name\'';
-        $this->assertQuerySql($expectedSql, $this->result);
+        $this->assertQuerySql($expectedSql, $this->getResult());
         $this->assertFalse($this->adapter->hasTable("table_name"));
     }
 
