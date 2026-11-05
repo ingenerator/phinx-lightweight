@@ -12,8 +12,8 @@ use PHPUnit\Framework\TestCase;
  * Class ConfigPhpTest
  * @package Test\Phinx\Config
  */
-#[CoversMethod(\Phinx\Config\Config::class, 'fromPhp')]
-#[CoversMethod(\Phinx\Config\Config::class, 'getDefaultEnvironment')]
+#[CoversMethod(Config::class, 'fromPhp')]
+#[CoversMethod(Config::class, 'getDefaultEnvironment')]
 #[Group('config')]
 class ConfigPhpTest extends TestCase
 {

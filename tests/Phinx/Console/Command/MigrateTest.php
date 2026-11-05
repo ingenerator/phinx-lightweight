@@ -90,13 +90,8 @@ class MigrateTest extends TestCase
         /** @var Migrate $command */
         $command = $application->find('migrate');
 
-        // mock the manager class
-        /** @var Manager|MockObject $managerStub */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
-        $managerStub
-                    ->method('migrate');
+        // stub the manager class
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         $command->setConfig($this->config);
         $command->setManager($managerStub);

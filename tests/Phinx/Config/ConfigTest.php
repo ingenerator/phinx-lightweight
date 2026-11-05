@@ -12,22 +12,22 @@ use Phinx\Config\Config;
  * Class ConfigTest
  * @package Test\Phinx\Config
  */
-#[CoversMethod(\Phinx\Config\Config::class, '__construct')]
-#[CoversMethod(\Phinx\Config\Config::class, 'getConfigFilePath')]
-#[CoversMethod(\Phinx\Config\Config::class, 'getEnvironments')]
-#[CoversMethod(\Phinx\Config\Config::class, 'hasEnvironment')]
-#[CoversMethod(\Phinx\Config\Config::class, 'getEnvironment')]
-#[CoversMethod(\Phinx\Config\Config::class, 'offsetGet')]
-#[CoversMethod(\Phinx\Config\Config::class, 'offsetSet')]
-#[CoversMethod(\Phinx\Config\Config::class, 'offsetExists')]
-#[CoversMethod(\Phinx\Config\Config::class, 'offsetUnset')]
-#[CoversMethod(\Phinx\Config\Config::class, 'getMigrationBaseClassName')]
-#[CoversMethod(\Phinx\Config\Config::class, 'getTemplateFile')]
-#[CoversMethod(\Phinx\Config\Config::class, 'getTemplateClass')]
-#[CoversMethod(\Phinx\Config\Config::class, 'getVersionOrder')]
-#[CoversMethod(\Phinx\Config\Config::class, 'isVersionOrderCreationTime')]
+#[CoversMethod(Config::class, '__construct')]
+#[CoversMethod(Config::class, 'getConfigFilePath')]
+#[CoversMethod(Config::class, 'getEnvironments')]
+#[CoversMethod(Config::class, 'hasEnvironment')]
+#[CoversMethod(Config::class, 'getEnvironment')]
+#[CoversMethod(Config::class, 'offsetGet')]
+#[CoversMethod(Config::class, 'offsetSet')]
+#[CoversMethod(Config::class, 'offsetExists')]
+#[CoversMethod(Config::class, 'offsetUnset')]
+#[CoversMethod(Config::class, 'getMigrationBaseClassName')]
+#[CoversMethod(Config::class, 'getTemplateFile')]
+#[CoversMethod(Config::class, 'getTemplateClass')]
+#[CoversMethod(Config::class, 'getVersionOrder')]
+#[CoversMethod(Config::class, 'isVersionOrderCreationTime')]
 #[Group('config')]
-class ConfigTest extends AbstractConfigTest
+class ConfigTest extends AbstractConfigTestCase
 {
     public function testConstructEmptyArguments()
     {
@@ -190,6 +190,7 @@ class ConfigTest extends AbstractConfigTest
         // get config stub
         $configStub = $this->getMockBuilder('\Phinx\Config\Config')
             ->setConstructorArgs([[]])
+            ->onlyMethods(['getVersionOrder'])
             ->getMock();
 
         $configStub->expects($this->once())

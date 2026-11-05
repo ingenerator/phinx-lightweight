@@ -87,7 +87,7 @@ class ManagerTest extends TestCase
         $this->manager = null;
     }
 
-    private function getCorrectedPath($path)
+    private static function getCorrectedPath($path)
     {
         return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
@@ -97,22 +97,30 @@ class ManagerTest extends TestCase
      *
      * @return array
      */
-    public function getConfigArray(): array
+    public static function getConfigArray(): array
     {
+        $dbConfig = defined('MYSQL_DB_CONFIG') ? MYSQL_DB_CONFIG : [
+            'host' => '127.0.0.1',
+            'name' => 'phinx',
+            'user' => 'root',
+            'pass' => '',
+            'port' => 3306,
+        ];
+
         return [
             'paths' => [
-                'migrations' => $this->getCorrectedPath(__DIR__ . '/_files/migrations'),
+                'migrations' => self::getCorrectedPath(__DIR__ . '/_files/migrations'),
             ],
             'environments' => [
                 'default_migration_table' => 'phinxlog',
                 'default_database' => 'production',
                 'production' => [
                     'adapter' => 'mysql',
-                    'host' => MYSQL_DB_CONFIG['host'],
-                    'name' => MYSQL_DB_CONFIG['name'],
-                    'user' => MYSQL_DB_CONFIG['user'],
-                    'pass' => MYSQL_DB_CONFIG['pass'],
-                    'port' => MYSQL_DB_CONFIG['port']
+                    'host' => $dbConfig['host'],
+                    'name' => $dbConfig['name'],
+                    'user' => $dbConfig['user'],
+                    'pass' => $dbConfig['pass'],
+                    'port' => $dbConfig['port'],
                 ]
             ]
         ];
@@ -281,9 +289,7 @@ class ManagerTest extends TestCase
     public function testPrintStatusMethodWithNoMigrations()
     {
         // stub environment
-        $envStub = $this->getMockBuilder('\Phinx\Migration\Manager\Environment')
-            ->setConstructorArgs(['mockenv', []])
-            ->getMock();
+        $envStub = $this->createStub('\Phinx\Migration\Manager\Environment');
 
         // override the migrations directory to an empty one
         $configArray = $this->getConfigArray();
@@ -650,10 +656,10 @@ class ManagerTest extends TestCase
         $this->assertStringContainsString($expectedStatusHeader, $outputStr);
     }
 
-    public function statusVersionOrderProvider()
+    public static function statusVersionOrderProvider()
     {
         // create the necessary configuration objects
-        $configArray = $this->getConfigArray();
+        $configArray = self::getConfigArray();
 
         $configWithNoVersionOrder = new Config($configArray);
 
@@ -682,9 +688,7 @@ class ManagerTest extends TestCase
     public function testPrintStatusInvalidVersionOrderKO()
     {
         // stub environment
-        $envStub = $this->getMockBuilder('\Phinx\Migration\Manager\Environment')
-            ->setConstructorArgs(['mockenv', []])
-            ->getMock();
+        $envStub = $this->createStub('\Phinx\Migration\Manager\Environment');
 
         $configArray = $this->getConfigArray();
         $configArray['version_order'] = 'invalid';

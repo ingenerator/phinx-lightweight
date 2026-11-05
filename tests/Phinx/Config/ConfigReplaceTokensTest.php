@@ -10,10 +10,10 @@ use Phinx\Config\Config;
  * Class ConfigReplaceTokensTest
  * @package Test\Phinx\Config
  */
-#[CoversMethod(\Phinx\Config\Config::class, 'replaceTokens')]
-#[CoversMethod(\Phinx\Config\Config::class, 'recurseArrayForTokens')]
+#[CoversMethod(Config::class, 'replaceTokens')]
+#[CoversMethod(Config::class, 'recurseArrayForTokens')]
 #[Group('config')]
-class ConfigReplaceTokensTest extends AbstractConfigTest
+class ConfigReplaceTokensTest extends AbstractConfigTestCase
 {
     /**
      * Data to be saved to $_SERVER and checked later

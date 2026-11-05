@@ -11,9 +11,9 @@ use Phinx\Config\Config;
  * Class ConfigMigrationPathsTest
  * @package Test\Phinx\Config
  */
-#[CoversMethod(\Phinx\Config\Config::class, 'getMigrationPaths')]
+#[CoversMethod(Config::class, 'getMigrationPaths')]
 #[Group('config')]
-class ConfigMigrationPathsTest extends AbstractConfigTest
+class ConfigMigrationPathsTest extends AbstractConfigTestCase
 {
 
     public function testGetMigrationPathsThrowsExceptionForNoPath()

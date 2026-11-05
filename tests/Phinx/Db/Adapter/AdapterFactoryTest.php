@@ -34,7 +34,6 @@ class AdapterFactoryTest extends TestCase
         // AdapterFactory::getClass is protected, work around it to avoid
         // creating unnecessary instances and making the test more complex.
         $method = new ReflectionMethod(get_class($this->factory), 'getClass');
-        $method->setAccessible(true);
 
         $adapter = $method->invoke($this->factory, 'mysql');
         $this->factory->registerAdapter('test', $adapter);

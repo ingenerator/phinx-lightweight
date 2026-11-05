@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  * Class ConfigJsonTest
  * @package Test\Phinx\Config
  */
-#[CoversMethod(\Phinx\Config\Config::class, 'fromJson')]
+#[CoversMethod(Config::class, 'fromJson')]
 #[Group('config')]
 class ConfigJsonTest extends TestCase
 {

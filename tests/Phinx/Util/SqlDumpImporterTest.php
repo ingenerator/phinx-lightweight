@@ -2,7 +2,6 @@
 
 namespace Test\Phinx\Util;
 
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Exception;
@@ -18,10 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class SqlDumpImporterTest extends TestCase
 {
 
-    /**
-     * @var Stub&AdapterInterface
-     */
-    private Stub $adapter;
+    private AdapterInterface $adapter;
 
     private OutputInterface $output;
 

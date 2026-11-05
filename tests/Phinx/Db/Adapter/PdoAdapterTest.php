@@ -5,6 +5,7 @@ namespace Test\Phinx\Db\Adapter;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Phinx\Config\Config;
+use Phinx\Db\Adapter\PdoAdapter;
 use RuntimeException;
 use PHPUnit\Framework\TestCase;
 
@@ -38,13 +39,52 @@ class PdoAdapterTestPDOMockWithExecChecks extends PdoAdapterTestPDOMock
     }
 }
 
+class ConcretePdoAdapter extends PdoAdapter
+{
+    protected function ensureSchemaTableExistsAndCorrect(): void
+    {
+    }
+
+    public function getAdapterType()
+    {
+        return 'concrete';
+    }
+
+    public function hasTransactions()
+    {
+        return true;
+    }
+
+    public function beginTransaction()
+    {
+    }
+
+    public function commitTransaction()
+    {
+    }
+
+    public function rollbackTransaction()
+    {
+    }
+
+    public function quoteTableName($tableName)
+    {
+        return '`' . $tableName . '`';
+    }
+
+    public function quoteColumnName($columnName)
+    {
+        return '`' . $columnName . '`';
+    }
+}
+
 class PdoAdapterTest extends TestCase
 {
     private $adapter;
 
     public function setUp(): void
     {
-        $this->adapter = $this->getMockForAbstractClass('\Phinx\Db\Adapter\PdoAdapter', [['foo' => 'bar']]);
+        $this->adapter = new ConcretePdoAdapter(['foo' => 'bar']);
     }
 
     public function tearDown(): void
@@ -84,15 +124,10 @@ class PdoAdapterTest extends TestCase
     #[DataProvider('getVersionLogDataProvider')]
     public function testGetVersionLog($versionOrder, $expectedOrderBy)
     {
-        $adapter = $this->getMockForAbstractClass(
-            '\Phinx\Db\Adapter\PdoAdapter',
-            [['version_order' => $versionOrder]],
-            '',
-            true,
-            true,
-            true,
-            ['fetchAll', 'getSchemaTableName']
-        );
+        $adapter = $this->getMockBuilder(ConcretePdoAdapter::class)
+            ->setConstructorArgs([['version_order' => $versionOrder]])
+            ->onlyMethods(['fetchAll', 'getSchemaTableName'])
+            ->getMock();
 
         $schemaTableName = 'log';
         $adapter->expects($this->once())
@@ -144,10 +179,7 @@ class PdoAdapterTest extends TestCase
 
     public function testGetVersionLogInvalidVersionOrderKO()
     {
-        $adapter = $this->getMockForAbstractClass(
-            '\Phinx\Db\Adapter\PdoAdapter',
-            [['version_order' => 'invalid']]
-        );
+        $adapter = new ConcretePdoAdapter(['version_order' => 'invalid']);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageIsOrContains('Invalid version_order configuration option');

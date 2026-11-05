@@ -12,9 +12,9 @@ use Phinx\Config\Config;
  * Class ConfigDefaultEnvironmentTest
  * @package Test\Phinx\Config
  */
-#[CoversMethod(\Phinx\Config\Config::class, 'getDefaultEnvironment')]
+#[CoversMethod(Config::class, 'getDefaultEnvironment')]
 #[Group('config')]
-class ConfigDefaultEnvironmentTest extends AbstractConfigTest
+class ConfigDefaultEnvironmentTest extends AbstractConfigTestCase
 {
     public function testGetDefaultEnvironment()
     {

@@ -8,8 +8,22 @@ use stdClass;
 use PHPUnit\Framework\Attributes\TestWith;
 use InvalidArgumentException;
 use Phinx\Db\Adapter\AdapterFactory;
+use Phinx\Db\Adapter\PdoAdapter;
+use Phinx\Migration\AbstractMigration;
 use Phinx\Migration\Manager\Environment;
 use PHPUnit\Framework\TestCase;
+
+class EnvironmentTestDummyAdapter extends PdoAdapter
+{
+    public function getAdapterType() { return 'pdomock'; }
+    public function hasTransactions() { return true; }
+    public function beginTransaction() {}
+    public function commitTransaction() {}
+    public function rollbackTransaction() {}
+    public function quoteTableName($tableName) { return $tableName; }
+    public function quoteColumnName($columnName) { return $columnName; }
+    protected function ensureSchemaTableExistsAndCorrect(): void {}
+}
 
 class PDOMock extends PDO
 {
@@ -79,8 +93,7 @@ class EnvironmentTest extends TestCase
 
     public function testGetAdapterWithExistingPdoInstance()
     {
-        $adapter = $this->getMockForAbstractClass('\Phinx\Db\Adapter\PdoAdapter', [['foo' => 'bar']]);
-        AdapterFactory::instance()->registerAdapter('pdomock', $adapter);
+        AdapterFactory::instance()->registerAdapter('pdomock', EnvironmentTestDummyAdapter::class);
         $this->environment->setOptions(['connection' => new PDOMock()]);
         $options = $this->environment->getAdapter()->getOptions();
         $this->assertEquals('pdomock', $options['adapter']);
@@ -89,8 +102,7 @@ class EnvironmentTest extends TestCase
     public function testSetPdoAttributeToErrmodeException()
     {
         $pdoMock = new PDOMock();
-        $adapter = $this->getMockForAbstractClass('\Phinx\Db\Adapter\PdoAdapter', [['foo' => 'bar']]);
-        AdapterFactory::instance()->registerAdapter('pdomock', $adapter);
+        AdapterFactory::instance()->registerAdapter('pdomock', EnvironmentTestDummyAdapter::class);
         $this->environment->setOptions(['connection' => $pdoMock]);
         $options = $this->environment->getAdapter()->getOptions();
         $this->assertEquals(PDO::ERRMODE_EXCEPTION, $options['connection']->getAttribute(PDO::ATTR_ERRMODE));
@@ -124,9 +136,7 @@ class EnvironmentTest extends TestCase
 
     public function testCurrentVersion()
     {
-        $stub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
+        $stub = $this->createStub(PdoAdapter::class);
         $stub
              ->method('getVersions')
              ->willReturn(['20110301080000']);
@@ -139,9 +149,7 @@ class EnvironmentTest extends TestCase
     public function testExecutingAMigrationUp()
     {
         // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
+        $adapterStub = $this->createMock(PdoAdapter::class);
         $adapterStub->expects($this->once())
                     ->method('migrated')
                     ->willReturnArgument(0);
@@ -149,9 +157,7 @@ class EnvironmentTest extends TestCase
         $this->environment->setAdapter($adapterStub);
 
         // up
-        $upMigration = $this->getMockBuilder('\Phinx\Migration\AbstractMigration')
-            ->setConstructorArgs(['20110301080000'])
-            ->getMock();
+        $upMigration = $this->createMock(AbstractMigration::class);
         $upMigration->expects($this->once())
                     ->method('up');
 
@@ -161,9 +167,7 @@ class EnvironmentTest extends TestCase
     public function testExecutingAMigrationWithTransactions()
     {
         // stub adapter
-        $adapterStub = $this->getMockBuilder('\Phinx\Db\Adapter\PdoAdapter')
-            ->setConstructorArgs([[]])
-            ->getMock();
+        $adapterStub = $this->createMock(PdoAdapter::class);
         $adapterStub->expects($this->once())
                     ->method('beginTransaction');
 
@@ -177,9 +181,7 @@ class EnvironmentTest extends TestCase
         $this->environment->setAdapter($adapterStub);
 
         // migrate
-        $migration = $this->getMockBuilder('\Phinx\Migration\AbstractMigration')
-            ->setConstructorArgs(['20110301080000'])
-            ->getMock();
+        $migration = $this->createMock(AbstractMigration::class);
         $migration->expects($this->once())
                   ->method('up');
 

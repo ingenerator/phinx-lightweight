@@ -2,6 +2,7 @@
 
 namespace Test\Phinx\Console\Command;
 
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
 use InvalidArgumentException;
 use Exception;
@@ -83,9 +84,7 @@ class CreateTest extends TestCase
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         $command->setConfig($this->config);
         $command->setManager($managerStub);
@@ -107,9 +106,7 @@ class CreateTest extends TestCase
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         $config = clone $this->config;
         $config['paths'] = [
@@ -137,9 +134,7 @@ class CreateTest extends TestCase
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         $command->setConfig($this->config);
         $command->setManager($managerStub);
@@ -159,9 +154,7 @@ class CreateTest extends TestCase
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         $this->config['templates'] = [
             'file' => 'MyTemplate',
@@ -223,9 +216,7 @@ class CreateTest extends TestCase
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         foreach ($config as $key => $value) {
             $this->config[$key] = $value;
@@ -278,6 +269,7 @@ class CreateTest extends TestCase
      * @param array $commandLine
      */
     #[DataProvider('provideNullTemplateGenerator')]
+    #[DoesNotPerformAssertions]
     public function testNullTemplateGeneratorsDoNotFail(array $config, array $commandLine)
     {
         $application = new PhinxApplication('testing');
@@ -287,9 +279,7 @@ class CreateTest extends TestCase
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         foreach ($config as $key => $value) {
             $this->config[$key] = $value;
@@ -302,8 +292,6 @@ class CreateTest extends TestCase
 
         $commandLine = array_merge(['command' => $command->getName()], $commandLine);
         $commandTester->execute($commandLine);
-
-        $this->addToAssertionCount(1);
     }
 
     public static function provideSimpleTemplateGenerator()
@@ -352,9 +340,7 @@ class CreateTest extends TestCase
         $command = $application->find('create');
 
         /** @var Manager $managerStub mock the manager class */
-        $managerStub = $this->getMockBuilder('\Phinx\Migration\Manager')
-            ->setConstructorArgs([$this->config, $this->input, $this->output])
-            ->getMock();
+        $managerStub = $this->createStub('\Phinx\Migration\Manager');
 
         foreach ($config as $key => $value) {
             $this->config[$key] = $value;

@@ -16,7 +16,7 @@ class MysqlAdapterTest extends TestCase
     private const EXPECTED_SCHEMA_TABLE_STRUCTURE = [
         [
             'Field'   => 'version',
-            'Type'    => 'bigint(20)',
+            'Type'    => 'bigint',
             'Null'    => 'NO',
             'Key'     => 'PRI',
             'Default' => NULL,

@@ -12,8 +12,8 @@ use PHPUnit\Framework\TestCase;
  * Class ConfigYamlTest
  * @package Test\Phinx\Config
  */
-#[CoversMethod(\Phinx\Config\Config::class, 'fromYaml')]
-#[CoversMethod(\Phinx\Config\Config::class, 'getDefaultEnvironment')]
+#[CoversMethod(Config::class, 'fromYaml')]
+#[CoversMethod(Config::class, 'getDefaultEnvironment')]
 #[Group('config')]
 class ConfigYamlTest extends TestCase
 {

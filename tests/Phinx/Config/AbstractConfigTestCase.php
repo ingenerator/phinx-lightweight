@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  */
 #[Group('config')]
 #[CoversNothing]
-abstract class AbstractConfigTest extends TestCase
+abstract class AbstractConfigTestCase extends TestCase
 {
     /**
      * @var string
