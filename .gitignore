@@ -17,6 +17,7 @@ dist
 
 # Don't commit composer lock file
 composer.lock
+/patches.lock.json
 
 # this is the code coverage generated when running phpunit.
 tests/log
