@@ -2,6 +2,8 @@
 
 ** UNRELEASED **
 
+** 1.5.0 ** (2026-11-05)
+
 * Support PHP 8.6
 * Update to PHPUnit 13
 * Drop support for PHP 8.2 and PHP 8.3
