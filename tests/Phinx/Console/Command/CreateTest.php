@@ -78,7 +78,7 @@ class CreateTest extends TestCase
     public function testExecuteWithDuplicateMigrationNames()
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command */
         $command = $application->find('create');
@@ -100,7 +100,7 @@ class CreateTest extends TestCase
     public function testExecuteWithDuplicateMigrationNamesWithNamespace()
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command */
         $command = $application->find('create');
@@ -128,7 +128,7 @@ class CreateTest extends TestCase
     public function testSupplyingBothClassAndTemplateAtCommandLineThrowsException()
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command $command */
         $command = $application->find('create');
@@ -148,7 +148,7 @@ class CreateTest extends TestCase
     public function testSupplyingBothClassAndTemplateInConfigThrowsException()
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command $command */
         $command = $application->find('create');
@@ -210,7 +210,7 @@ class CreateTest extends TestCase
     public function testTemplateGeneratorsWithoutCorrectInterfaceThrowsException(array $config, array $commandLine, $exceptionMessage)
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command $command */
         $command = $application->find('create');
@@ -272,7 +272,7 @@ class CreateTest extends TestCase
     public function testNullTemplateGeneratorsDoNotFail(array $config, array $commandLine)
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command $command */
         $command = $application->find('create');
@@ -333,7 +333,7 @@ class CreateTest extends TestCase
     public function testSimpleTemplateGeneratorsIsCorrectlyPopulated(array $config, array $commandLine)
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Create());
+        $application->addCommand(new Create());
 
         /** @var Create $command $command */
         $command = $application->find('create');

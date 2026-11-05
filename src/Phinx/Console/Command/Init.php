@@ -38,7 +38,7 @@ class Init extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('init')
             ->setDescription('Initialize the application for Phinx')

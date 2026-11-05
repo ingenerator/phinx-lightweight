@@ -21,7 +21,7 @@ class InitTest extends TestCase
     public function testConfigIsWritten()
     {
         $application = new PhinxApplication('testing');
-        $application->add(new Init());
+        $application->addCommand(new Init());
 
         $command = $application->find('init');
 
@@ -48,7 +48,7 @@ class InitTest extends TestCase
     {
         touch(sys_get_temp_dir() . '/phinx.yml');
         $application = new PhinxApplication('testing');
-        $application->add(new Init());
+        $application->addCommand(new Init());
 
         $command = $application->find('init');
 
